@@ -4,6 +4,7 @@ import { connectDB } from "./infrastruture/database/dbConfig";
 import cors from "cors";
 import morgan from "morgan";
 
+
 const startServer = async (): Promise<void> => {
   try {
     await connectDB();
