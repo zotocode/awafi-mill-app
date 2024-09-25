@@ -1,6 +1,7 @@
 
 import { IUserRepo } from "../../interface/userInterface/IuserRepo";
 import { IuserDocument,userModel } from "../model/userModel";
+import { InewUserData } from "../../types/userTypes/userInteractorTypes";
 
 
 export class UserRepo implements IUserRepo {
@@ -15,7 +16,7 @@ export class UserRepo implements IUserRepo {
         }
       }
   
-      async registerUser(userData: any): Promise<string> {
+      async registerUser(userData: InewUserData): Promise<string> {
         console.log("user register  repo..", userData);
     
         const newUser = new userModel({
