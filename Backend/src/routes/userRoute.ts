@@ -15,7 +15,7 @@ const userRoute = express.Router();
 const userRepo = new UserRepo()
 
 //craete instance for interactor
-const userInteractor = new UserInteractor(userRepo) ;//inject the dependancies for the interactor on the class
+const userInteracto = new UserInteractor(userRepo) ;//inject the dependancies for the interactor on the class
 
 
 //create instance for controller
