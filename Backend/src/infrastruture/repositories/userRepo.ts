@@ -14,5 +14,17 @@ export class UserRepo implements IUserRepo {
           throw error;
         }
       }
-
+  
+      async registerUser(userData: any): Promise<string> {
+        console.log("user register  repo..", userData);
+    
+        const newUser = new userModel({
+          email: userData.email,
+          password: userData.password,
+          userName: userData.name,
+        });
+        await newUser.save();
+        return "registration completed";
+      }
+      
 }
