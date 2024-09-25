@@ -16,11 +16,11 @@ const userRepo = new UserRepo()
 
 //craete instance for interactor
 
-const kuttanIntractor = new UserInteractor(userRepo) ;//inject the dependancies for the interactor on the class
+const userInteractor  = new UserInteractor(userRepo) ;//inject the dependancies for the interactor on the class
 
 
 //create instance for controller
-const userController = new UserController(kuttanIntractor)
+const userController = new UserController(userInteractor)
 
 
 //middlewares
