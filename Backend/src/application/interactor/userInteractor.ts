@@ -6,6 +6,7 @@ export class UserInteractor implements IUserInteractor{
 
   //make all things as private
   private userRepository: IUserRepo;
+  
 
   constructor(
     userRepository: IUserRepo,
