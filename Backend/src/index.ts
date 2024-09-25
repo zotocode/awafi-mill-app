@@ -8,7 +8,7 @@ import morgan from "morgan";
 
   const startServer = async (): Promise<void> => {
     try {
-         console.log("i am here")
+      
         await connectDB();
         const app = express();
         app.use(morgan("dev"));
