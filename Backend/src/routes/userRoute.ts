@@ -1,9 +1,7 @@
 import express from "express";
-
-
 import { UserController } from "../presentation/controllers/userController";
 import { UserInteractor } from "../application/interactor/userInteractor";
-import { UserRepo } from "../infrastruture/repositories/userRepo";
+import { UserRepo } from "../infrastrucutre/repositories/userRepo";
 import { HashPassword } from "../application/services/bcrypt";
 
 
