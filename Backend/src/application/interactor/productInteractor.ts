@@ -1,52 +1,55 @@
 import { ProductDTO } from "../../domain/dtos/ProductDTO";
 import { ProductRepository } from "../../infrastrucutre/repositories/productRepository";
+import IProductInteractor from "../../interface/productInterface/IproductInteractor";
+import { IProduct, product } from '../../domain/entities/productSchema'; 
+import { Product } from "../../interface/productInterface/IproductRepo"; 
 
+export class ProductInteractor implements IProductInteractor {
+  private productRepo: ProductRepository;
 
-export class ProductInteractor {
-    private productRepo: ProductRepository;
-  
-    constructor(productRepo: ProductRepository) {
-      this.productRepo = productRepo;
-    }
-  
-    // Use case for adding a new product
-    async addProduct(productDTO: ProductDTO): Promise<ProductDTO> {
-      // Convert DTO to domain entity
-      const product = ProductDTO.toEntity(productDTO);
-  
-      // Apply some business logic (e.g., validate price)
-      if (product.price <= 0) {
-        throw new Error("Price must be greater than zero");
-      }
-  
-      // Save the product using the repository
-      return await this.productRepo.create(product);
-    }
-  
-    // // Get all products
-    // async getAllProducts(): Promise<ProductDTO[]> {
-    //   const products = await this.productRepo.findAll();
-      
-    //   // Map products to DTOs
-    //   return products.map(ProductDTO.fromEntity);
-    // }
-  
-    // // Get a single product by ID
-    // async getProductById(id: string): Promise<ProductDTO | null> {
-    //   const product = await this.productRepo.findById(id);
-    //   if (!product) return null;
-  
-    //   return ProductDTO.fromEntity(product);
-    // }
-  
-    // // Update a product by ID
-    // async updateProduct(id: string, productDTO: ProductDTO): Promise<void> {
-    //   const product = ProductDTO.toEntity(productDTO);
-    //   await this.productRepo.update(id, product);
-    // }
-  
-    // // Delete a product by ID
-    // async deleteProduct(id: string): Promise<void> {
-    //   await this.productRepo.delete(id);
-    // }
+  constructor(productRepo: ProductRepository) {
+    this.productRepo = productRepo;
   }
+
+  async addProduct(productData: product): Promise<ProductDTO> {
+    const product = ProductDTO.toEntity(productData);
+    if (product.price <= 0) {
+      throw new Error("Price must be greater than zero");
+    }
+    const createdProduct = await this.productRepo.create(product);
+    return ProductDTO.fromEntity(this.mapToProduct(createdProduct));
+  }
+
+  async getAllProducts(): Promise<ProductDTO[]> {
+    const products = await this.productRepo.findAll();
+    return products.map(p => ProductDTO.fromEntity(this.mapToProduct(p)));
+  }
+
+  async getProductById(id: string): Promise<ProductDTO | null> {
+    const product = await this.productRepo.findById(id);
+    return product ? ProductDTO.fromEntity(this.mapToProduct(product)) : null;
+  }
+
+  async updateProduct(id: string, data: Partial<product>): Promise<ProductDTO | null> {
+    const updatedProduct = await this.productRepo.update(id, data);
+    return updatedProduct ? ProductDTO.fromEntity(this.mapToProduct(updatedProduct)) : null;
+  }
+
+  async deleteProduct(id: string): Promise<boolean> {
+    const deletedProduct = await this.productRepo.delete(id);
+    return !!deletedProduct; // Returns true if deleted, false if not found
+  }
+  
+
+  private mapToProduct(iProduct: IProduct): Product {
+    return new Product(
+      iProduct._id,
+      iProduct.title,
+      iProduct.description,
+      iProduct.price,
+      iProduct.inventory,
+      iProduct.createdAt,
+      iProduct.updatedAt
+    );
+  }
+}

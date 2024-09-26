@@ -1,6 +1,6 @@
 
 import bcrypt from "bcryptjs";
-import { IBcrypt } from "../../interface/serviceInterface/bcryptInterface";
+import { IBcrypt } from "../../interface/serviceInterface/IbcryptInterface";
 export class HashPassword implements IBcrypt  {
   constructor() {}
   async encryptPassword(password: string): Promise<string> {

@@ -1,4 +1,4 @@
-import { User } from "../../domain/userSchema"
+import { User } from "../../domain/entities/userSchema"
 import { IuserDocument } from "../../infrastrucutre/model/userModel"
 import { InewUserData } from "../../types/userTypes/userInteractorTypes"
 

@@ -1,6 +1,6 @@
 // src/domain/dtos/ProductDTO.ts
 import mongoose from 'mongoose';
-import { Product } from '../entities/Product';
+import { Product } from '../../interface/productInterface/IproductRepo'; 
 
 
 
