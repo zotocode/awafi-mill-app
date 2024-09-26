@@ -1,5 +1,5 @@
 import { JwtPayload } from "jsonwebtoken";
-import { Ijwt } from "../../interface/serviceInterface/jwtInterface";
+import { Ijwt } from "../../interface/serviceInterface/IjwtInterface";
 import jwt from "jsonwebtoken";
 
 export type jwtOutput = {
