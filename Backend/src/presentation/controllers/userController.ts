@@ -1,6 +1,7 @@
 //user Controller
 import { Request, Response, NextFunction } from "express";
 import { IUserInteractor } from "../../interface/userInterface/IuserInteractor";
+
 // userController.ts
 
 export class UserController {
@@ -10,44 +11,52 @@ export class UserController {
      this.userInteractor = userInteractor;
    }
  
+     //=-========================================controller login===============
    async userLogin(req: Request, res: Response, next: NextFunction) {
-     const { email, password } = req.body;
      try {
-       const result = await this.userInteractor.login(email, password);
+       const { email, password } = req.body;
+       const result = await this.userInteractor.login(email,password);
        if (result.success) {
-         return res.status(200).json({ message: result.message });
+         return res.status(200).json({ message: result.message,data:result.data });
        } else {
          return res.status(401).json({ message: result.message });
        }
      } catch (error) {
-       next(error); // Passing error to global error handler (500)
+       next(error); 
      }
    }
- 
+      //=-========================================register====================
    async userRegister(req: Request, res: Response, next: NextFunction) {
      try {
-       const result = await this.userInteractor.registerUser(req.body);
+      const { email, password } = req.body;
+       const result = await this.userInteractor.registerUser(email,password);
        if (result.success) {
          return res.status(200).json({ message: result.message,otp:result.otp });
        } else {
          return res.status(401).json({ message: result.message });
        }
      } catch (error) {
-       next(error); // Passing error to global error handler (500)
+       next(error); 
      }
    }
+ //=-========================================verify otp====================
+   async otpVerify(req: Request, res: Response, next: NextFunction) {
+      try {
+       
 
-   async otpVerify(req: Request, res: Response, next: NextFunction){
-      try{
-         console.log('====================================');
-         console.log("reached controller");
-         console.log('====================================');
-         const result = await this.userInteractor.verifyOtp(req.body);
-
-      }catch(err){
-         console.log(err);
-         
+        const result = await this.userInteractor.verifyOtp(req.body.otp);
+    
+        // Handle the response based on the result of OTP verification
+        if (result.success) {
+          return res.status(200).json({ message: result.message });
+        } else {
+          return res.status(400).json({ message: result.message });
+        }
+      } catch (err) {
+        next(err)
       }
-   }
+    }
+
+
  }
  
