@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 import { User } from "../../domain/userSchema"
-=======
-import { User } from "../../domin/userSchema"
-import { IuserDocument } from "../../infrastruture/model/userModel"
->>>>>>> upstream/main
+import { IuserDocument } from "../../infrastrucutre/model/userModel"
 
 export interface IUserRepo{
  findUser(email:string):Promise<any>
