@@ -1,7 +1,7 @@
 import express from "express";
 import { UserController } from "../presentation/controllers/userController";
 import { UserInteractor } from "../application/interactor/userInteractor";
-import { UserRepo } from "../infrastruture/repositories/userRepo";
+import { UserRepo } from "../infrastrucutre/repositories/userRepo";
 import { HashPassword } from "../application/services/bcrypt";
 import { validateUserInput } from "../presentation/middleware/validationMiddleware";
 import { JWT } from "../application/services/jwt";
@@ -15,8 +15,11 @@ const jwt = new JWT()
 
 
 
+
+
 const userInteractor = new UserInteractor(userRepo, hashedPassword,jwt); 
 const userController = new UserController(userInteractor);
+
 
 // Routes
 userRoute.post('/login', validateUserInput, userController.userLogin.bind(userController));

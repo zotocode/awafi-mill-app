@@ -10,7 +10,7 @@ const nullifyGlobalUserData = () => {
 // userInteractor.ts
 import { IUserInteractor } from "../../interface/userInterface/IuserInteractor";
 import { IUserRepo } from "../../interface/userInterface/IuserRepo";
-import { User } from "../../domin/userSchema";
+import { User } from "../../domain/userSchema";
 import { IBcrypt } from "../../interface/serviceInterface/bcryptInterface";
 import { generateOTP } from "../services/otpService";
 import { UserInteractorResp } from "../../types/userTypes/userInteractorTypes";
