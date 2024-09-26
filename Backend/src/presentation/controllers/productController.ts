@@ -1,85 +1,81 @@
 // src/presentation/controllers/ProductController.ts
-import { Request, Response } from "express";
-import { ProductInteractor } from "../../application/interactor/productInteractor";
-import { ProductDTO } from "../../domain/dtos/ProductDTO";
+import { NextFunction, Request, Response } from "express";
+import IProductInteractor from "../../interface/productInterface/IproductInteractor"; // Import the interface
+import { product } from "../../domain/entities/productSchema"; 
+
 
 export class ProductController {
-  private productInteractor: ProductInteractor;
+  private productInteractor: IProductInteractor; // Use the interface type
 
-  constructor(productInteractor: ProductInteractor) {
+  constructor(productInteractor: IProductInteractor) {
     this.productInteractor = productInteractor;
   }
 
   // Add a new product (HTTP POST)
-  async addProduct(req: Request, res: Response): Promise<void> {
+  async addProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        console.log("product route is working")
-      const productDTO: ProductDTO = req.body;
-      await this.productInteractor.addProduct(productDTO)
-      .then((response)=>{
-        console.log("data respose",response)
-      })
-     
+      console.log("product route is working");
+      const productData: product = req.body; // Assuming req.body conforms to the 'product' type
+      await this.productInteractor.addProduct(productData); 
       res.status(201).json({ message: "Product created successfully" });
     } catch (error) {
-      this.handleError(res, error, 400);
+      next(error);
     }
   }
 
-//   // Get all products (HTTP GET)
-//   async getAllProducts(req: Request, res: Response): Promise<void> {
-//     try {
-//       const products = await this.productInteractor.getAllProducts();
-//       res.status(200).json(products);
-//     } catch (error) {
-//       this.handleError(res, error, 500);
-//     }
-//   }
+  // Get all products (HTTP GET)
+  async getAllProducts(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const products = await this.productInteractor.getAllProducts();
+      res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  }
 
-//   // Get a product by ID (HTTP GET)
-//   async getProductById(req: Request, res: Response): Promise<void> {
-//     try {
-//       const productId: string = req.params.id;
-//       const product = await this.productInteractor.getProductById(productId);
-//       if (!product) {
-//         res.status(404).json({ message: "Product not found" });
-//       } else {
-//         res.status(200).json(product);
-//       }
-//     } catch (error) {
-//       this.handleError(res, error, 500);
-//     }
-//   }
+  // Get a product by ID (HTTP GET)
+  async getProductById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const productId = req.params.id;
+      const product = await this.productInteractor.getProductById(productId);
+      if (product) {
+        res.status(200).json(product);
+      } else {
+        res.status(404).json({ message: "Product not found" });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
 
-//   // Update a product by ID (HTTP PUT)
-//   async updateProduct(req: Request, res: Response): Promise<void> {
-//     try {
-//       const productId: string = req.params.id;
-//       const productDTO: ProductDTO = req.body;
-//       await this.productInteractor.updateProduct(productId, productDTO);
-//       res.status(200).json({ message: "Product updated successfully" });
-//     } catch (error) {
-//       this.handleError(res, error, 400);
-//     }
-//   }
+  // Update a product (HTTP PUT)
+  async updateProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const productId = req.params.id;
+      const updatedData: Partial<product> = req.body; 
+      const updatedProduct = await this.productInteractor.updateProduct(productId, updatedData);
+      if (updatedProduct) {
+        res.status(200).json(updatedProduct);
+      } else {
+        res.status(404).json({ message: "Product not found" });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
 
-//   // Delete a product by ID (HTTP DELETE)
-//   async deleteProduct(req: Request, res: Response): Promise<void> {
-//     try {
-//       const productId: string = req.params.id;
-//       await this.productInteractor.deleteProduct(productId);
-//       res.status(200).json({ message: "Product deleted successfully" });
-//     } catch (error) {
-//       this.handleError(res, error, 500);
-//     }
-//   }
-
-  // Helper method for handling errors with proper type checking
-  private handleError(res: Response, error: unknown, statusCode: number): void {
-    if (error instanceof Error) {
-      res.status(statusCode).json({ error: error.message });
-    } else {
-      res.status(statusCode).json({ error: "An unknown error occurred" });
+  // Delete a product (HTTP DELETE)
+  async deleteProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const productId = req.params.id;
+      const deleted = await this.productInteractor.deleteProduct(productId);
+      if (deleted) {
+        res.status(200).json({ message: "Product deleted successfully" });
+      } else {
+        res.status(404).json({ message: "Product not found" });
+      }
+    } catch (error) {
+      next(error);
     }
   }
 }
