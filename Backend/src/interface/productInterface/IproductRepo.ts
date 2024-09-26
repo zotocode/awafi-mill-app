@@ -1,7 +1,7 @@
+// src/domain/entities/Product.ts
+
 import mongoose from "mongoose";
 
-
-// src/domain/entities/Product.ts
 export class Product {
     public _id: string |mongoose.Types.ObjectId;
     public title: string;
