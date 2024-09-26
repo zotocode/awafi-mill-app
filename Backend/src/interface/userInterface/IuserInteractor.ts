@@ -1,3 +1,4 @@
+// src/interface/userInterface/IuserInteractor.ts
 import { UserInteractorResp } from "../../types/userTypes/userInteractorTypes"
 
 

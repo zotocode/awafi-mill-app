@@ -1,6 +1,5 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import {IProduct} from '../../types/commonTypes'
-
+import mongoose, { Schema, Model } from 'mongoose';
+import { IProduct } from '../../domain/entities/productSchema'; 
 
 // Define the schema
 const productSchema = new Schema<IProduct>({
@@ -12,5 +11,5 @@ const productSchema = new Schema<IProduct>({
   timestamps: true // Automatically manage createdAt and updatedAt
 });
 
-// Create the Mongoose model
-export const ProductModel = mongoose.model<IProduct>('Product', productSchema);
+// Ensure ProductModel is correctly typed with Document
+export const ProductModel: Model<IProduct> = mongoose.model<IProduct>('Product', productSchema);
