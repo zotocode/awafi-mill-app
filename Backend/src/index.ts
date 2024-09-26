@@ -28,8 +28,8 @@ const startServer = async (): Promise<void> => {
     );
 
     // User routes
-    app.use('/api/users', userRoute);
-    app.use('/api/products', productRoute);
+    app.use('/api/user', userRoute);
+    app.use('/api/product', productRoute);
 
 
     //cart Routes

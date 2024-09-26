@@ -28,8 +28,8 @@ export class UserController {
       //=-========================================register====================
    async userRegister(req: Request, res: Response, next: NextFunction) {
      try {
-      const { email, password } = req.body;
-       const result = await this.userInteractor.registerUser(email,password);
+      const { email, password,phone,name } = req.body;
+       const result = await this.userInteractor.registerUser(email,name,password,phone);
        if (result.success) {
          return res.status(200).json({ message: result.message,otp:result.otp });
        } else {
@@ -56,7 +56,26 @@ export class UserController {
         next(err)
       }
     }
+    //  ==========================================Profile page section==================================
+    async editProfile(req: Request, res: Response, next: NextFunction) {
+      try {
+       
 
+        const result = await this.userInteractor.editProfile(req.body);
+    
+        // Handle the response based on the result of OTP verification
+        if (result.success) {
+          return res.status(200).json({ message: result.message });
+        } else {
+          return res.status(400).json({ message: result.message });
+        }
+      } catch (err) {
+        next(err)
+      }
+    }
 
  }
+
+
+
  
