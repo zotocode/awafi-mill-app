@@ -1,11 +1,4 @@
-// Declare a global variable to store user data, including OTP
-let globalUserData: { email: string; password: string; otp?: string } | null =
-  null;
 
-const nullifyGlobalUserData = () => {
-  globalUserData = null;
-  console.log("Global User Data has been nullified.");
-};
 
 // userInteractor.ts
 import { IUserInteractor } from "../../interface/userInterface/IuserInteractor";
@@ -15,6 +8,9 @@ import { IBcrypt } from "../../interface/serviceInterface/bcryptInterface";
 import { generateOTP } from "../services/otpService";
 import { UserInteractorResp } from "../../types/userTypes/userInteractorTypes";
 import { Ijwt } from "../../interface/serviceInterface/jwtInterface";
+import RedisServices from "../../application/services/redisServices"
+
+
 
 
 // userInteractor.ts
@@ -54,19 +50,27 @@ export class UserInteractor implements IUserInteractor {
   }
 
   //=-========================================registration========================
-  async registerUser(email:string,password:string): Promise<UserInteractorResp> {
+  async  registerUser(email: string, name: string, password: string, phone: number): Promise<UserInteractorResp> {
     try {
-      const userData = await this.userRepository.findUser(email);
+  
+      // Check if user exists in Redis
+      const userData = await RedisServices.getUserData(email);
       if (userData) {
         return { success: false, message: "User already registered" };
       }
+
+      console.log("hi second")
+  
+      // Generate OTP
       const otp = generateOTP();
-      globalUserData = { email: email, password: password, otp };
-      console.log("data", globalUserData);
-      setTimeout(nullifyGlobalUserData, 300000);
+  
+      // Store user data in Redis
+      await RedisServices.storeUserData(email, name, password, phone, otp);
+        console.log("data saved on redis")
+      // Return OTP
       return { success: true, otp, message: "User registration initiated.." };
     } catch (error) {
-      console.log("error", error);
+      console.error("Error during registration:", error);
       throw new Error("Registration failed");
     }
   }
@@ -75,27 +79,26 @@ export class UserInteractor implements IUserInteractor {
 
   async verifyOtp(otp:string): Promise<UserInteractorResp> {
     try {
-      console.log("===============otp=====================");
-      console.log(otp, globalUserData?.otp);
-      console.log("====================================");
-      if (globalUserData && otp === globalUserData.otp) {
-        const hashedPassword = await this.bcrypt.encryptPassword(
-          globalUserData.password
-        );
-        const newUser = new User(
-          "hihello",
-          globalUserData.email as string,
-          hashedPassword
-        );
-        const register = await this.userRepository.registerUser(newUser);
-        nullifyGlobalUserData();
-        return { success: true, message: "User registered successfully." };
-      } else {
+     
+   
         return { success: false, message: "Invalid OTP." };
-      }
+  
     } catch (error) {
       console.log(error);
       throw new Error("OTP verification failed.");
     }
   }
+
+  // =======================================profile section starting from here======================================
+  
+  async editProfile(otp:string): Promise<void> {
+    try {
+
+     
+    } catch (error) {
+      console.log(error);
+      throw new Error("OTP verification failed.");
+    }
+  }
+
 }

@@ -1,12 +1,12 @@
 
 import { IUserRepo } from "../../interface/userInterface/IuserRepo";
-import { IuserDocument,userModel } from "../model/userModel";
+import { userModel } from "../model/userModel";
 import { InewUserData } from "../../types/userTypes/userInteractorTypes";
 
 
 export class UserRepo implements IUserRepo {
 
-    async findUser(email: string): Promise<IuserDocument | null> {
+    async findUser(email: string): Promise<any | null> {
         try {
           const user = await userModel.findOne({ email });
           return user;
@@ -25,6 +25,7 @@ export class UserRepo implements IUserRepo {
           userName: userData.name,
         });
         await newUser.save();
+        
         return "registration completed";
       }
       

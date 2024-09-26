@@ -12,18 +12,14 @@ const userRoute = express.Router();
 const hashedPassword = new HashPassword();
 const userRepo = new UserRepo();
 const jwt = new JWT()
-
-
-
-
-
 const userInteractor = new UserInteractor(userRepo, hashedPassword,jwt); 
 const userController = new UserController(userInteractor);
 
 
 // Routes
-userRoute.post('/login', validateUserInput, userController.userLogin.bind(userController));
+userRoute.post('/', validateUserInput, userController.userLogin.bind(userController));
 userRoute.post('/register', validateUserInput, userController.userRegister.bind(userController));
 userRoute.post('/otpVerify', userController.otpVerify.bind(userController));
+userRoute.patch('/profile', userController.editProfile.bind(userController));
 
 export default userRoute;
