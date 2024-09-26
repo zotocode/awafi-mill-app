@@ -10,7 +10,7 @@ export class ProductInteractor {
     }
   
     // Use case for adding a new product
-    async addProduct(productDTO: ProductDTO): Promise<void> {
+    async addProduct(productDTO: ProductDTO): Promise<ProductDTO> {
       // Convert DTO to domain entity
       const product = ProductDTO.toEntity(productDTO);
   
@@ -20,33 +20,33 @@ export class ProductInteractor {
       }
   
       // Save the product using the repository
-      await this.productRepo.create(product);
+      return await this.productRepo.create(product);
     }
   
-    // Get all products
-    async getAllProducts(): Promise<ProductDTO[]> {
-      const products = await this.productRepo.findAll();
+    // // Get all products
+    // async getAllProducts(): Promise<ProductDTO[]> {
+    //   const products = await this.productRepo.findAll();
       
-      // Map products to DTOs
-      return products.map(ProductDTO.fromEntity);
-    }
+    //   // Map products to DTOs
+    //   return products.map(ProductDTO.fromEntity);
+    // }
   
-    // Get a single product by ID
-    async getProductById(id: string): Promise<ProductDTO | null> {
-      const product = await this.productRepo.findById(id);
-      if (!product) return null;
+    // // Get a single product by ID
+    // async getProductById(id: string): Promise<ProductDTO | null> {
+    //   const product = await this.productRepo.findById(id);
+    //   if (!product) return null;
   
-      return ProductDTO.fromEntity(product);
-    }
+    //   return ProductDTO.fromEntity(product);
+    // }
   
-    // Update a product by ID
-    async updateProduct(id: string, productDTO: ProductDTO): Promise<void> {
-      const product = ProductDTO.toEntity(productDTO);
-      await this.productRepo.update(id, product);
-    }
+    // // Update a product by ID
+    // async updateProduct(id: string, productDTO: ProductDTO): Promise<void> {
+    //   const product = ProductDTO.toEntity(productDTO);
+    //   await this.productRepo.update(id, product);
+    // }
   
-    // Delete a product by ID
-    async deleteProduct(id: string): Promise<void> {
-      await this.productRepo.delete(id);
-    }
+    // // Delete a product by ID
+    // async deleteProduct(id: string): Promise<void> {
+    //   await this.productRepo.delete(id);
+    // }
   }
