@@ -1,49 +1,43 @@
+// src/application/interactor/userInteractor.ts
+import { IUserInteractor } from "../../interface/userInterface/IuserInteractor";
+import { IUserRepo } from "../../interface/userInterface/IuserRepo";
+import { IBcrypt } from "../../interface/serviceInterface/IbcryptInterface";
+import { generateOTP } from "../services/otpService";
+import { UserInteractorResp } from "../../types/userTypes/userInteractorTypes";
+import { Ijwt } from "../../interface/serviceInterface/IjwtInterface";
+import { UserDTO } from "../../domain/dtos/UserDTO";  // Import UserDTO
+
 // Declare a global variable to store user data, including OTP
-let globalUserData: { email: string; password: string; otp?: string } | null =
-  null;
+let globalUserData: { email: string; password: string; otp?: string } | null = null;
 
 const nullifyGlobalUserData = () => {
   globalUserData = null;
   console.log("Global User Data has been nullified.");
 };
 
-// userInteractor.ts
-import { IUserInteractor } from "../../interface/userInterface/IuserInteractor";
-import { IUserRepo } from "../../interface/userInterface/IuserRepo";
-import { User } from "../../domain/userSchema";
-import { IBcrypt } from "../../interface/serviceInterface/bcryptInterface";
-import { generateOTP } from "../services/otpService";
-import { UserInteractorResp } from "../../types/userTypes/userInteractorTypes";
-import { Ijwt } from "../../interface/serviceInterface/jwtInterface";
-
-
-// userInteractor.ts
-
 export class UserInteractor implements IUserInteractor {
   private userRepository: IUserRepo;
   private bcrypt: IBcrypt;
-  private jwt:Ijwt;
+  private jwt: Ijwt;
 
-  constructor(userRepository: IUserRepo, bcrypt: IBcrypt,jwt:Ijwt) {
+  constructor(userRepository: IUserRepo, bcrypt: IBcrypt, jwt: Ijwt) {
     this.userRepository = userRepository;
     this.bcrypt = bcrypt;
     this.jwt = jwt;
   }
 
   //=-========================================login===============
-  async login(email:string,password:string): Promise<UserInteractorResp> {
+  async login(email: string, password: string): Promise<UserInteractorResp> {
     try {
       const userData = await this.userRepository.findUser(email);
       if (!userData) {
         return { success: false, message: "User not found" };
       }
-      const userLogin = await this.bcrypt.comparePassword(
-        password,
-        userData.password
-      );
+
+      const userLogin = await this.bcrypt.comparePassword(password, userData.password);
       if (userLogin) {
         const accessToken = this.jwt.generateToken({ id: userData.id }, "1h");
-        return { success: true, message: "Login successful", data:accessToken};
+        return { success: true, message: "Login successful", data: accessToken };
       } else {
         return { success: false, message: "Invalid credentials" };
       }
@@ -53,17 +47,18 @@ export class UserInteractor implements IUserInteractor {
     }
   }
 
-  //=-========================================registration========================
-  async registerUser(email:string,password:string): Promise<UserInteractorResp> {
+  //=-========================================registerUser========================
+  async registerUser(email: string, password: string): Promise<UserInteractorResp> {
     try {
       const userData = await this.userRepository.findUser(email);
       if (userData) {
         return { success: false, message: "User already registered" };
       }
+
       const otp = generateOTP();
-      globalUserData = { email: email, password: password, otp };
+      globalUserData = { email, password, otp };
       console.log("data", globalUserData);
-      setTimeout(nullifyGlobalUserData, 300000);
+      setTimeout(nullifyGlobalUserData, 300000); // Clear global data after 5 mins
       return { success: true, otp, message: "User registration initiated.." };
     } catch (error) {
       console.log("error", error);
@@ -71,23 +66,26 @@ export class UserInteractor implements IUserInteractor {
     }
   }
 
-  //=-========================================otpverify========================
-
-  async verifyOtp(otp:string): Promise<UserInteractorResp> {
+  //=-========================================verifyOtp========================
+  async verifyOtp(otp: string): Promise<UserInteractorResp> {
     try {
-      console.log("===============otp=====================");
-      console.log(otp, globalUserData?.otp);
-      console.log("====================================");
       if (globalUserData && otp === globalUserData.otp) {
-        const hashedPassword = await this.bcrypt.encryptPassword(
-          globalUserData.password
+        const hashedPassword = await this.bcrypt.encryptPassword(globalUserData.password);
+
+        // Create new user using UserDTO
+        const newUserDTO = new UserDTO(
+          "some-id",                
+          "New User",               
+          globalUserData.email,     
+          hashedPassword,           
+          new Date(),               
+          new Date()                
         );
-        const newUser = new User(
-          "hihello",
-          globalUserData.email as string,
-          hashedPassword
-        );
-        const register = await this.userRepository.registerUser(newUser);
+
+        // Convert DTO to entity and register the user
+        const newUser = UserDTO.toEntity(newUserDTO);
+        await this.userRepository.registerUser(newUser);
+        
         nullifyGlobalUserData();
         return { success: true, message: "User registered successfully." };
       } else {
