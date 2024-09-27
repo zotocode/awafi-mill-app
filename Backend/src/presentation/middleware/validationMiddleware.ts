@@ -11,6 +11,15 @@ const schema = Joi.object({
     'string.min': 'Password must be at least 6 characters long',
     'any.required': 'Password is required',
   }),
+  phone: Joi.string().regex(/^\d{10}$/).required().messages({
+    'any.required': 'Phone number is required',
+  }),
+  name: Joi.string().alphanum().min(3).max(30).required().messages({
+    'string.alphanum': 'Username must contain only letters and numbers',
+    'string.min': 'Username must be at least 3 characters long',
+    'string.max': 'Username cannot exceed 30 characters',
+    'any.required': 'Username is required',
+  }),
 });
 
 //validation middleware
