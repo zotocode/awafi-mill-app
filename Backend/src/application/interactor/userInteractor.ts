@@ -7,16 +7,21 @@ import { UserInteractorResp } from "../../types/userTypes/userInteractorTypes";
 import { Ijwt } from "../../interface/serviceInterface/IjwtInterface";
 import { userDTO,userCreationDTO } from "../../domain/dtos/UserDTO";  // Import UserDTO
 import RedisServices from "../../application/services/redisServices";
+ import {IEmailServices} from '../../application/services/email'
+
+
 
 export class UserInteractor implements IUserInteractor {
   private userRepository: IUserRepo;
   private bcrypt: IBcrypt;
   private jwt: Ijwt;
+  private emailService: IEmailServices;
 
-  constructor(userRepository: IUserRepo, bcrypt: IBcrypt, jwt: Ijwt) {
+  constructor(userRepository: IUserRepo, bcrypt: IBcrypt, jwt: Ijwt,emailService:IEmailServices) {
     this.userRepository = userRepository;
     this.bcrypt = bcrypt;
     this.jwt = jwt;
+    this.emailService=emailService;
   }
 
   //=-========================================login===============
@@ -43,10 +48,10 @@ export class UserInteractor implements IUserInteractor {
   //=-========================================registration========================
   async registerUser(email: string, name: string, password: string, phone: number): Promise<UserInteractorResp> {
   try {
- 
+    
     const existingUser = await RedisServices.getData<{ email: string; name: string; password: string; phone: number; otp: string }>(email);
     if (existingUser) {
-      return { success: false, message: "User already registered" };
+      return { success: false, message: "User already  under registration process" };
     }
 
     // Generate OTP
@@ -56,9 +61,18 @@ export class UserInteractor implements IUserInteractor {
     const userData = { email, name, password, phone, otp };
     await RedisServices.setData(email, userData, 300);  // Set data with a 5-minute expiration (300 seconds)
 
-    console.log("User data saved in Redis");
 
-    return { success: true, otp, message: "User registration initiated, please verify OTP." };
+    // sendEmail--------------------
+    await this.emailService.OtpEmail(email,otp)
+    const dataSet={
+      email,
+      otp
+    }
+
+
+ 
+
+    return { success: true, data:dataSet, message: "User registration initiated, please verify OTP." };
   } catch (error) {
     console.error("Error during registration:", error);
     throw new Error("Registration failed");
@@ -104,7 +118,7 @@ async verifyOtp(email: string, otp: string): Promise<any> {
     throw new Error("OTP verification failed.");
   }
 }
-
+// Edit Profile----------------------------------
 async editProfile(data: any): Promise<any> {
      console.log('dem')
 }
