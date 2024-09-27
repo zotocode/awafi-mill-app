@@ -4,8 +4,8 @@ import productRoute from "./routes/productRoute";
 import cartRoute from "./routes/cartRoute";
 import { connectDB } from "./infrastrucutre/database/dbConfig";
 import cors from "cors";
-
 import morgan from "morgan";
+
 
 
 const startServer = async (): Promise<void> => {
@@ -28,8 +28,8 @@ const startServer = async (): Promise<void> => {
     );
 
     // User routes
-    app.use('/api/users', userRoute);
-    app.use('/api/products', productRoute);
+    app.use('/api/user', userRoute);
+    app.use('/api/product', productRoute);
 
 
     //cart Routes
