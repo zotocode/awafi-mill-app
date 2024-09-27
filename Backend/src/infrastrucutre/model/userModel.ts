@@ -25,7 +25,7 @@ export interface IAddress {
 // Extend user document for an eCommerce platform
 export interface IUserDocument extends Document {
     email: string;
-    userName: string;
+    name: string;
     password: string;
     phone: number;
     address: IAddress[];
@@ -60,7 +60,7 @@ const userSchema: Schema = new Schema<IUserDocument>(
             required: true,
             unique: true,
         },
-        userName: {
+        name: {
             type: String,
             required: true,
         },
@@ -86,6 +86,6 @@ const userSchema: Schema = new Schema<IUserDocument>(
 );
 
 export const userModel: Model<IUserDocument> = mongoose.model<IUserDocument>(
-    "users",
+    "user",
     userSchema
 );

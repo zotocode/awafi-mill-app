@@ -1,15 +1,15 @@
 // src/infrastructure/repositories/userRepo.ts
 import { IUserRepo } from "../../interface/userInterface/IuserRepo";
-import { IuserDocument, userModel } from "../model/userModel";
+import { IUserDocument, userModel } from "../model/userModel";
 import { InewUserData } from "../../types/userTypes/userInteractorTypes";
 import { BaseRepository } from "./baseRepository";
 
-export class UserRepo extends BaseRepository<IuserDocument> implements IUserRepo {
+export class UserRepo extends BaseRepository<IUserDocument> implements IUserRepo {
     constructor() {
         super(userModel); 
     }
 
-    async findUser(email: string): Promise<IuserDocument | null> {
+    async findUser(email: string): Promise<IUserDocument | null> {
         try {
           return await this.model.findOne({ email }); 
         } catch (error) {
@@ -21,11 +21,7 @@ export class UserRepo extends BaseRepository<IuserDocument> implements IUserRepo
       async registerUser(userData: InewUserData): Promise<string> {
         console.log("user register  repo..", userData);
     
-        const newUser = new this.model({  
-          email: userData.email,
-          password: userData.password,
-          userName: userData.name,
-        });
+        const newUser = new this.model(userData);
         await newUser.save();
         
         return "registration completed";
