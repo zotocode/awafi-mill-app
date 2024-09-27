@@ -54,3 +54,5 @@ dist/
 
 #enviroment variable
 .env
+Backend/.env
+
