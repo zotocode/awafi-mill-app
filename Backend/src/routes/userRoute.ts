@@ -6,14 +6,15 @@ import { UserRepo } from "../infrastrucutre/repositories/userRepo";
 import { HashPassword } from "../application/services/bcrypt";
 import { validateUserInput } from "../presentation/middleware/validationMiddleware";
 import { JWT } from "../application/services/jwt";
+import EmailService from "../application/services/email";
 
-const userRoute = express.Router();
-
+const userRoute = express.Router()
 // Create instances of services and repositories
 const hashedPassword = new HashPassword();
 const userRepo = new UserRepo();
 const jwt = new JWT()
-const userInteractor = new UserInteractor(userRepo, hashedPassword,jwt); 
+const email=new EmailService()
+const userInteractor = new UserInteractor(userRepo, hashedPassword,jwt,email); 
 const userController = new UserController(userInteractor);
 
 
