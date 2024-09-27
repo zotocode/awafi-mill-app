@@ -7,7 +7,7 @@ import envConfig from '../../config/env';
 export interface IEmailServices {
     OtpEmail(email: string, otp: string): Promise<void>;
 }
-
+console.log('emails')
 class EmailService implements IEmailServices {
     private transporter: nodemailer.Transporter;
    
