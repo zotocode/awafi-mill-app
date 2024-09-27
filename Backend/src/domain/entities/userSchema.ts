@@ -6,8 +6,7 @@ export class User {
       readonly email: string,
       readonly password: string | null,
       readonly createdAt: Date,
-      readonly updatedAt: Date,
-      readonly phone: number,
+      readonly updatedAt: Date
     ) {}
   
     // Factory method to create a new user
@@ -15,8 +14,7 @@ export class User {
       id: string,
       name: string,
       email: string,
-      password: string | null,
-      phone:number,
+      password: string | null
     ) {
       const now = new Date();
       return new User(
@@ -25,8 +23,7 @@ export class User {
         email,
         password,
         now,  // createdAt
-        now  ,
-        phone
+        now   // updatedAt
       );
     }
   }

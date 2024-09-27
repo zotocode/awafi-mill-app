@@ -6,22 +6,25 @@ import { UserRepo } from "../infrastrucutre/repositories/userRepo";
 import { HashPassword } from "../application/services/bcrypt";
 import { validateUserInput } from "../presentation/middleware/validationMiddleware";
 import { JWT } from "../application/services/jwt";
-import EmailService from "../application/services/email";
 
-const userRoute = express.Router()
+const userRoute = express.Router();
+
 // Create instances of services and repositories
 const hashedPassword = new HashPassword();
 const userRepo = new UserRepo();
 const jwt = new JWT()
-const email=new EmailService()
-const userInteractor = new UserInteractor(userRepo, hashedPassword,jwt,email); 
+
+
+
+
+
+const userInteractor = new UserInteractor(userRepo, hashedPassword,jwt); 
 const userController = new UserController(userInteractor);
 
 
 // Routes
-userRoute.post('/', validateUserInput, userController.userLogin.bind(userController));
+userRoute.post('/login', validateUserInput, userController.userLogin.bind(userController));
 userRoute.post('/register', validateUserInput, userController.userRegister.bind(userController));
 userRoute.post('/otpVerify', userController.otpVerify.bind(userController));
-userRoute.patch('/profile', userController.editProfile.bind(userController));
 
 export default userRoute;

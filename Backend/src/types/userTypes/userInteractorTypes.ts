@@ -1,7 +1,8 @@
 export interface UserInteractorResp {
     success: boolean;
     message: string;
-    data?:any;
+    otp?: string;
+    data?:string;
   }
 
   
