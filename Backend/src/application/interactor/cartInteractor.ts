@@ -1,4 +1,4 @@
-import { Cart } from "../../domain/entities/userCart";
+import { Cart } from "../../domain/entities/userCartSchema";
 import { IUserRepo } from "../../interface/userInterface/IuserRepo";
 import { ICartInteractor } from "../../interface/cartInterface/IcartInteractor";
 import { ICartRepo } from "../../interface/cartInterface/IcartRepo";

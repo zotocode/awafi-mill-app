@@ -1,3 +1,4 @@
+// src/routes/userRoute.ts
 import express from "express";
 import { UserController } from "../presentation/controllers/userController";
 import { UserInteractor } from "../application/interactor/userInteractor";
