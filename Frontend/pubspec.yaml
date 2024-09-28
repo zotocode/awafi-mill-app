@@ -37,6 +37,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   provider: ^6.1.2
   animated_text_kit: ^4.2.2
+  get: ^4.6.6
+  google_fonts: ^6.2.1
+  navbar_router: ^0.7.6
 
 dev_dependencies:
   flutter_test:

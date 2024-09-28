@@ -1,10 +1,6 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:frondend/view_model/splash_animation.dart';
-
 import 'package:provider/provider.dart';
-import 'package:flutter/material.dart';
 
 class AnimationProvider with ChangeNotifier {
   String _text = 'Awafi Mill';
