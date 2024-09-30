@@ -3,13 +3,17 @@ import { ProductRepository } from "../../infrastructure/repositories/productRepo
 import IProductInteractor from "../../interface/productInterface/IproductInteractor";
 import { Product } from "../../domain/entities/productSchema";
 import { error } from "console";
+import IDHandler from "../services/hashIdServices";
+
 
 
 export class ProductInteractor implements IProductInteractor {
   private productRepo: ProductRepository;
+  private hashIdHandler:IDHandler
 
-  constructor(productRepo: ProductRepository) {
+  constructor(productRepo: ProductRepository, hashIdHandler:IDHandler) {
     this.productRepo = productRepo;
+    this.hashIdHandler=hashIdHandler;
   }
 
   // Adding a new product
@@ -30,10 +34,12 @@ export class ProductInteractor implements IProductInteractor {
   }
 
   // Retrieve a product by ID
-  // async getProductById(id: string): Promise<ProductDTO | null> {
-  //   const product = await this.productRepo.findById(id);
-  //   return product ? this.mapEntityToDto(product) : null;
-  // }
+  async getProductById(id: string): Promise<ProductDTO | null> {
+    const productId=this.hashIdHandler.dehashID(id)
+   console.log("id",productId)
+    const product = await this.productRepo.pFindById(productId);
+    return product ? this.mapEntityToDto(product) : null;
+  }
 
   // Update a product by ID
   // async updateProduct(id: string, data: Partial<ProductDTO>): Promise<ProductDTO | null> {
@@ -76,7 +82,9 @@ export class ProductInteractor implements IProductInteractor {
 
   // Mapping Product entity to DTO
   private mapEntityToDto(product: Product): ProductDTO {
+    const hashedId = this.hashIdHandler.hashID(product._id);
     return {
+      _id: hashedId, // Use the hashed ID here
       name: product.name,
       description: product.description,
       price: product.price,
@@ -88,4 +96,5 @@ export class ProductInteractor implements IProductInteractor {
       variants: product.variants,
     };
   }
+  
 }

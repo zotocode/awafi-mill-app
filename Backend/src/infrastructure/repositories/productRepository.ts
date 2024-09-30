@@ -31,19 +31,16 @@ export class ProductRepository extends BaseRepository<Product> {
    
   }
 
-  async findAll(): Promise<ProductDTO[]> {
+  async findAll(): Promise<Product[]> {
 
       return await this.model.find().exec();
   
   }
 
-  // async findById(id: string): Promise<ProductDTO | null> {
-  //   try {
-  //     return await this.model.findById(id).exec();
-  //   } catch (error) {
-  //     throw new error('An error occurred while retrieving product', 404);
-  //   }
-  // }
+  async pFindById(id: string): Promise<Product | null> {
+ 
+      return await this.model.findById(id).exec();
+  }
 
   // async update(id: string, data: Partial<any>): Promise<ProductDTO | null> {
   //   try {

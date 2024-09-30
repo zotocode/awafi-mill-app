@@ -16,12 +16,12 @@ export class ProductController {
   async addProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const photos: any = req.files || [];
-      
+       console.log("njana")
       const productData: ProductCreationDTO = req.body;
       
       if (photos.length > 0 && !productData.images) {
         productData.images = photos.map((photo: any[0]) => photo.path.toString());
-        console.log("proseu",productData)
+    
       }
       
       const result = await this.productInteractor.addProduct(productData);
@@ -36,6 +36,7 @@ export class ProductController {
   // Get all products (HTTP GET)
   async getAllProducts(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+   
       const products = await this.productInteractor.getAllProducts();
       res.status(200).json(products);
     } catch (error) {
@@ -44,19 +45,19 @@ export class ProductController {
   }
 
   // Get a product by ID (HTTP GET)
-  // async getProductById(req: Request, res: Response, next: NextFunction): Promise<void> {
-  //   try {
-  //     const productId = req.params.id;
-  //     const product = await this.productInteractor.getProductById(productId);
-  //     if (product) {
-  //       res.status(200).json(product);
-  //     } else {
-  //       res.status(404).json({ message: "Product not found" });
-  //     }
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
+  async getProductById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const productId = req.params.id;
+      const product = await this.productInteractor.getProductById(productId);
+      if (product) {
+        res.status(200).json(product);
+      } else {
+        res.status(404).json({ message: "Product not found" });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
 
   // Update a product (HTTP PUT)
   // async updateProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
