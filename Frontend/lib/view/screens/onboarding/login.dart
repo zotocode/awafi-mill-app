@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:frondend/common/assigns.dart';
 import 'package:frondend/common/style.dart';
 import 'package:frondend/view/components/widgets/auth_button.dart';
+import 'package:frondend/view/components/widgets/drop_down_field.dart';
 import 'package:frondend/view/components/widgets/text_field.dart';
+import 'package:frondend/view/screens/dashboard/bottom.dart';
 import 'package:frondend/view/screens/onboarding/forgot_password.dart';
 import 'package:frondend/view/screens/onboarding/sign_up.dart';
 import 'package:get/get.dart';
@@ -53,13 +55,10 @@ class LoginScreen extends StatelessWidget {
                     padding: EdgeInsets.only(left: 22, right: 22, top: 36),
                     child: Column(
                       children: [
-                        SizedBox(height: 20),
-                        Text(Assigns.login, style: Style.textStyle),
-                        SizedBox(height: 20),
-                        CustomizableTextFieldwidget(
-                          labelText: Assigns.numberText,
-                        ),
                         SizedBox(height: 10),
+                        Text(Assigns.login, style: Style.textStyle),
+                        SizedBox(height: 30),
+                        CountryCodeTextField(labelText: Assigns.numberText),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -73,7 +72,7 @@ class LoginScreen extends StatelessWidget {
                             )
                           ],
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 10),
                         CustomizableTextFieldwidget(
                           labelText: Assigns.passwordLabelText,
                         ),
@@ -97,7 +96,9 @@ class LoginScreen extends StatelessWidget {
                         SizedBox(height: 20),
                         AuthenticateSaveButton(
                           buttonText: Assigns.buttonLogin,
-                          onpressed: () {},
+                          onpressed: () {
+                            Get.to(() => BottomScreen());
+                          },
                         ),
                         SizedBox(height: 20),
                         Row(
@@ -106,7 +107,7 @@ class LoginScreen extends StatelessWidget {
                             Text(
                               Assigns.accoutMessage,
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.white54,
                                 fontWeight: FontWeight.w300,
                                 fontSize: 16,
                               ),
@@ -134,18 +135,23 @@ class LoginScreen extends StatelessWidget {
                             Text(
                               Assigns.loginAsGuest,
                               style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w300,
+                                color: Colors.white54,
+                                fontWeight: FontWeight.w500,
                                 fontSize: 16,
                               ),
                             ),
-                            SizedBox(width: 10),
-                            Text(
-                              Assigns.guest,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
+                            SizedBox(width: 4),
+                            InkWell(
+                              onTap: () {
+                                Get.to(() => BottomScreen());
+                              },
+                              child: Text(
+                                Assigns.guest,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                           ],

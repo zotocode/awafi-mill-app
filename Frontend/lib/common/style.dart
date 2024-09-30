@@ -7,4 +7,5 @@ class Style {
       fontWeight: FontWeight.w500,
       letterSpacing: 1,
       fontSize: 36);
+  static Color themeColor = Color(0xFF414851);
 }

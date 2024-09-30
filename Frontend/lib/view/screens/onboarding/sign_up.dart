@@ -3,6 +3,7 @@ import 'package:frondend/common/assigns.dart';
 import 'package:frondend/common/style.dart';
 import 'package:frondend/view/components/widgets/auth_button.dart';
 import 'package:frondend/view/components/widgets/back_arrow.dart';
+import 'package:frondend/view/components/widgets/drop_down_field.dart';
 import 'package:frondend/view/components/widgets/text_field.dart';
 import 'package:frondend/view/screens/onboarding/verification_screen.dart';
 import 'package:get/get.dart';
@@ -79,10 +80,7 @@ class SignUpScreen extends StatelessWidget {
                               labelText: Assigns.name,
                             ),
                             SizedBox(height: 16),
-                            CustomizableTextFieldwidget(
-                              labelText: Assigns.numberText,
-                            ),
-                            SizedBox(height: 16),
+                            CountryCodeTextField(labelText: Assigns.numberText),
                             CustomizableTextFieldwidget(
                               labelText: Assigns.email,
                             ),
@@ -121,7 +119,6 @@ class SignUpScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            SizedBox(height: 10),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [

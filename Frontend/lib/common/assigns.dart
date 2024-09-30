@@ -19,4 +19,49 @@ class Assigns {
   static String verification = 'Verification';
   static String checkImage = 'assets/images/Frame.png';
   static String successfullMessage = 'Password Successfully Changed!';
+  static String appNameSmall = 'assets/images/app_name_small.png';
+  static List<Map<String, dynamic>> categories = [
+    {
+      'image': 'assets/images/incese.png',
+      'text': 'INCENSE',
+    },
+    {
+      'image': 'assets/images/herbs.png',
+      'text': 'HERBS',
+    },
+    {
+      'image': 'assets/images/rareherbs.png',
+      'text': 'RARE HERBS',
+    },
+    {
+      'image': 'assets/images/spaces.png',
+      'text': 'SPICES',
+    },
+    {
+      'image': 'assets/images/set.png',
+      'text': 'POTPURI SET',
+    },
+    {
+      'image': 'assets/images/oil.png',
+      'text': 'FRAGRANCE & ESSENTIAL OIL',
+    }
+  ];
+  static List<Map<String, dynamic>> collections = [
+    {
+      'image': 'assets/images/resin.png',
+      'text': 'Resin Collections',
+    },
+    {
+      'image': 'assets/images/dried_fruit.png',
+      'text': 'Dried Fruit Collections',
+    },
+    {
+      'image': 'assets/images/dried_leaf.png',
+      'text': 'Dried leaf Collections',
+    },
+    {
+      'image': 'assets/images/essential_oil.png',
+      'text': 'Essential Oil Collections',
+    }
+  ];
 }
