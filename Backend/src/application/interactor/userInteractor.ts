@@ -7,7 +7,7 @@ import { UserInteractorResp } from "../../types/userTypes/userInteractorTypes";
 import { Ijwt } from "../../interface/serviceInterface/IjwtInterface";
 import { userDTO,userCreationDTO } from "../../domain/dtos/UserDTO";  // Import UserDTO
 import RedisServices from "../../application/services/redisServices";
- import {IEmailServices} from '../../application/services/email'
+ import {IEmailServices} from '../../application/services/emailService'
 
 
 
