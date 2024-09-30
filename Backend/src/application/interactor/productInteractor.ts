@@ -1,55 +1,100 @@
-import { ProductDTO } from "../../domain/dtos/ProductDTO";
-import { ProductRepository } from "../../infrastrucutre/repositories/productRepository";
+import { ProductCreationDTO, ProductDTO } from "../../domain/dtos/ProductDTO";
+import { ProductRepository } from "../../infrastructure/repositories/productRepository";
 import IProductInteractor from "../../interface/productInterface/IproductInteractor";
-import { IProduct, product } from '../../domain/entities/productSchema'; 
-import { Product } from "../../interface/productInterface/IproductRepo"; 
+import { Product } from "../../domain/entities/productSchema";
+import { error } from "console";
+import IDHandler from "../services/hashIdServices";
+
+
 
 export class ProductInteractor implements IProductInteractor {
   private productRepo: ProductRepository;
+  private hashIdHandler:IDHandler
 
-  constructor(productRepo: ProductRepository) {
+  constructor(productRepo: ProductRepository, hashIdHandler:IDHandler) {
     this.productRepo = productRepo;
+    this.hashIdHandler=hashIdHandler;
   }
 
-  async addProduct(productData: product): Promise<ProductDTO> {
-    const product = ProductDTO.toEntity(productData);
-    if (product.price <= 0) {
-      throw new Error("Price must be greater than zero");
+  // Adding a new product
+  async addProduct(productData: ProductCreationDTO): Promise<ProductDTO> {
+    
+    if (productData.price <= 0) {
+      throw  error('Price must be greater than zero');
     }
-    const createdProduct = await this.productRepo.create(product);
-    return ProductDTO.fromEntity(this.mapToProduct(createdProduct));
+
+    const createdProduct = await this.productRepo.create(productData);
+    return this.mapEntityToDto(createdProduct);
   }
 
+  // Retrieve all products
   async getAllProducts(): Promise<ProductDTO[]> {
     const products = await this.productRepo.findAll();
-    return products.map(p => ProductDTO.fromEntity(this.mapToProduct(p)));
+    return products.map((p) => this.mapEntityToDto(p as any));
   }
 
+  // Retrieve a product by ID
   async getProductById(id: string): Promise<ProductDTO | null> {
-    const product = await this.productRepo.findById(id);
-    return product ? ProductDTO.fromEntity(this.mapToProduct(product)) : null;
+    const productId=this.hashIdHandler.dehashID(id)
+   console.log("id",productId)
+    const product = await this.productRepo.pFindById(productId);
+    return product ? this.mapEntityToDto(product) : null;
   }
 
-  async updateProduct(id: string, data: Partial<product>): Promise<ProductDTO | null> {
-    const updatedProduct = await this.productRepo.update(id, data);
-    return updatedProduct ? ProductDTO.fromEntity(this.mapToProduct(updatedProduct)) : null;
-  }
+  // Update a product by ID
+  // async updateProduct(id: string, data: Partial<ProductDTO>): Promise<ProductDTO | null> {
+  //   const productUpdateData = this.mapDtoToEntity(data as ProductDTO);
+  //   const updatedProduct = await this.productRepo.update(id, productUpdateData);
+  //   return updatedProduct ? this.mapEntityToDto(updatedProduct) : null;
+  // }
 
-  async deleteProduct(id: string): Promise<boolean> {
-    const deletedProduct = await this.productRepo.delete(id);
-    return !!deletedProduct; // Returns true if deleted, false if not found
+  // Delete a product by ID
+  // async deleteProduct(id: string): Promise<boolean> {
+  //   const deletedProduct = await this.productRepo.delete(id);
+  //   return !!deletedProduct;
+  // }
+
+  private mapDtoToEntity(productData: ProductDTO): Product {
+    if (!productData.name || !productData.description || !productData.price) {
+      throw error('Required fields are missing in ProductDTO');
+    }
+  
+    const stockStatus = {
+      quantity: productData.stockStatus.quantity,
+      status: productData.stockStatus.status,
+    };
+  
+    return {
+      name: productData.name,
+      description: productData.description,
+      price: productData.price,
+      originalPrice: productData.originalPrice,
+      weight: productData.weight,
+      stockStatus: stockStatus,
+      categories: productData.categories,
+      images: productData.images,
+      variants: productData.variants,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as Product;
   }
   
 
-  private mapToProduct(iProduct: IProduct): Product {
-    return new Product(
-      iProduct._id,
-      iProduct.title,
-      iProduct.description,
-      iProduct.price,
-      iProduct.inventory,
-      iProduct.createdAt,
-      iProduct.updatedAt
-    );
+  // Mapping Product entity to DTO
+  private mapEntityToDto(product: Product): ProductDTO {
+    const hashedId = this.hashIdHandler.hashID(product._id);
+    return {
+      _id: hashedId, // Use the hashed ID here
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      weight: product.weight,
+      stockStatus: product.stockStatus,
+      categories: product.categories,
+      images: product.images,
+      variants: product.variants,
+    };
   }
+  
 }
