@@ -2,7 +2,7 @@ export interface UserInteractorResp {
     success: boolean;
     message: string;
     otp?: string;
-    data?:string;
+    data?:any;
   }
 
   

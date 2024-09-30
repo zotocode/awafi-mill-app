@@ -16,7 +16,7 @@ export class ProductController {
   async addProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const photos: any = req.files || [];
-       console.log("njana")
+    
       const productData: ProductCreationDTO = req.body;
       
       if (photos.length > 0 && !productData.images) {
@@ -60,20 +60,21 @@ export class ProductController {
   }
 
   // Update a product (HTTP PUT)
-  // async updateProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
-  //   try {
-  //     const productId = req.params.id;
-  //     const updatedData: Partial<ProductDTO> = req.body; 
-  //     const updatedProduct = await this.productInteractor.updateProduct(productId, updatedData);
-  //     if (updatedProduct) {
-  //       res.status(200).json(updatedProduct);
-  //     } else {
-  //       res.status(404).json({ message: "Product not found" });
-  //     }
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
+  async updateProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+
+      const productId = req.params.id;
+      const updatedData: Partial<ProductCreationDTO> = req.body; 
+      const updatedProduct = await this.productInteractor.updateProduct(productId, updatedData);
+      if (updatedProduct) {
+        res.status(200).json(updatedProduct);
+      } else {
+        res.status(404).json({ message: "Product not found" });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
 
   // Delete a product (HTTP DELETE)
   // async deleteProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
