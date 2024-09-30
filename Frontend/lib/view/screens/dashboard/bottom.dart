@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frondend/view/components/widgets/custom_bottom.dart';
 import 'package:frondend/view/screens/dashboard/account.dart';
 import 'package:frondend/view/screens/dashboard/cart.dart';
 import 'package:frondend/view/screens/dashboard/home.dart';
 import 'package:frondend/view/screens/dashboard/wishlist.dart';
-import 'package:frondend/view_model/bottom_bar.dart'; // Your BottomNavProvider
+import 'package:frondend/view_model/bottom_bar.dart';
 import 'package:provider/provider.dart';
 
 class BottomScreen extends StatelessWidget {
@@ -26,31 +27,50 @@ class BottomScreen extends StatelessWidget {
         },
       ),
       bottomNavigationBar: Consumer<BottomNavProvider>(
-        builder: (context, bottomNavProvider, child) {
-          return NavigationBar(
-            selectedIndex: bottomNavProvider.currentIndex,
-            onDestinationSelected: (index) {
-              bottomNavProvider.changeIndex(index);
-            },
-            backgroundColor: Colors.white,
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.shopping_cart),
-                label: 'Cart',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.favorite),
-                label: 'Wish list',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.person),
-                label: 'Account',
-              ),
-            ],
+        builder: (context, bottomNavbarProvider, child) {
+          return Container(
+            height: 70,
+            width: double.infinity,
+            child: Row(
+              children: [
+                CustomBottomWidget(
+                  index: 0,
+                  text: 'Home',
+                  image: 'assets/images/home.png',
+                  currentIndex: bottomNavbarProvider.currentIndex,
+                  onTap: () {
+                    bottomNavbarProvider.changeIndex(0);
+                  },
+                ),
+                CustomBottomWidget(
+                  index: 1,
+                  text: 'Cart',
+                  image: 'assets/images/cart.png',
+                  currentIndex: bottomNavbarProvider.currentIndex,
+                  onTap: () {
+                    bottomNavbarProvider.changeIndex(1);
+                  },
+                ),
+                CustomBottomWidget(
+                  index: 2,
+                  text: 'Whish list',
+                  image: 'assets/images/which_list.png',
+                  currentIndex: bottomNavbarProvider.currentIndex,
+                  onTap: () {
+                    bottomNavbarProvider.changeIndex(2);
+                  },
+                ),
+                CustomBottomWidget(
+                  index: 3,
+                  text: 'Account',
+                  image: 'assets/images/person.png',
+                  currentIndex: bottomNavbarProvider.currentIndex,
+                  onTap: () {
+                    bottomNavbarProvider.changeIndex(3);
+                  },
+                ),
+              ],
+            ),
           );
         },
       ),

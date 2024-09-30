@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.frondend.app-mergeDebugResources-24:/values-fr/values-fr.xml",
+            "outputFile": "com.example.frondend.app-mergeDebugResources-25:/values-fr/values-fr.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Lenovo\\.gradle\\caches\\transforms-3\\c666c258fca39b3353b46678a6b928ab\\transformed\\core-1.13.1\\res\\values-fr\\values-fr.xml",
@@ -11,6 +11,30 @@
                         "startOffsets": "55,153,255,354,456,560,664,782",
                         "endColumns": "97,101,98,101,103,103,117,100",
                         "endOffsets": "148,250,349,451,555,659,777,878"
+                    },
+                    "to": {
+                        "startLines": "2,3,4,5,6,7,8,13",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,153,255,354,456,560,664,1215",
+                        "endColumns": "97,101,98,101,103,103,117,100",
+                        "endOffsets": "148,250,349,451,555,659,777,1311"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Lenovo\\.gradle\\caches\\transforms-3\\9a7a783aa8682aaa028c57031d48c15e\\transformed\\browser-1.8.0\\res\\values-fr\\values-fr.xml",
+                    "from": {
+                        "startLines": "2,3,4,5",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,162,264,383",
+                        "endColumns": "106,101,118,104",
+                        "endOffsets": "157,259,378,483"
+                    },
+                    "to": {
+                        "startLines": "9,10,11,12",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "782,889,991,1110",
+                        "endColumns": "106,101,118,104",
+                        "endOffsets": "884,986,1105,1210"
                     }
                 }
             ]
