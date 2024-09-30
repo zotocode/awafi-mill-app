@@ -1,3 +1,4 @@
+// src/domain/entities/wishlistSchema.ts
 import mongoose, { Document } from "mongoose";
 
 // Wishlist interface
