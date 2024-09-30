@@ -1,5 +1,5 @@
 // src/application/interactor/wishlistInteractor.ts
-import { WishlistRepository } from "../../infrastrucutre/repositories/wishlistRepo"; 
+import { WishlistRepository } from "../../infrastructure/repositories/wishlistRepo";
 import IWishlistInteractor from "../../interface/wishlistInterface/IwishlistInteractor";
 import { WishlistDTO, AddToWishlistDTO, RemoveFromWishlistDTO } from "../../domain/dtos/WishlistDTO";
 import { IWishlist } from "../../domain/entities/wishlistSchema";

@@ -1,22 +1,36 @@
-import mongoose, { Document } from "mongoose";
+import { Document } from "mongoose";
 
-// Ensure that 'product' and 'IProduct' types align
-export interface product {
-  _id: string | mongoose.Types.ObjectId;
-  title: string;
-  description: string;
-  price: number;
-  inventory: number;
-  createdAt: Date;
-  updatedAt: Date;
+// Define interfaces for nested types
+interface Image {
+  url: string;
+  altText?: string;
 }
 
-export interface IProduct extends Document {
-  _id: string | mongoose.Types.ObjectId;
-  title: string;
+interface Variant {
+  size: string;
+  price: number;
+  stockQuantity: number;
+}
+
+interface StockStatus {
+  quantity: number;
+  status: 'In Stock' | 'Out of Stock';
+}
+
+
+// Define the Product interface that extends Document
+export interface Product extends Document {
+  _id:string
+  name: string;
   description: string;
   price: number;
-  inventory: number;
-  createdAt: Date;
-  updatedAt: Date;
+  originalPrice?: number; // Optional
+  weight: string;
+  stockStatus: StockStatus;
+  categories?: string[]; // Optional
+  images?: string[]; // Optional
+  variants?: Variant[]; // Optional
+  createdAt?: Date; // Automatically handled by mongoose
+  updatedAt?: Date; // Automatically handled by mongoose
 }
+Document

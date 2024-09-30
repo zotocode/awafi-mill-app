@@ -1,9 +1,8 @@
-// src/interface/productInterface/IproductInteractor.ts
-import { product } from "../../domain/entities/productSchema";
+import { ProductDTO ,ProductCreationDTO} from "../../domain/dtos/ProductDTO"; 
 export default interface IProductInteractor {
-  addProduct(data: product): Promise<any>;
-  getAllProducts(): Promise<product[]>;
-  getProductById(id: string): Promise<product | null>;
-  updateProduct(id: string, data: Partial<product>): Promise<product | null>;
-  deleteProduct(id: string): Promise<boolean>; 
+  addProduct(data: ProductCreationDTO): Promise<ProductDTO>;
+  getAllProducts(): Promise<ProductDTO[]>;
+  getProductById(id: string): Promise<ProductDTO | null>;
+  updateProduct(id: string, data: Partial<ProductCreationDTO>): Promise<ProductDTO | null>;
+  // deleteProduct(id: string): Promise<boolean>; 
 }

@@ -2,7 +2,7 @@ import { Cart } from "../../domain/entities/userCartSchema";
 import { IUserRepo } from "../../interface/userInterface/IuserRepo";
 import { ICartInteractor } from "../../interface/cartInterface/IcartInteractor";
 import { ICartRepo } from "../../interface/cartInterface/IcartRepo";
-import { CartRepo } from "../../infrastrucutre/repositories/cartRepo";
+import { CartRepo } from "../../infrastructure/repositories/cartRepo";
 
 
 
