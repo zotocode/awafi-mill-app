@@ -1,6 +1,7 @@
 // src/domain/dto/product.dto.ts
 
 export interface ProductDTO {
+  _id:string
   name: string;
   description: string;
   price: number;

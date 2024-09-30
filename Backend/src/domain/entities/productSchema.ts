@@ -20,6 +20,7 @@ interface StockStatus {
 
 // Define the Product interface that extends Document
 export interface Product extends Document {
+  _id:string
   name: string;
   description: string;
   price: number;
