@@ -1,3 +1,4 @@
+// src/interface/productInterface/IproductInteractor.ts
 import { product } from "../../domain/entities/productSchema";
 export default interface IProductInteractor {
   addProduct(data: product): Promise<any>;
