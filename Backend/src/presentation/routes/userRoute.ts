@@ -1,12 +1,12 @@
 // src/routes/userRoute.ts
 import express from "express";
-import { UserController } from "../presentation/controllers/userController";
-import { UserInteractor } from "../application/interactor/userInteractor";
-import { UserRepo } from "../infrastrucutre/repositories/userRepo";
-import { HashPassword } from "../application/services/bcrypt";
-import { validateUserInput } from "../presentation/middleware/validationMiddleware";
-import { JWT } from "../application/services/jwt";
-import EmailService from "../application/services/email";
+import { UserController } from "../controllers/userController";
+import { UserInteractor } from "../../application/interactor/userInteractor";
+import { UserRepo } from "../../infrastructure/repositories/userRepo";
+import { HashPassword } from "../../application/services/bcryptService";
+import { validateUserInput } from "../middleware/validationMiddleware";
+import { JWT } from "../../application/services/jwtService";
+import EmailService from "../../application/services/emailService";
 
 const userRoute = express.Router()
 // Create instances of services and repositories
