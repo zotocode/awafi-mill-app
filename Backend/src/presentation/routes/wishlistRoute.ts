@@ -1,9 +1,9 @@
 // src/routes/wishlistRoute.ts
 import express from "express";
-import { WishlistRepository } from "../infrastrucutre/repositories/wishlistRepo"; 
-import { WishlistController } from "../presentation/controllers/wishlistController"; 
-import { WishlistInteractor } from "../application/interactor/wishlistInteractor"; 
-import { WishlistModel } from "../infrastrucutre/model/wishlistModel";
+import { WishlistRepository } from "../../infrastructure/repositories/wishlistRepo"; 
+import { WishlistController } from "../controllers/wishlistController"; 
+import { WishlistInteractor } from "../../application/interactor/wishlistInteractor"; 
+import { WishlistModel } from "../../infrastructure/model/wishlistModel"; 
 
 // Set up dependencies
 const wishlistRepo = new WishlistRepository(WishlistModel);

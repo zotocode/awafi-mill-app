@@ -1,3 +1,4 @@
+// src/infrastructure/repositories/wishlistRepo.ts
 import { WishlistDTO } from "../../domain/dtos/WishlistDTO";
 import { Model } from "mongoose";
 import { IWishlist } from "../../domain/entities/wishlistSchema";

@@ -2,7 +2,6 @@ import express, { Request, Response, NextFunction } from "express";
 import 
 userRoute from "./presentation/routes/userRoute";
 import productRoute from "./presentation/routes/productRoute";
-import cartRoute from "./presentation/routes/cartRoute";
 import { connectDB } from "./infrastructure/database/dbConfig";
 import cors from "cors";
 
@@ -31,7 +30,6 @@ const startServer = async (): Promise<void> => {
 
     app.use('/api/user', userRoute);
     app.use('/api/products', productRoute);
-    app.use('/api/cart', cartRoute);
 
 
     
