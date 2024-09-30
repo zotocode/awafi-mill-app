@@ -1,7 +1,7 @@
 import express from "express";
-import { CartInteractor } from "../application/interactor/cartInteractor";
-import { CartController } from "../presentation/controllers/cartController";
-import { CartRepo } from "../infrastrucutre/repositories/cartRepo";
+import { CartInteractor } from "../../application/interactor/cartInteractor";
+import { CartController } from "../controllers/cartController";
+import { CartRepo } from "../../infrastructure/repositories/cartRepo";
 
 
 
