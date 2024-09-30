@@ -3,17 +3,17 @@ import { ProductRepository } from "../../infrastructure/repositories/productRepo
 import IProductInteractor from "../../interface/productInterface/IproductInteractor";
 import { Product } from "../../domain/entities/productSchema";
 import { error } from "console";
-import IDHandler from "../services/hashIdServices";
+// import IDHandler from "../services/hashIdServices";
 
 
 
 export class ProductInteractor implements IProductInteractor {
   private productRepo: ProductRepository;
-  private hashIdHandler:IDHandler
 
-  constructor(productRepo: ProductRepository, hashIdHandler:IDHandler) {
+
+  constructor(productRepo: ProductRepository) {
     this.productRepo = productRepo;
-    this.hashIdHandler=hashIdHandler;
+  
   }
 
   // Adding a new product
@@ -35,18 +35,17 @@ export class ProductInteractor implements IProductInteractor {
 
   // Retrieve a product by ID
   async getProductById(id: string): Promise<ProductDTO | null> {
-    const productId=this.hashIdHandler.dehashID(id)
-   console.log("id",productId)
-    const product = await this.productRepo.pFindById(productId);
+
+    const product = await this.productRepo.pFindById(id);
     return product ? this.mapEntityToDto(product) : null;
   }
 
   // Update a product by ID
-  // async updateProduct(id: string, data: Partial<ProductDTO>): Promise<ProductDTO | null> {
-  //   const productUpdateData = this.mapDtoToEntity(data as ProductDTO);
-  //   const updatedProduct = await this.productRepo.update(id, productUpdateData);
-  //   return updatedProduct ? this.mapEntityToDto(updatedProduct) : null;
-  // }
+  async updateProduct(id: string, data: Partial<ProductCreationDTO>): Promise<ProductDTO | null> {
+  
+    const updatedProduct = await this.productRepo.update(id, data);
+    return updatedProduct ? this.mapEntityToDto(updatedProduct) : null;
+  }
 
   // Delete a product by ID
   // async deleteProduct(id: string): Promise<boolean> {
@@ -82,9 +81,9 @@ export class ProductInteractor implements IProductInteractor {
 
   // Mapping Product entity to DTO
   private mapEntityToDto(product: Product): ProductDTO {
-    const hashedId = this.hashIdHandler.hashID(product._id);
+  
     return {
-      _id: hashedId, // Use the hashed ID here
+      _id: product._id, // Use the hashed ID here
       name: product.name,
       description: product.description,
       price: product.price,

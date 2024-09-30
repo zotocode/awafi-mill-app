@@ -18,6 +18,7 @@ export abstract class BaseRepository<T extends Document> {
   }
 
   async update(id: string, update: any): Promise<T | null> {
+
     return await this.model.findByIdAndUpdate(id, update, { new: true });
   }
 
