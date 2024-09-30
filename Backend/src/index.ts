@@ -30,7 +30,7 @@ const startServer = async (): Promise<void> => {
 
 
     app.use('/api/user', userRoute);
-    app.use('/api/product', productRoute);
+    app.use('/api/products', productRoute);
     app.use('/api/cart', cartRoute);
 
 
