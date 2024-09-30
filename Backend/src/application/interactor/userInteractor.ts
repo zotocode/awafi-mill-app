@@ -71,23 +71,30 @@ export class UserInteractor implements IUserInteractor {
     try {
       if (globalUserData && otp === globalUserData.otp) {
         const hashedPassword = await this.bcrypt.encryptPassword(globalUserData.password);
-
+  
         // Create new user using UserDTO
         const newUserDTO = new UserDTO(
-          "some-id",                
-          "New User",               
-          globalUserData.email,     
-          hashedPassword,           
-          new Date(),               
-          new Date()                
+          "some-id",                // Use actual user ID after creation if available
+          "New User",               // Set an appropriate name or retrieve from globalUserData if needed
+          globalUserData.email,
+          hashedPassword,
+          new Date(),
+          new Date()
         );
-
+  
         // Convert DTO to entity and register the user
         const newUser = UserDTO.toEntity(newUserDTO);
-        await this.userRepository.registerUser(newUser);
+        const registeredUser = await this.userRepository.registerUser(newUser);
         
+        // Map registered user to DTO for response
+        const registeredUserDTO = UserDTO.fromEntity(registeredUser);
+  
         nullifyGlobalUserData();
-        return { success: true, message: "User registered successfully." };
+        return { 
+          success: true, 
+          message: "User registered successfully.", 
+          data: registeredUserDTO  // Include user details in response
+        };
       } else {
         return { success: false, message: "Invalid OTP." };
       }
@@ -96,4 +103,5 @@ export class UserInteractor implements IUserInteractor {
       throw new Error("OTP verification failed.");
     }
   }
+  
 }
