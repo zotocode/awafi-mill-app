@@ -26,6 +26,6 @@ export interface ProductCreationDTO {
   categories?: string[]; // Optional
   images?: string[];
   variants?: { size: string; price: number; stockQuantity: number }[]; // Optional
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

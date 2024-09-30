@@ -4,7 +4,7 @@ import { UserController } from "../controllers/userController";
 import { UserInteractor } from "../../application/interactor/userInteractor";
 import { UserRepo } from "../../infrastructure/repositories/userRepo";
 import { HashPassword } from "../../application/services/bcryptService";
-import { validateUserInput } from "../middleware/validationMiddleware";
+import { validateUserInput } from "../middleware/userValidation";
 import { JWT } from "../../application/services/jwtService";
 import EmailService from "../../application/services/emailService";
 
