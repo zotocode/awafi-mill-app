@@ -48,9 +48,7 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+
 # Backend
 node_modules/
 dist/
-
-#enviroment variable
-.env

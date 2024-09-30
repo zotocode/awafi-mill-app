@@ -124,4 +124,3 @@ async editProfile(data: any): Promise<any> {
 }
 
 }
-

@@ -5,8 +5,8 @@ import productRoute from "./presentation/routes/productRoute";
 import cartRoute from "./presentation/routes/cartRoute";
 import { connectDB } from "./infrastructure/database/dbConfig";
 import cors from "cors";
-import morgan from "morgan";
 
+import morgan from "morgan";
 
 
 const startServer = async (): Promise<void> => {
