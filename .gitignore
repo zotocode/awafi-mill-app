@@ -1,6 +1,6 @@
 # main
 Abhishek/
-
+.vscode/
 # Frontend
 
 
@@ -50,3 +50,5 @@ app.*.map.json
 
 
 # Backend
+node_modules/
+dist/
