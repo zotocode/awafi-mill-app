@@ -74,7 +74,7 @@ export class UserInteractor implements IUserInteractor {
 
     return { success: true, data:dataSet, message: "User registration initiated, please verify OTP." };
   } catch (error) {
-    console.error("Error during registration:", error);
+   
     throw new Error("Registration failed");
   }
 }

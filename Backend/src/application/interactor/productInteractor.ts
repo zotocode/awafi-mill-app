@@ -3,8 +3,7 @@ import { ProductRepository } from "../../infrastructure/repositories/productRepo
 import IProductInteractor from "../../interface/productInterface/IproductInteractor";
 import { Product } from "../../domain/entities/productSchema";
 import { error } from "console";
-// import IDHandler from "../services/hashIdServices";
-import {listed} from '../../types/productTypes'
+import {resposeHandler} from '../../types/commonTypes'
 
 
 
@@ -19,7 +18,14 @@ export class ProductInteractor implements IProductInteractor {
   }
 
   // Adding a new product
-  async addProduct(productData: ProductCreationDTO): Promise<ProductDTO> {
+  async addProduct(productData: ProductCreationDTO): Promise<ProductDTO |resposeHandler> {
+    const{name}=productData
+    const isAvailable=await this.productRepo.findByName(name)
+    if(isAvailable)
+    {
+      return { message: "Product is always in your bucket", status: 409 };
+
+    }
     
     if (productData.price <= 0) {
       throw  error('Price must be greater than zero');
@@ -49,14 +55,24 @@ export class ProductInteractor implements IProductInteractor {
   }
 
   // Update a product by ID
-  async updateProduct(id: string, data: Partial<ProductCreationDTO>): Promise<ProductDTO | null> {
+  async updateProduct(id: string, data: Partial<ProductCreationDTO>): Promise<ProductDTO | null |resposeHandler> {
+    if(data?.name)
+    {
+      const isAvailable=await this.productRepo.findByName(data.name)
+      if(isAvailable)
+      {
+        return { message: "Product is always in your bucket", status: 409 };
   
+      }
+
+    }
+   
     const updatedProduct = await this.productRepo.update(id, data);
     return updatedProduct ? this.mapEntityToDto(updatedProduct) : null;
   }
   // list and unlist product-------------------
 
-  async listById(id: string): Promise<listed | null> {
+  async listById(id: string): Promise<resposeHandler | null> {
      const isListed=await this.productRepo.isListedProduct(id)
      if(isListed)
      {
@@ -65,7 +81,7 @@ export class ProductInteractor implements IProductInteractor {
     const listProduct = await this.productRepo.updateListing(id,{isListed:true});
     return listProduct.modifiedCount > 0 ? { message:"product listed" } : null;
   }
-  async unListById(id: string): Promise<listed | null> {
+  async unListById(id: string): Promise<resposeHandler | null> {
     const isListed=await this.productRepo.isListedProduct(id)
     if(!isListed)
     {

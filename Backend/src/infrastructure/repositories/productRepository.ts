@@ -37,8 +37,13 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
 
   async findAllProducts(): Promise<Product[]> {
 
-      return await this.model.find({isListed:true}).exec();
+      return await this.model.find().exec();
   
+  }
+
+  async findByName(name: string): Promise<Product | null> {
+    const regex = new RegExp(`^${name}$`, 'i'); 
+    return await super.findOne({ name: regex });
   }
 
   async productFindById(id: string): Promise<Product | null> {

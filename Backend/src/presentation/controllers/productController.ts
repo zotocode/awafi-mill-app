@@ -24,7 +24,11 @@ export class ProductController {
     
       }
       
-      const result = await this.productInteractor.addProduct(productData);
+      const result:any = await this.productInteractor.addProduct(productData);
+      if(result?.status)
+        {
+          res.status(result.status).json({ message: result.message});
+        }
   
       res.status(201).json({ message: "Product created successfully", product: result });
     } catch (error) {
@@ -98,7 +102,11 @@ export class ProductController {
 
       const productId = req.params.id;
       const updatedData: Partial<ProductCreationDTO> = req.body; 
-      const updatedProduct = await this.productInteractor.updateProduct(productId, updatedData);
+      const updatedProduct:any = await this.productInteractor.updateProduct(productId, updatedData);
+      if(updatedProduct?.status)
+        {
+          res.status(updatedProduct.status).json({ message: updatedProduct.message});
+        }
       if (updatedProduct) {
         res.status(200).json(updatedProduct);
       } else {
