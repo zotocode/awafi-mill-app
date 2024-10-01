@@ -3,9 +3,10 @@ import { CartDTO } from "../../domain/dtos/CartDTO";
 import { Model } from "mongoose";
 import { IUserCart } from "../../domain/entities/userCartSchema";
 import { BaseRepository } from "./baseRepository";
+import ICartRepo from "../../interface/cartInterface/IcartRepo"
 
 // Cart repository extending the base repository
-export class CartRepository extends BaseRepository<IUserCart> {
+export class CartRepository extends BaseRepository<IUserCart> implements ICartRepo {
   constructor(model: Model<IUserCart>) {
     super(model);
   }
