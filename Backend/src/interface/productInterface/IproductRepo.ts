@@ -8,4 +8,5 @@ export interface IproductRepo{
     updateImage(id:string,index:number,photo:string):Promise<any>
     updateProduct(id:string,data:any):Promise<any>
     isListedProduct(id:string):Promise<any>
+    findByName(id:string):Promise<any>
    }
