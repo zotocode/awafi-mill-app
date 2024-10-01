@@ -54,4 +54,4 @@ node_modules/
 dist/
 
 
-Backend/src/uploads
+uploads/
