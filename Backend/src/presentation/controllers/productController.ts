@@ -31,9 +31,42 @@ export class ProductController {
       next(error);
     }
   }
+  // update single image----------------------------
+
+
+  async updateImage(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      // Extract id and index from the query
+      const { id, index } = req.query;
+  
+      if (!req.file) {
+        throw new Error('Photo is not provided');
+      }
+  
+      const { path } = req.file;
+  
+      // Ensure id is a string and index is a valid number
+      if (typeof id !== 'string' || typeof index !== 'string') {
+        throw new Error('Invalid id or index');
+      }
+  
+      const currentIndex = parseInt(index, 10);
+      if (isNaN(currentIndex)) {
+        throw new Error('Index must be a valid number');
+      }
+  
+      // Call your productInteractor to update the image
+      const products = await this.productInteractor.updateImage(id, currentIndex, path);
+  
+      res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  }
   
 
   // Get all products (HTTP GET)
+  
   async getAllProducts(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
    
@@ -75,6 +108,32 @@ export class ProductController {
       next(error);
     }
   }
+
+  // list  product---------------------------------
+  
+  async toggleListStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { action } = req.query; // action can be 'list' or 'unlist'
+  
+      if (typeof action !== 'string' || (action !== 'list' && action !== 'unlist')) {
+        throw new Error('Invalid action. Expected "list" or "unlist".');
+      }
+  
+      let product;
+      if (action === 'list') {
+        product = await this.productInteractor.listById(id);
+      } else if (action === 'unlist') {
+        product = await this.productInteractor.unListById(id);
+      }
+  
+      res.status(200).json(product);
+    } catch (error) {
+      next(error);
+    }
+  }
+  
+
 
   // Delete a product (HTTP DELETE)
   // async deleteProduct(req: Request, res: Response, next: NextFunction): Promise<void> {

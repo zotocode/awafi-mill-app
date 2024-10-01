@@ -3,7 +3,7 @@ import { IUserInteractor } from "../../interface/userInterface/IuserInteractor";
 import { IUserRepo } from "../../interface/userInterface/IuserRepo";
 import { IBcrypt } from "../../interface/serviceInterface/IbcryptInterface";
 import { generateOTP } from "../services/otpService";
-import { UserInteractorResp } from "../../types/userTypes/userInteractorTypes";
+import { UserInteractorResp } from "../../types/userTypes";
 import { Ijwt } from "../../interface/serviceInterface/IjwtInterface";
 import { userDTO,userCreationDTO } from "../../domain/dtos/UserDTO";  // Import UserDTO
 import RedisServices from "../../application/services/redisServices";

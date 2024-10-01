@@ -2,13 +2,17 @@ import { ProductDTO, ProductCreationDTO } from "../../domain/dtos/ProductDTO";
 import { Model } from "mongoose";
 import { Product } from "../../domain/entities/productSchema"; 
 import { BaseRepository } from "./baseRepository";
+import {IproductRepo} from '../../interface/productInterface/IproductRepo'
 
-export class ProductRepository extends BaseRepository<Product> {
+type listing={
+  isListed:boolean
+}
+export class ProductRepository extends BaseRepository<Product> implements IproductRepo {
   constructor(model: Model<Product>) {
     super(model);
   }
 
-  async create(productDTO: ProductCreationDTO): Promise<Product> {
+  async addProduct(productDTO: ProductCreationDTO): Promise<Product> {
  
       const productEntity = {
         name: productDTO.name,
@@ -31,24 +35,36 @@ export class ProductRepository extends BaseRepository<Product> {
    
   }
 
-  async findAll(): Promise<Product[]> {
+  async findAllProducts(): Promise<Product[]> {
 
-      return await this.model.find().exec();
+      return await this.model.find({isListed:true}).exec();
   
   }
 
-  async pFindById(id: string): Promise<Product | null> {
+  async productFindById(id: string): Promise<Product | null> {
  
       return await this.model.findById(id).exec();
   }
+  async isListedProduct(id: string): Promise<Product | null> {
+ 
+      return await this.model.findOne({_id:id,isListed:true}).exec();
+  }
 
-  // async update(id: string, data: Partial<any>): Promise<ProductDTO | null> {
-  //   try {
-  //     return await this.model.findByIdAndUpdate(id, data, { new: true }).exec();
-  //   } catch (error) {
-  //     throw new error('An error occurred while updating the product', 500);
-  //   }
-  // }
+  async updateListing(id: string,UpdateQuery:listing): Promise<any | null> {
+ 
+      return await this.model.updateOne({_id:id},UpdateQuery);
+  }
+
+  async updateImage(id:string,index:number,photo:string):Promise<any | null> 
+  {
+    return await this.model.updateOne({_id:id}, { $set: { [`images.${index}`]: photo } } );
+  }
+
+  async updateProduct(id: string, data: Partial<any>): Promise<ProductDTO | null> {
+
+      return await this.model.findByIdAndUpdate(id, data, { new: true }).exec();
+   
+  }
 
   // async delete(id: string): Promise<boolean> {
   //   try {
