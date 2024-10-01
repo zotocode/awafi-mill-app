@@ -1,13 +1,12 @@
-// src/application/interactor/wishlistInteractor.ts
-import { WishlistRepository } from "../../infrastructure/repositories/wishlistRepo";
+import IWishlistRepo from "../../interface/wishlistInterface/IwishlistRepo"; // Use IWishlistRepo interface
 import IWishlistInteractor from "../../interface/wishlistInterface/IwishlistInteractor";
 import { WishlistDTO, AddToWishlistDTO, RemoveFromWishlistDTO } from "../../domain/dtos/WishlistDTO";
 import { IWishlist } from "../../domain/entities/wishlistSchema";
 
 export class WishlistInteractor implements IWishlistInteractor {
-  private wishlistRepo: WishlistRepository;
+  private wishlistRepo: IWishlistRepo; // Use the IWishlistRepo interface
 
-  constructor(wishlistRepo: WishlistRepository) {
+  constructor(wishlistRepo: IWishlistRepo) {
     this.wishlistRepo = wishlistRepo;
   }
 

@@ -1,11 +1,11 @@
-// src/infrastructure/repositories/wishlistRepo.ts
 import { WishlistDTO } from "../../domain/dtos/WishlistDTO";
 import { Model } from "mongoose";
 import { IWishlist } from "../../domain/entities/wishlistSchema";
 import { BaseRepository } from "./baseRepository";
+import IWishlistRepo from "../../interface/wishlistInterface/IwishlistRepo"; // Import IWishlistRepo interface
 
-// Wishlist repository extending the base repository
-export class WishlistRepository extends BaseRepository<IWishlist> {
+// Wishlist repository extending the base repository and implementing IWishlistRepo
+export class WishlistRepository extends BaseRepository<IWishlist> implements IWishlistRepo {
   constructor(model: Model<IWishlist>) {
     super(model);
   }

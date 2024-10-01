@@ -1,13 +1,13 @@
 // src/application/interactor/cartInteractor.ts
-import { CartRepository } from "../../infrastructure/repositories/cartRepo";
+import ICartRepo from "../../interface/cartInterface/IcartRepo";
 import ICartInteractor from "../../interface/cartInterface/IcartInteractor";
 import { CartDTO, AddToCartDTO, UpdateCartQuantityDTO, RemoveFromCartDTO } from "../../domain/dtos/CartDTO";
 import { IUserCart } from "../../domain/entities/userCartSchema";
 
 export class CartInteractor implements ICartInteractor {
-  private cartRepo: CartRepository;
+  private cartRepo: ICartRepo;
 
-  constructor(cartRepo: CartRepository) {
+  constructor(cartRepo: ICartRepo) {
     this.cartRepo = cartRepo;
   }
 
