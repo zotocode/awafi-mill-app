@@ -58,3 +58,5 @@ dist/
 Backend/.env
 
 dist/
+
+uploads/
