@@ -1,5 +1,5 @@
 // src/interface/userInterface/IuserInteractor.ts
-import { UserInteractorResp } from "../../types/userTypes/userInteractorTypes"
+import { UserInteractorResp } from "../../types/userTypes"
 
 
 export interface IUserInteractor{
