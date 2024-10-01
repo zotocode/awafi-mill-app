@@ -1,7 +1,7 @@
 // src/infrastructure/repositories/userRepo.ts
 import { IUserRepo } from "../../interface/userInterface/IuserRepo";
 import { IuserDocument, userModel } from "../model/userModel";
-import { InewUserData } from "../../types/userTypes/userInteractorTypes";
+import { InewUserData } from "../../types/userTypes";
 import { BaseRepository } from "./baseRepository";
 
 export class UserRepo extends BaseRepository<IuserDocument> implements IUserRepo {

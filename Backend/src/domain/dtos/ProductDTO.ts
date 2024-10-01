@@ -14,6 +14,7 @@ export interface ProductDTO {
   categories?: string[]; // Optional
   images?: string[];
   variants?: { size: string; price: number; stockQuantity: number }[]; // Optional
+  isListed:boolean
 }
 export interface ProductCreationDTO {
   name: string;

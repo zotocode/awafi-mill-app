@@ -28,4 +28,4 @@ const userSchema:Schema = new Schema<IuserDocument>(
     },
     { timestamps: true })
 
-export  const userModel:Model<IuserDocument> =mongoose.model<IuserDocument>("users1",userSchema)
+export  const userModel:Model<IuserDocument> =mongoose.model<IuserDocument>("user",userSchema)
