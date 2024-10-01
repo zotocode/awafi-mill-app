@@ -28,7 +28,7 @@ class AuthenticateSaveButton extends StatelessWidget {
         child: Text(
           buttonText,
           style: GoogleFonts.mulish(
-              color: Colors.white, fontSize: 24, fontWeight: FontWeight.w400),
+              color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
     );

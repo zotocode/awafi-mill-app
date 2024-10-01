@@ -28,48 +28,50 @@ class BottomScreen extends StatelessWidget {
       ),
       bottomNavigationBar: Consumer<BottomNavProvider>(
         builder: (context, bottomNavbarProvider, child) {
-          return Container(
-            height: 70,
-            width: double.infinity,
-            child: Row(
-              children: [
-                CustomBottomWidget(
-                  index: 0,
-                  text: 'Home',
-                  image: 'assets/images/home.png',
-                  currentIndex: bottomNavbarProvider.currentIndex,
-                  onTap: () {
-                    bottomNavbarProvider.changeIndex(0);
-                  },
-                ),
-                CustomBottomWidget(
-                  index: 1,
-                  text: 'Cart',
-                  image: 'assets/images/cart.png',
-                  currentIndex: bottomNavbarProvider.currentIndex,
-                  onTap: () {
-                    bottomNavbarProvider.changeIndex(1);
-                  },
-                ),
-                CustomBottomWidget(
-                  index: 2,
-                  text: 'Whish list',
-                  image: 'assets/images/which_list.png',
-                  currentIndex: bottomNavbarProvider.currentIndex,
-                  onTap: () {
-                    bottomNavbarProvider.changeIndex(2);
-                  },
-                ),
-                CustomBottomWidget(
-                  index: 3,
-                  text: 'Account',
-                  image: 'assets/images/person.png',
-                  currentIndex: bottomNavbarProvider.currentIndex,
-                  onTap: () {
-                    bottomNavbarProvider.changeIndex(3);
-                  },
-                ),
-              ],
+          return Card(
+            child: Container(
+              height: 70,
+              width: double.infinity,
+              child: Row(
+                children: [
+                  CustomBottomWidget(
+                    index: 0,
+                    text: 'Home',
+                    image: 'assets/images/home.png',
+                    currentIndex: bottomNavbarProvider.currentIndex,
+                    onTap: () {
+                      bottomNavbarProvider.changeIndex(0);
+                    },
+                  ),
+                  CustomBottomWidget(
+                    index: 1,
+                    text: 'Cart',
+                    image: 'assets/images/cart.png',
+                    currentIndex: bottomNavbarProvider.currentIndex,
+                    onTap: () {
+                      bottomNavbarProvider.changeIndex(1);
+                    },
+                  ),
+                  CustomBottomWidget(
+                    index: 2,
+                    text: 'Wish list',
+                    image: 'assets/images/which_list.png',
+                    currentIndex: bottomNavbarProvider.currentIndex,
+                    onTap: () {
+                      bottomNavbarProvider.changeIndex(2);
+                    },
+                  ),
+                  CustomBottomWidget(
+                    index: 3,
+                    text: 'Account',
+                    image: 'assets/images/person.png',
+                    currentIndex: bottomNavbarProvider.currentIndex,
+                    onTap: () {
+                      bottomNavbarProvider.changeIndex(3);
+                    },
+                  ),
+                ],
+              ),
             ),
           );
         },
