@@ -1,3 +1,4 @@
+// src/application/interactor/productInteractor.ts
 import { ProductDTO } from "../../domain/dtos/ProductDTO";
 import { ProductRepository } from "../../infrastrucutre/repositories/productRepository";
 import IProductInteractor from "../../interface/productInterface/IproductInteractor";
