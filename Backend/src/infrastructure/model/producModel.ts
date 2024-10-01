@@ -9,6 +9,7 @@ const productSchema = new Schema<Product>({
   price: { type: Number, required: true },
   originalPrice: { type: Number }, // Optional original price for discounts
   weight: { type: String, required: true },
+  isListed: { type: Boolean,default:true,required:true },
   stockStatus: {
     quantity: { type: Number, required: true },
     status: { type: String, enum: ['In Stock', 'Out of Stock'], required: true }
