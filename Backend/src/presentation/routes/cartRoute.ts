@@ -1,27 +1,23 @@
+// src/presentation/routes/cartRoute.ts
 import express from "express";
-import { CartInteractor } from "../../application/interactor/cartInteractor";
-import { CartController } from "../controllers/cartController";
-import { CartRepo } from "../../infrastructure/repositories/cartRepo";
+import { CartRepository } from "../../infrastructure/repositories/cartRepo"; 
+import { CartController } from "../controllers/cartController"; 
+import { CartInteractor } from "../../application/interactor/cartInteractor"; 
+import { CartModel } from "../../infrastructure/model/cartModel"; 
 
+// Set up dependencies
+const cartRepo = new CartRepository(CartModel);
+const cartInteractor = new CartInteractor(cartRepo);
+const cartController = new CartController(cartInteractor);
 
+const cartRoutes = express.Router();
 
+// Define routes
+cartRoutes.post("/cart", cartController.createCart.bind(cartController));
+cartRoutes.get("/cart/:userId", cartController.getCartByUserId.bind(cartController));
+cartRoutes.post("/cart/add", cartController.addItemToCart.bind(cartController));
+cartRoutes.put("/cart/update", cartController.updateCartItemQuantity.bind(cartController));
+cartRoutes.post("/cart/remove", cartController.removeItemFromCart.bind(cartController));
+cartRoutes.delete("/cart/:userId", cartController.clearCart.bind(cartController));
 
-
-
-const cartRoute = express.Router();
-
-//repo
-const cartRepo = new CartRepo()
-
-//cart interactor
-const cartInteractor = new CartInteractor(cartRepo)
-
-//cart controllers
-
-const cartController = new CartController(cartInteractor)
-
-
-cartRoute.get('/cart-products',cartController.userCart.bind(cartController))
-
-
-export default cartRoute;
+export default cartRoutes;
