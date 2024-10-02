@@ -32,5 +32,6 @@ export interface Product extends Document {
   variants?: Variant[]; // Optional
   createdAt?: Date; // Automatically handled by mongoose
   updatedAt?: Date; // Automatically handled by mongoose
+  isListed: boolean; // Automatically handled by mongoose
 }
 Document

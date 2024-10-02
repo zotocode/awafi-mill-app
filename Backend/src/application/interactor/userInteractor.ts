@@ -4,7 +4,7 @@ import { IuserDocument } from "../../infrastructure/model/userModel";
 import { IUserRepo } from "../../interface/userInterface/IuserRepo";
 import { IBcrypt } from "../../interface/serviceInterface/IbcryptInterface";
 import { generateOTP } from "../services/otpService";
-import { UserInteractorResp } from "../../types/userTypes/userInteractorTypes";
+import { UserInteractorResp } from "../../types/userTypes";
 import { Ijwt } from "../../interface/serviceInterface/IjwtInterface";
 import { userDTO,userCreationDTO } from "../../domain/dtos/UserDTO";  // Import UserDTO
 import RedisServices from "../../application/services/redisServices";
@@ -29,7 +29,7 @@ export class UserInteractor implements IUserInteractor {
   //=-========================================login===============
   async login(email: string, password: string): Promise<UserInteractorResp> {
     try {
-      const userData = await this.userRepository.findUser(email);
+      const userData = await this.userRepository.findUserEmail(email);
       if (!userData) {
         return { success: false, message: "User not found" };
       }
@@ -70,7 +70,7 @@ export class UserInteractor implements IUserInteractor {
     }
     return { success: true, data:dataSet, message: `User registcujuimration initiated, please verify OTP.${otp}` };
   } catch (error) {
-    console.error("Error during registration:", error);
+   
     throw new Error("Registration failed");
   }
 }
@@ -109,11 +109,14 @@ async verifyOtp(email: string, otp: string): Promise<any> {
 async editProfile(id:string,email:string,name:string,phone:number): Promise<any> {
   try{
     const userData = await this.userRepository.findUser(id);
+    console.log('====================================');
+    console.log(userData,id,email,name,phone);
+    console.log('====================================');
     if(!userData){
       return null
     }
     await this.userRepository.updateProfile(id,email,name,phone)
-
+    return {success:true}
   }catch(error){
     
   } 

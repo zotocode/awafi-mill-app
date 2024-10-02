@@ -80,7 +80,7 @@ export class UserController {
       }
       const result = await this.userInteractor.editProfile(id,email,name,phone);
       if (result.success) {
-        return res.status(200).json({ message: result.message });
+        return res.status(200).json({status:true, message: "user data update" });
       } else {
         return res.status(400).json({ message: result.message });
       }

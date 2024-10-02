@@ -17,7 +17,7 @@ const userSchema: Schema<IuserDocument> = new Schema(
       required: true,
       unique: true,
     },
-    name: {
+    name: { 
       type: String,
       required: true,
     },
@@ -33,8 +33,4 @@ const userSchema: Schema<IuserDocument> = new Schema(
 
 );
 
-// Create and export the model
-export const userModel: Model<IuserDocument> = mongoose.model<IuserDocument>(
-  "users1",
-  userSchema
-);
+export  const userModel:Model<IuserDocument> =mongoose.model<IuserDocument>("user",userSchema)
