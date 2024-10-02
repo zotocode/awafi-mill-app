@@ -19,7 +19,7 @@ export class JWT implements Ijwt {
 
   verifyToken(token: string): any {
     try {
-      const decoded = jwt.verify(token, "JWT_PUBLIC_KEY") as JwtPayload;
+      const decoded = jwt.verify(token, "JWT_PRIVATE_KEY") as JwtPayload;
       return {
         payload: decoded,
         message: "Authenticated",
