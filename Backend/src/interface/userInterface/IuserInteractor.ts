@@ -1,5 +1,5 @@
 // src/interface/userInterface/IuserInteractor.ts
-import { UserInteractorResp } from "../../types/userTypes/userInteractorTypes"
+import { UserInteractorResp } from "../../types/userTypes"
 import { userProfileDTO ,userPasswordChangeDTO} from "../../domain/dtos/UserDTO"
 
 export interface IUserInteractor{
