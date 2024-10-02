@@ -53,5 +53,10 @@ app.*.map.json
 node_modules/
 dist/
 
+#enviroment variable
+.env
+Backend/.env
+
+dist/
 
 uploads/
