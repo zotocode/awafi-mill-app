@@ -57,6 +57,7 @@ export class UserInteractor implements IUserInteractor {
       return { success: false, message: "User already  under registration process" };
     }
     
+    
     // Generate OTP
     const otp = generateOTP();
     // Store user data along with OTP in Redis

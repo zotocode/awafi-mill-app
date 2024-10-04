@@ -33,9 +33,6 @@ export class UserController {
   //=========================================register====================
   async userRegister(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("====================================");
-      console.log("user reg");
-      console.log("====================================");
       const { email, password, phone, name } = req.body;
       const result = await this.userInteractor.registerUser(
         email,
@@ -46,9 +43,9 @@ export class UserController {
       if (result.success) {
         return res
           .status(200)
-          .json({ message: result.message, otp: result.otp });
+          .json({ status:true, message: result.message, otp: result.otp });
       } else {
-        return res.status(401).json({ message: result.message });
+        return res.status(401).json({status:false, message: result.message });
       }
     } catch (error) {
       next(error);
