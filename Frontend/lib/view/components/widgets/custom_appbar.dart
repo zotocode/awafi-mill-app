@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frondend/view/components/silvers/settings_menu.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class customAppBarWidget extends StatelessWidget
@@ -24,16 +25,22 @@ class customAppBarWidget extends StatelessWidget
         padding: EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Container(
-              height: 39,
-              width: 38,
-              decoration: BoxDecoration(
-                  color: Colors.black, borderRadius: BorderRadius.circular(6)),
-              child: Center(
-                  child: Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-              )),
+            GestureDetector(
+              onTap: () {
+                Get.back();
+              },
+              child: Container(
+                height: 39,
+                width: 38,
+                decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(6)),
+                child: Center(
+                    child: Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                )),
+              ),
             ),
           ],
         ),

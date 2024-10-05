@@ -4,7 +4,7 @@ import 'package:frondend/view/screens/dashboard_pages/account.dart';
 import 'package:frondend/view/screens/dashboard_pages/cart.dart';
 import 'package:frondend/view/screens/dashboard_pages/home.dart';
 import 'package:frondend/view/screens/dashboard_pages/wishlist.dart';
-import 'package:frondend/view_model/bottom_bar.dart';
+import 'package:frondend/view_model/provider.dart/bottom_bar.dart';
 import 'package:provider/provider.dart';
 
 class BottomScreen extends StatelessWidget {

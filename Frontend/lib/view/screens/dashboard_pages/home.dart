@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:frondend/common/assigns.dart';
 import 'package:frondend/common/style.dart';
 import 'package:frondend/view/components/widgets/offer_carousal.dart';
+import 'package:frondend/view/components/widgets/prodoct.dart';
+import 'package:frondend/view/screens/internal_pages/categories.dart';
+import 'package:frondend/view/screens/internal_pages/collections.dart';
+import 'package:frondend/view/screens/internal_pages/home_search.dart';
 import 'package:frondend/view/screens/internal_pages/notifications.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -80,10 +84,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 20),
                 TextFormField(
+                  readOnly: true,
+                  onTap: () {
+                    Get.to(() => HomeSearchScreen());
+                  },
                   decoration: InputDecoration(
                       labelText: 'Search',
                       prefixIcon: Icon(IconlyLight.search,
                           size: 30, color: Style.themeColor),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide:
+                              BorderSide(color: Style.themeColor, width: 2)),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(color: Style.themeColor))),
@@ -112,31 +124,38 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisSpacing: 8),
                       itemBuilder: (context, index) {
                         var data = Assigns.categories[index];
-                        return Container(
-                          height: 40,
-                          width: 40,
-                          decoration: BoxDecoration(
-                              border: Border.all(width: 2),
-                              borderRadius: BorderRadius.circular(20)),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Image.asset(
-                                  data['image'],
-                                ),
-                                SizedBox(height: 10),
-                                Flexible(
-                                  child: Text(
-                                    data['text'],
-                                    style: GoogleFonts.mulish(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold),
-                                    textAlign: TextAlign.center,
+                        return InkWell(
+                          onTap: () {
+                            Get.to(() => TopCategoriesScreen(
+                                  appBarText: data['text'],
+                                ));
+                          },
+                          child: Container(
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(
+                                border: Border.all(width: 2),
+                                borderRadius: BorderRadius.circular(20)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Image.asset(
+                                    data['image'],
                                   ),
-                                )
-                              ],
+                                  SizedBox(height: 10),
+                                  Flexible(
+                                    child: Text(
+                                      data['text'],
+                                      style: GoogleFonts.mulish(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
                         );
@@ -197,39 +216,47 @@ class _HomeScreenState extends State<HomeScreen> {
                           var collection = Assigns.collections[index];
                           return Padding(
                             padding: const EdgeInsets.only(top: 24),
-                            child: Container(
-                              height: 160,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  image: DecorationImage(
-                                      image: AssetImage(collection['image']),
-                                      fit: BoxFit.cover)),
+                            child: InkWell(
+                              onTap: () {
+                                Get.to(() => CollectionsScreen(
+                                      appBarText: collection['text'],
+                                    ));
+                              },
                               child: Container(
+                                height: 160,
                                 width: double.infinity,
-                                height: double.infinity,
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(16),
-                                    gradient: LinearGradient(
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                        colors: [
-                                          Colors.black.withOpacity(0.1),
-                                          Colors.black.withOpacity(0.8),
-                                        ])),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      collection['text'],
-                                      style: GoogleFonts.mulish(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    SizedBox(width: 30),
-                                  ],
+                                    image: DecorationImage(
+                                        image: AssetImage(collection['image']),
+                                        fit: BoxFit.cover)),
+                                child: Container(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      gradient: LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [
+                                            Colors.black.withOpacity(0.1),
+                                            Colors.black.withOpacity(0.8),
+                                          ])),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        collection['text'],
+                                        style: GoogleFonts.mulish(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      SizedBox(width: 30),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -261,118 +288,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 SizedBox(height: 14),
-                SingleChildScrollView(
-                  child: ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: 10,
-                    itemBuilder: (context, index) {
-                      return Card(
-                        child: Container(
-                          height: 350,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                              border: Border.all(),
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Column(
-                            children: [
-                              Expanded(
-                                flex: 2,
-                                child: Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                          image: AssetImage(
-                                              'assets/images/sample_collection.png'),
-                                          fit: BoxFit.cover)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 12),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Container(
-                                          height: 40,
-                                          width: 40,
-                                          decoration: BoxDecoration(
-                                            color: Colors.black,
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Stack(
-                                            alignment: Alignment.center,
-                                            children: [
-                                              IconButton(
-                                                onPressed: () {},
-                                                icon: Icon(
-                                                  Icons.favorite,
-                                                  size: 25,
-                                                ),
-                                                color: Colors.white,
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          'Palo Santo Sticks',
-                                          style: GoogleFonts.mulish(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                              letterSpacing: 1),
-                                        ),
-                                        Text(
-                                          '(Holy Wood)',
-                                          style: GoogleFonts.mulish(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 15,
-                                              letterSpacing: 1),
-                                        ),
-                                        Text(
-                                          '₹932.00-₹4,635.00',
-                                          style: GoogleFonts.mulish(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 15,
-                                              letterSpacing: 1),
-                                        ),
-                                        Container(
-                                          height: 40,
-                                          width: 150,
-                                          decoration: BoxDecoration(
-                                              color: Colors.black,
-                                              borderRadius:
-                                                  BorderRadius.circular(8)),
-                                          child: Center(
-                                            child: Text(
-                                              'View Prodoct',
-                                              style: GoogleFonts.mulish(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 18,
-                                                  letterSpacing: 1),
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  )),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                )
+                productListWidget(),
               ],
             ),
           ),
