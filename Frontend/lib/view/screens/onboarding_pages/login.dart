@@ -7,13 +7,16 @@ import 'package:frondend/view/components/widgets/text_field.dart';
 import 'package:frondend/view/screens/dashboard_pages/bottom.dart';
 import 'package:frondend/view/screens/onboarding_pages/forgot_password.dart';
 import 'package:frondend/view/screens/onboarding_pages/sign_up.dart';
-import 'package:frondend/view_model/field_provider.dart';
+import 'package:frondend/view_model/provider.dart/field_provider.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    TextEditingController phoneNubmerController = TextEditingController();
+    TextEditingController emailController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
     final loginProvider = Provider.of<FieldProvider>(context);
 
     return SafeArea(
@@ -62,9 +65,11 @@ class LoginScreen extends StatelessWidget {
                         SizedBox(height: 30),
                         loginProvider.isField == true
                             ? CustomizableTextFieldwidget(
+                                controller: emailController,
                                 labelText: Assigns.email,
                               )
                             : CountryCodeTextField(
+                                controller: phoneNubmerController,
                                 labelText: Assigns.numberText),
                         SizedBox(height: 10),
                         Row(
@@ -87,6 +92,7 @@ class LoginScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 10),
                         CustomizableTextFieldwidget(
+                          controller: passwordController,
                           labelText: Assigns.passwordLabelText,
                         ),
                         SizedBox(height: 20),
