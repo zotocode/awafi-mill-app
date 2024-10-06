@@ -8,6 +8,7 @@ import 'package:frondend/view/screens/internal_pages/categories.dart';
 import 'package:frondend/view/screens/internal_pages/collections.dart';
 import 'package:frondend/view/screens/internal_pages/home_search.dart';
 import 'package:frondend/view/screens/internal_pages/notifications.dart';
+import 'package:frondend/view/screens/onboarding_pages/login.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconly/iconly.dart';
@@ -37,14 +38,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    CircleAvatar(
-                      maxRadius: 22,
-                      child: Icon(
-                        Icons.person,
-                        size: 30,
-                        color: Colors.white,
+                    GestureDetector(
+                      onTap: () {
+                        Get.to(() => LoginScreen());
+                      },
+                      child: CircleAvatar(
+                        maxRadius: 22,
+                        child: Icon(
+                          Icons.person,
+                          size: 30,
+                          color: Colors.white,
+                        ),
+                        backgroundColor: Colors.black,
                       ),
-                      backgroundColor: Colors.black,
                     ),
                     Image.asset(
                       Assigns.appNameSmall,

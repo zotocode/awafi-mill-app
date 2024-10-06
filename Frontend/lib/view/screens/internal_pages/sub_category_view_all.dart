@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frondend/common/style.dart';
 import 'package:frondend/view/components/widgets/custom_appbar.dart';
+import 'package:frondend/view/screens/internal_pages/product_details.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconly/iconly.dart';
 
@@ -94,113 +96,118 @@ class SubCategoryViewAllScreen extends StatelessWidget {
                     crossAxisSpacing: 8,
                     mainAxisExtent: 310),
                 itemBuilder: (context, index) {
-                  return Card(
-                    color: Style.myColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding:
-                              const EdgeInsets.only(top: 4, left: 4, right: 4),
-                          child: Container(
-                            height: 175,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                topRight: Radius.circular(10),
-                              ),
-                              image: const DecorationImage(
-                                image: AssetImage(
-                                  'assets/images/sample_collection.png',
+                  return InkWell(
+                    onTap: () {
+                      Get.to(() => ProductDetailsScreen());
+                    },
+                    child: Card(
+                      color: Style.myColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                top: 4, left: 4, right: 4),
+                            child: Container(
+                              height: 175,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10),
                                 ),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 12,
-                              ),
-                              child: Align(
-                                alignment: Alignment.topRight,
-                                child: Container(
-                                  height: 36,
-                                  width: 36,
-                                  decoration: BoxDecoration(
-                                    color: Colors.black,
-                                    borderRadius: BorderRadius.circular(8),
+                                image: const DecorationImage(
+                                  image: AssetImage(
+                                    'assets/images/sample_collection.png',
                                   ),
-                                  child: IconButton(
-                                    padding: EdgeInsets.zero,
-                                    onPressed: () {},
-                                    icon: const Icon(
-                                      Icons.favorite,
-                                      size: 22,
-                                      color: Colors.white,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 12,
+                                ),
+                                child: Align(
+                                  alignment: Alignment.topRight,
+                                  child: Container(
+                                    height: 36,
+                                    width: 36,
+                                    decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 8.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(
-                                  'Palo Santo Sticks',
-                                  style: GoogleFonts.mulish(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                                Text(
-                                  '(Holy Wood)',
-                                  style: GoogleFonts.mulish(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 14,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                                Text(
-                                  '₹932.00 - ₹4,635.00',
-                                  style: GoogleFonts.mulish(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 14,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                Container(
-                                  height: 30,
-                                  width: 120,
-                                  decoration: BoxDecoration(
-                                    color: Colors.black,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      'View Product',
-                                      style: GoogleFonts.mulish(
+                                    child: IconButton(
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () {},
+                                      icon: const Icon(
+                                        Icons.favorite,
+                                        size: 22,
                                         color: Colors.white,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 13,
-                                        letterSpacing: 1,
                                       ),
                                     ),
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'Palo Santo Sticks',
+                                    style: GoogleFonts.mulish(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                                  Text(
+                                    '(Holy Wood)',
+                                    style: GoogleFonts.mulish(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14,
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                                  Text(
+                                    '₹932.00 - ₹4,635.00',
+                                    style: GoogleFonts.mulish(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14,
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Container(
+                                    height: 30,
+                                    width: 120,
+                                    decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'View Product',
+                                        style: GoogleFonts.mulish(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 13,
+                                          letterSpacing: 1,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
