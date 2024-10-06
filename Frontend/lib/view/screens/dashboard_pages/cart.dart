@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:frondend/view/components/silvers/total_price.dart';
 import 'package:frondend/view/components/widgets/auth_button.dart';
 import 'package:frondend/view/components/widgets/custom_appbar.dart';
+import 'package:frondend/view_model/provider.dart/quantity.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -117,7 +119,11 @@ class CartScreen extends StatelessWidget {
                                               Expanded(
                                                 child: IconButton(
                                                   padding: EdgeInsets.zero,
-                                                  onPressed: () {},
+                                                  onPressed: () {
+                                                    context
+                                                        .read<ProductQuantity>()
+                                                        .decrement();
+                                                  },
                                                   icon: Icon(
                                                     Icons.remove,
                                                     size: 9,
@@ -126,7 +132,10 @@ class CartScreen extends StatelessWidget {
                                                 ),
                                               ),
                                               Text(
-                                                '2',
+                                                context
+                                                    .watch<ProductQuantity>()
+                                                    .quantity
+                                                    .toString(),
                                                 style: GoogleFonts.mulish(
                                                   color: Colors.white,
                                                   fontSize: 12,
@@ -135,7 +144,11 @@ class CartScreen extends StatelessWidget {
                                               Expanded(
                                                 child: IconButton(
                                                   padding: EdgeInsets.zero,
-                                                  onPressed: () {},
+                                                  onPressed: () {
+                                                    context
+                                                        .read<ProductQuantity>()
+                                                        .increment();
+                                                  },
                                                   icon: Icon(
                                                     Icons.add,
                                                     size: 9,
@@ -145,7 +158,7 @@ class CartScreen extends StatelessWidget {
                                               ),
                                             ],
                                           ),
-                                        )
+                                        ),
                                       ],
                                     ),
                                   ],

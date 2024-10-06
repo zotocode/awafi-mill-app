@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frondend/common/assigns.dart';
 import 'package:frondend/common/style.dart';
 import 'package:frondend/view/components/widgets/auth_button.dart';
+import 'package:frondend/view/components/widgets/back_arrow.dart';
 import 'package:frondend/view/components/widgets/drop_down_field.dart';
 import 'package:frondend/view/components/widgets/text_field.dart';
 import 'package:frondend/view/screens/dashboard_pages/bottom.dart';
@@ -27,7 +28,7 @@ class LoginScreen extends StatelessWidget {
         child: Scaffold(
           body: Column(
             children: [
-              // Logo and app name section
+              BackArrowButtonWidget(),
               Container(
                 height: 320,
                 width: double.infinity,
@@ -57,13 +58,12 @@ class LoginScreen extends StatelessWidget {
                     color: Colors.black,
                   ),
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.only(left: 22, right: 22, top: 36),
+                    padding: EdgeInsets.only(left: 22, right: 22, top: 14),
                     child: Column(
                       children: [
-                        SizedBox(height: 10),
                         Text(Assigns.login, style: Style.textStyle),
                         SizedBox(height: 30),
-                        loginProvider.isField == true
+                        loginProvider.isField == false
                             ? CustomizableTextFieldwidget(
                                 controller: emailController,
                                 labelText: Assigns.email,
@@ -71,7 +71,7 @@ class LoginScreen extends StatelessWidget {
                             : CountryCodeTextField(
                                 controller: phoneNubmerController,
                                 labelText: Assigns.numberText),
-                        SizedBox(height: 10),
+                        SizedBox(height: 6),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -95,7 +95,7 @@ class LoginScreen extends StatelessWidget {
                           controller: passwordController,
                           labelText: Assigns.passwordLabelText,
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 10),
                         Row(
                           children: [
                             InkWell(
@@ -112,7 +112,7 @@ class LoginScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 10),
                         AuthenticateSaveButton(
                           buttonText: Assigns.buttonLogin,
                           onpressed: () {
@@ -147,7 +147,7 @@ class LoginScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
