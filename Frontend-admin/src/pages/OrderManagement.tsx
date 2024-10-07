@@ -23,7 +23,6 @@ const Dashboard = () => {
     <>
       <Navbar />
       <Sidebar />
-      
       <div className="p-4 sm:ml-64 mt-16">
         <Table data={productData} columns={columns} />
       </div>
