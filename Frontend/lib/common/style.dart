@@ -8,4 +8,5 @@ class Style {
       letterSpacing: 1,
       fontSize: 36);
   static Color themeColor = Color(0xFF414851);
+  static Color myColor = const Color.fromARGB(255, 191, 202, 221);
 }

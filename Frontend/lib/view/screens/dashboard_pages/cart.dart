@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:frondend/view/components/silvers/total_price.dart';
 import 'package:frondend/view/components/widgets/auth_button.dart';
 import 'package:frondend/view/components/widgets/custom_appbar.dart';
+import 'package:frondend/view_model/provider.dart/quantity.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -14,6 +16,7 @@ class CartScreen extends StatelessWidget {
         appBar: customAppBarWidget(
           text: 'My Cart',
           icon: Icons.delete,
+          isWidget: true,
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -26,7 +29,7 @@ class CartScreen extends StatelessWidget {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
-                      height: 150,
+                      height: 140,
                       width: double.infinity,
                       decoration: BoxDecoration(
                           color: Colors.grey,
@@ -37,7 +40,7 @@ class CartScreen extends StatelessWidget {
                             padding: const EdgeInsets.only(
                                 left: 12, top: 8, bottom: 8, right: 8),
                             child: Container(
-                              width: 140,
+                              width: 120,
                               height: double.infinity,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(4),
@@ -71,8 +74,11 @@ class CartScreen extends StatelessWidget {
                                             ),
                                             CircleAvatar(
                                               backgroundColor: Colors.white60,
-                                              maxRadius: 16,
-                                              child: Icon(Icons.close),
+                                              maxRadius: 12,
+                                              child: Icon(
+                                                Icons.close,
+                                                size: 16,
+                                              ),
                                             )
                                           ],
                                         ),
@@ -113,7 +119,11 @@ class CartScreen extends StatelessWidget {
                                               Expanded(
                                                 child: IconButton(
                                                   padding: EdgeInsets.zero,
-                                                  onPressed: () {},
+                                                  onPressed: () {
+                                                    context
+                                                        .read<ProductQuantity>()
+                                                        .decrement();
+                                                  },
                                                   icon: Icon(
                                                     Icons.remove,
                                                     size: 9,
@@ -122,7 +132,10 @@ class CartScreen extends StatelessWidget {
                                                 ),
                                               ),
                                               Text(
-                                                '2',
+                                                context
+                                                    .watch<ProductQuantity>()
+                                                    .quantity
+                                                    .toString(),
                                                 style: GoogleFonts.mulish(
                                                   color: Colors.white,
                                                   fontSize: 12,
@@ -131,7 +144,11 @@ class CartScreen extends StatelessWidget {
                                               Expanded(
                                                 child: IconButton(
                                                   padding: EdgeInsets.zero,
-                                                  onPressed: () {},
+                                                  onPressed: () {
+                                                    context
+                                                        .read<ProductQuantity>()
+                                                        .increment();
+                                                  },
                                                   icon: Icon(
                                                     Icons.add,
                                                     size: 9,
@@ -141,7 +158,7 @@ class CartScreen extends StatelessWidget {
                                               ),
                                             ],
                                           ),
-                                        )
+                                        ),
                                       ],
                                     ),
                                   ],
@@ -190,7 +207,7 @@ class CartScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10)),
                         child: Center(
                           child: Text(
-                            'APPLY COUPON',
+                            'Apply Coupon',
                             style: GoogleFonts.mulish(
                               fontSize: 12,
                               color: Colors.white,
@@ -209,13 +226,13 @@ class CartScreen extends StatelessWidget {
           ),
         ),
         bottomNavigationBar: Padding(
-          padding: EdgeInsets.only(left: 26, right: 26),
+          padding: EdgeInsets.only(left: 28, right: 28),
           child: Container(
             height: 80,
             padding: EdgeInsets.only(bottom: 12),
             child: Center(
               child: AuthenticateSaveButton(
-                buttonText: 'PROCEED TO CHECKOUT',
+                buttonText: 'Proceed To Checkout',
                 onpressed: () {},
               ),
             ),

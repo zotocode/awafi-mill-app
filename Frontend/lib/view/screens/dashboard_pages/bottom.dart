@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frondend/view/components/widgets/custom_bottom.dart';
-import 'package:frondend/view/screens/dashboard/account.dart';
-import 'package:frondend/view/screens/dashboard/cart.dart';
-import 'package:frondend/view/screens/dashboard/home.dart';
-import 'package:frondend/view/screens/dashboard/wishlist.dart';
-import 'package:frondend/view_model/bottom_bar.dart';
+import 'package:frondend/view/screens/dashboard_pages/account.dart';
+import 'package:frondend/view/screens/dashboard_pages/cart.dart';
+import 'package:frondend/view/screens/dashboard_pages/home.dart';
+import 'package:frondend/view/screens/dashboard_pages/wishlist.dart';
+import 'package:frondend/view_model/provider.dart/bottom_bar.dart';
 import 'package:provider/provider.dart';
 
 class BottomScreen extends StatelessWidget {

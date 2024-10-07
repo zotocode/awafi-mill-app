@@ -2,18 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:frondend/common/assigns.dart';
 import 'package:frondend/common/style.dart';
 import 'package:frondend/view/components/widgets/auth_button.dart';
+import 'package:frondend/view/components/widgets/back_arrow.dart';
 import 'package:frondend/view/components/widgets/drop_down_field.dart';
 import 'package:frondend/view/components/widgets/text_field.dart';
-import 'package:frondend/view/screens/dashboard/bottom.dart';
-import 'package:frondend/view/screens/onboarding/forgot_password.dart';
-import 'package:frondend/view/screens/onboarding/sign_up.dart';
+import 'package:frondend/view/screens/dashboard_pages/bottom.dart';
+import 'package:frondend/view/screens/onboarding_pages/forgot_password.dart';
+import 'package:frondend/view/screens/onboarding_pages/sign_up.dart';
+import 'package:frondend/view_model/provider.dart/field_provider.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
+    TextEditingController phoneNubmerController = TextEditingController();
+    TextEditingController emailController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
+    final loginProvider = Provider.of<FieldProvider>(context);
+
     return SafeArea(
       child: GestureDetector(
         onTap: () {
@@ -22,7 +28,7 @@ class LoginScreen extends StatelessWidget {
         child: Scaffold(
           body: Column(
             children: [
-              // Logo and app name section
+              BackArrowButtonWidget(),
               Container(
                 height: 320,
                 width: double.infinity,
@@ -52,31 +58,44 @@ class LoginScreen extends StatelessWidget {
                     color: Colors.black,
                   ),
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.only(left: 22, right: 22, top: 36),
+                    padding: EdgeInsets.only(left: 22, right: 22, top: 14),
                     child: Column(
                       children: [
-                        SizedBox(height: 10),
                         Text(Assigns.login, style: Style.textStyle),
                         SizedBox(height: 30),
-                        CountryCodeTextField(labelText: Assigns.numberText),
+                        loginProvider.isField == false
+                            ? CustomizableTextFieldwidget(
+                                controller: emailController,
+                                labelText: Assigns.email,
+                              )
+                            : CountryCodeTextField(
+                                controller: phoneNubmerController,
+                                labelText: Assigns.numberText),
+                        SizedBox(height: 6),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Text(
-                              Assigns.orSelected,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: Colors.white60),
+                            GestureDetector(
+                              onTap: () => loginProvider.toggleField(),
+                              child: Text(
+                                loginProvider.isField == true
+                                    ? Assigns.number
+                                    : Assigns.orEmail,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: Colors.white60),
+                              ),
                             )
                           ],
                         ),
                         SizedBox(height: 10),
                         CustomizableTextFieldwidget(
+                          controller: passwordController,
                           labelText: Assigns.passwordLabelText,
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 10),
                         Row(
                           children: [
                             InkWell(
@@ -93,7 +112,7 @@ class LoginScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 10),
                         AuthenticateSaveButton(
                           buttonText: Assigns.buttonLogin,
                           onpressed: () {
@@ -128,7 +147,7 @@ class LoginScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

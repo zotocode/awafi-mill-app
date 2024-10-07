@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frondend/common/assigns.dart';
 import 'package:frondend/view/components/widgets/auth_button.dart';
-import 'package:frondend/view/screens/onboarding/sucess.dart';
+import 'package:frondend/view/screens/onboarding_pages/sucess.dart';
 import 'package:get/get.dart';
 
 class SuccessfullScreen extends StatelessWidget {

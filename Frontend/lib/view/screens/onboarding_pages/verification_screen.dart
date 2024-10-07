@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frondend/common/assigns.dart';
 import 'package:frondend/view/components/widgets/auth_button.dart';
 import 'package:frondend/view/components/widgets/back_arrow.dart';
-import 'package:frondend/view/screens/onboarding/successfull_screen.dart';
+import 'package:frondend/view/screens/onboarding_pages/successfull_screen.dart';
 import 'package:get/get.dart';
 
 class VerificationScreen extends StatelessWidget {

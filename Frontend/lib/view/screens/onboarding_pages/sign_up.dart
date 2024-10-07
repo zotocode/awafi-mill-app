@@ -5,7 +5,9 @@ import 'package:frondend/view/components/widgets/auth_button.dart';
 import 'package:frondend/view/components/widgets/back_arrow.dart';
 import 'package:frondend/view/components/widgets/drop_down_field.dart';
 import 'package:frondend/view/components/widgets/text_field.dart';
-import 'package:frondend/view/screens/onboarding/verification_screen.dart';
+import 'package:frondend/view/screens/onboarding_pages/verification_screen.dart';
+import 'package:frondend/view_model/services.dart/model.dart/user_credential.dart';
+import 'package:frondend/view_model/services.dart/repos/user_credential.dart';
 import 'package:get/get.dart';
 
 class SignUpScreen extends StatelessWidget {
@@ -13,6 +15,31 @@ class SignUpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController phoneNumberController = TextEditingController();
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+    final AuthService authService = AuthService();
+
+    Future<void> registerUser() async {
+      UserData user = UserData(
+        name: nameController.text,
+        phoneNumber: phoneNumberController.text,
+        email: emailController.text,
+        password: passwordController.text,
+      );
+
+      final success = await authService.registerUser(user);
+      if (success) {
+        Get.snackbar('Success', 'Credential added successfully',
+            backgroundColor: Colors.blue);
+        Get.to(() => VerificationScreen());
+      } else {
+        Get.snackbar('Error', 'Failed to register user. Please try again.',
+            backgroundColor: Colors.red);
+      }
+    }
+
     return SafeArea(
       child: GestureDetector(
         onTap: () {
@@ -77,22 +104,35 @@ class SignUpScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 20),
                             CustomizableTextFieldwidget(
+                              controller: nameController,
                               labelText: Assigns.name,
                             ),
                             SizedBox(height: 16),
-                            CountryCodeTextField(labelText: Assigns.numberText),
+                            CountryCodeTextField(
+                                controller: phoneNumberController,
+                                labelText: Assigns.numberText),
                             CustomizableTextFieldwidget(
+                              controller: emailController,
                               labelText: Assigns.email,
                             ),
                             SizedBox(height: 16),
                             CustomizableTextFieldwidget(
+                              controller: passwordController,
                               labelText: Assigns.passwordLabelText,
                             ),
                             SizedBox(height: 20),
                             AuthenticateSaveButton(
                               buttonText: Assigns.signUp,
                               onpressed: () {
-                                Get.to(() => VerificationScreen());
+                                if (nameController.text.isNotEmpty &&
+                                    phoneNumberController.text.isNotEmpty &&
+                                    emailController.text.isNotEmpty &&
+                                    passwordController.text.isNotEmpty) {
+                                  registerUser();
+                                } else {
+                                  Get.snackbar(
+                                      'Error', 'All fields are required');
+                                }
                               },
                             ),
                             SizedBox(height: 10),
