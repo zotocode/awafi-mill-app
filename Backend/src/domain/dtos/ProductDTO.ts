@@ -1,5 +1,9 @@
 // src/domain/dto/product.dto.ts
 
+import mongoose from "mongoose";
+
+
+
 export interface ProductDTO {
   _id:string
   name: string;
@@ -7,11 +11,8 @@ export interface ProductDTO {
   price: number;
   originalPrice?: number; // Optional
   weight: string;
-  stockStatus: {
-    quantity: number;
-    status: "In Stock" | "Out of Stock";
-  };
-  categories?: string[]; // Optional
+  stockQuantity:number
+  category: mongoose.Schema.Types.ObjectId; // Optional
   images?: string[];
   variants?: { size: string; price: number; stockQuantity: number }[]; // Optional
   isListed:boolean
@@ -23,10 +24,9 @@ export interface ProductCreationDTO {
   originalPrice?: number; // Optional
   weight: string;
   stockQuantity:number,
-  status:"In Stock" | "Out of Stock",
-  categories?: string[]; // Optional
+  categories: mongoose.Schema.Types.ObjectId; // Optional
   images?: string[];
-  variants?: { size: string; price: number; stockQuantity: number }[]; // Optional
+  variants?: [{ size: string; price: number; stockQuantity: number }]; // Optional
   createdAt?: Date;
   updatedAt?: Date;
 }
