@@ -23,164 +23,180 @@ class LoginScreen extends StatelessWidget {
     return SafeArea(
       child: GestureDetector(
         onTap: () {
-          FocusScope.of(context).unfocus();
+          FocusScope.of(context).unfocus(); // Close keyboard on tap
         },
         child: Scaffold(
-          body: Column(
-            children: [
-              BackArrowButtonWidget(),
-              Container(
-                height: 320,
-                width: double.infinity,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      Assigns.logoImage,
-                      height: 100,
-                      width: 100,
-                    ),
-                    SizedBox(height: 20),
-                    Image.asset(
-                      Assigns.appName,
-                    ),
-                  ],
-                ),
-              ),
-              // Main body content wrapped inside Expanded
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20)),
-                    color: Colors.black,
-                  ),
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.only(left: 22, right: 22, top: 14),
+          resizeToAvoidBottomInset:
+              false, // Allow layout to adjust for the keyboard
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              return Column(
+                children: [
+                  BackArrowButtonWidget(),
+                  Container(
+                    height: 320,
+                    width: double.infinity,
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(Assigns.login, style: Style.textStyle),
-                        SizedBox(height: 30),
-                        loginProvider.isField == false
-                            ? CustomizableTextFieldwidget(
-                                controller: emailController,
-                                labelText: Assigns.email,
-                              )
-                            : CountryCodeTextField(
-                                controller: phoneNubmerController,
-                                labelText: Assigns.numberText),
-                        SizedBox(height: 6),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            GestureDetector(
-                              onTap: () => loginProvider.toggleField(),
-                              child: Text(
-                                loginProvider.isField == true
-                                    ? Assigns.number
-                                    : Assigns.orEmail,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    decoration: TextDecoration.underline,
-                                    decorationColor: Colors.white60),
-                              ),
-                            )
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        CustomizableTextFieldwidget(
-                          controller: passwordController,
-                          labelText: Assigns.passwordLabelText,
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                Get.to(() => ForgotPasswordScreen());
-                              },
-                              child: Text(
-                                Assigns.forgotPassowrd,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  letterSpacing: 1,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        AuthenticateSaveButton(
-                          buttonText: Assigns.buttonLogin,
-                          onpressed: () {
-                            Get.to(() => BottomScreen());
-                          },
+                        Image.asset(
+                          Assigns.logoImage,
+                          height: 100,
+                          width: 100,
                         ),
                         SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              Assigns.accoutMessage,
-                              style: TextStyle(
-                                color: Colors.white54,
-                                fontWeight: FontWeight.w300,
-                                fontSize: 16,
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            InkWell(
-                              onTap: () {
-                                Get.to(() => SignUpScreen());
-                              },
-                              child: Text(
-                                Assigns.singUp,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              Assigns.loginAsGuest,
-                              style: TextStyle(
-                                color: Colors.white54,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
-                              ),
-                            ),
-                            SizedBox(width: 4),
-                            InkWell(
-                              onTap: () {
-                                Get.to(() => BottomScreen());
-                              },
-                              child: Text(
-                                Assigns.guest,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ],
+                        Image.asset(
+                          Assigns.appName,
                         ),
                       ],
                     ),
                   ),
-                ),
-              ),
-            ],
+                  // Main body content wrapped inside Expanded
+                  Expanded(
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
+                        color: Colors.black,
+                      ),
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.only(left: 22, right: 22, top: 14),
+                        child: Padding(
+                          // Dynamically adjust padding based on keyboard visibility
+                          padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).viewInsets.bottom,
+                          ),
+                          child: Column(
+                            children: [
+                              Text(Assigns.login, style: Style.textStyle),
+                              SizedBox(height: 30),
+                              loginProvider.isField == false
+                                  ? CustomizableTextFieldwidget(
+                                      keyboardType: TextInputType.emailAddress,
+                                      controller: emailController,
+                                      labelText: Assigns.email,
+                                    )
+                                  : CountryCodeTextField(
+                                      controller: phoneNubmerController,
+                                      labelText: Assigns.numberText,
+                                    ),
+                              SizedBox(height: 6),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () => loginProvider.toggleField(),
+                                    child: Text(
+                                      loginProvider.isField == false
+                                          ? Assigns.number
+                                          : Assigns.orEmail,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: Colors.white60,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              SizedBox(height: 10),
+                              CustomizableTextFieldwidget(
+                                controller: passwordController,
+                                labelText: Assigns.passwordLabelText,
+                              ),
+                              SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      Get.to(() => ForgotPasswordScreen());
+                                    },
+                                    child: Text(
+                                      Assigns.forgotPassowrd,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        letterSpacing: 1,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10),
+                              AuthenticateSaveButton(
+                                buttonText: Assigns.buttonLogin,
+                                onpressed: () {
+                                  Get.to(() => BottomScreen());
+                                },
+                              ),
+                              SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    Assigns.accoutMessage,
+                                    style: TextStyle(
+                                      color: Colors.white54,
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  InkWell(
+                                    onTap: () {
+                                      Get.to(() => SignUpScreen());
+                                    },
+                                    child: Text(
+                                      Assigns.singUp,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    Assigns.loginAsGuest,
+                                    style: TextStyle(
+                                      color: Colors.white54,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  SizedBox(width: 4),
+                                  InkWell(
+                                    onTap: () {
+                                      Get.to(() => BottomScreen());
+                                    },
+                                    child: Text(
+                                      Assigns.guest,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
