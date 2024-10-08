@@ -1,34 +1,22 @@
-export class CartItem {
-    constructor(
-        readonly productId: string,
-        readonly quantity: number,
-        readonly price: number,
-    ) {}
-    
-    
-    public static newCartItem(productId: string, quantity: number, price: number) {
-        return new CartItem(productId, quantity, price);
-    }
+// src/domain/entities/userCartSchema.ts
+import mongoose, { Document } from "mongoose";
+
+// Cart interface
+export interface IUserCart extends Document {
+  user: string | mongoose.Types.ObjectId;
+  items: { product: mongoose.Types.ObjectId; quantity: number }[];  
 }
 
-export class Cart {
-    constructor(
-        readonly userId: string,
-        readonly items: CartItem[],
-        readonly totalPrice: number,
-    ) {}
-
-    // Static method to create a new cart
-    public static newCart(
-        userId: string,
-        items: CartItem[],
-        totalPrice: number,
-    ) {
-        return new Cart(userId, items, totalPrice);
+const userCartSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  items: [
+    {
+      product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
+      quantity: { type: Number, required: true, default: 1 }
     }
+  ]
+}, {
+  timestamps: true  
+});
 
-    // Optional method to recalculate total price
-    public calculateTotalPrice(): number {
-        return this.items.reduce((total, item) => total + (item.price * item.quantity), 0);
-    }
-}
+export default userCartSchema;

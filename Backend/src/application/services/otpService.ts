@@ -1,6 +1,9 @@
 import crypto from "crypto";
 
 export const generateOTP = (): string => {
+  console.log('====================================');
+  console.log("callong otp function");
+  console.log('====================================');
   const digits = '0123456789'; 
   let OTP = '';               
   const bytes = crypto.randomBytes(4); 

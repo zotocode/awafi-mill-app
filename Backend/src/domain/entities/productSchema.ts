@@ -1,22 +1,30 @@
 import mongoose, { Document } from "mongoose";
 
-// Ensure that 'product' and 'IProduct' types align
-export interface product {
-  _id: string | mongoose.Types.ObjectId;
-  title: string;
-  description: string;
+
+
+interface Variant {
+  size: string;
   price: number;
-  inventory: number;
-  createdAt: Date;
-  updatedAt: Date;
+  stockQuantity: number;
 }
 
-export interface IProduct extends Document {
-  _id: string | mongoose.Types.ObjectId;
-  title: string;
+interface StockStatus {
+  quantity: number;
+}
+
+// Define the Product interface that extends Document
+export interface Product extends Document {
+  _id: string; // MongoDB ID
+  name: string;
   description: string;
   price: number;
-  inventory: number;
-  createdAt: Date;
-  updatedAt: Date;
+  originalPrice?: number; // Optional original price for discounts
+  weight: string;
+  stockQuantity:number;
+  category: mongoose.Schema.Types.ObjectId; // Reference to Category
+  images?: string[]; // Use Image interface for structured image data
+  variants?: Variant[]; // Optional product variants
+  createdAt?: Date; // Automatically handled by mongoose
+  updatedAt?: Date; // Automatically handled by mongoose
+  isListed: boolean; // Indicates if the product is listed
 }

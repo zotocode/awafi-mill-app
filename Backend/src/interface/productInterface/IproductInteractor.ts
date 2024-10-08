@@ -1,9 +1,12 @@
-// src/interface/productInterface/IproductInteractor.ts
-import { product } from "../../domain/entities/productSchema";
+import { ProductDTO ,ProductCreationDTO} from "../../domain/dtos/ProductDTO"; 
+import {resposeHandler} from '../../types/commonTypes'
 export default interface IProductInteractor {
-  addProduct(data: product): Promise<any>;
-  getAllProducts(): Promise<product[]>;
-  getProductById(id: string): Promise<product | null>;
-  updateProduct(id: string, data: Partial<product>): Promise<product | null>;
-  deleteProduct(id: string): Promise<boolean>; 
+  addProduct(data: ProductCreationDTO): Promise<ProductDTO |resposeHandler>;
+  getAllProducts(): Promise<ProductDTO[]>;
+  getProductById(id: string): Promise<ProductDTO | null>;
+  updateProduct(id: string, data: Partial<ProductCreationDTO>): Promise<ProductDTO | null |resposeHandler>;
+  // deleteProduct(id: string): Promise<boolean>; 
+  listById(id: string): Promise<resposeHandler | null>; 
+  unListById(id: string): Promise<resposeHandler | null>; 
+  updateImage(id:string,index:number,file:string):Promise<any>
 }
