@@ -17,7 +17,7 @@ export class CategoryController {
     try {
     
       const category: categoryCreationDTo = req.body;
-    
+      //  console.log('data set',req.bodycod
     
       const result:any = await this.categoryInteractor.addCategory(category);
       if(result?.status)
@@ -66,7 +66,7 @@ export class CategoryController {
       const updatedData: Partial<categoryCreationDTo> = req.body; 
       const updatedProduct = await this.categoryInteractor.updateCategory(productId, updatedData);
       if (updatedProduct) {
-        res.status(200).json(updatedProduct);
+        res.status(200).json({Category:updatedProduct});
       } else {
         res.status(404).json({ message: "Product not found" });
       }

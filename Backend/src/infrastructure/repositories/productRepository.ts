@@ -19,11 +19,7 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
         description: productDTO.description,
         price: productDTO.price,
         originalPrice: productDTO.originalPrice,
-        weight: productDTO.weight,
-        stockStatus: {
-          quantity: productDTO.stockQuantity,
-          status: productDTO.status,
-        },
+        stockQuantity:productDTO.stockQuantity,
         categories: productDTO.categories,
         images: productDTO.images,
         variants: productDTO.variants,
