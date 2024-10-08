@@ -2,7 +2,7 @@ import Navbar from '../components/Navbar';
 import Table from '../components/Table';
 import Sidebar from '../components/Sidebar';
 import { useState } from 'react';
-import ModalForm from '../components/ModalForm';
+import ProductModalForm from '../components/ProductModalForm';
 
 const ProductManagement = () => {
     const[isModal,setModal]=useState(false)
@@ -38,7 +38,7 @@ const ProductManagement = () => {
         <button onClick={()=>{setModal(true)}} type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Add Product</button>
         </div>
       <Table data={productData} columns={productColumns} actions={productActions} />
-      <ModalForm isOpen={isModal} onClose={handleModalClose} />
+      <ProductModalForm isOpen={isModal} onClose={handleModalClose} />
     </div>
     </>
   );
