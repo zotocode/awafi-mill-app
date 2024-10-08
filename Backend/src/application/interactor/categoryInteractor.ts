@@ -12,6 +12,7 @@ export class CategoryInteractor implements ICategoryInteractor {
 
   // Add a new category
   async addCategory(data: categoryCreationDTo): Promise<categoryDTo |resposeHandler> {
+    // console.log("data",data)
     const{name}=data
     const isAvailable=await this.categoryRepo.findByName(name)
     if(isAvailable)
