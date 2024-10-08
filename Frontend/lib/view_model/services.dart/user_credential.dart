@@ -6,9 +6,6 @@ import 'dart:convert';
 // To register userCredential...!
 
 class AuthService {
-  final String apiUrl =
-      'https://xg1xw7n6-3000.inc1.devtunnels.ms/api/user/register';
-
   Future<bool> registerUser(UserData user) async {
     try {
       final response = await http.post(
@@ -22,6 +19,35 @@ class AuthService {
       return response.statusCode == 200;
     } catch (e) {
       print('Error during registration: $e');
+      return false;
+    }
+  }
+
+  Future<bool> verifyOtp({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${EndPoint.otpUrl}/verify-otp'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'email': email,
+          'otp': otp,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print(response.body);
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        print("data status ${data['status']}");
+        return data['status'] ?? false;
+      }
+      return false;
+    } catch (e) {
+      print('OTP verification error: $e');
       return false;
     }
   }

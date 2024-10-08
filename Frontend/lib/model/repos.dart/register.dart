@@ -22,7 +22,11 @@ Future<void> registerUser(
   if (success) {
     Get.snackbar('Success', 'Credential added successfully',
         backgroundColor: Colors.blue);
-    Get.to(() => VerificationScreen());
+    Get.to(() => VerificationScreen(
+        name: nameController.text,
+        email: emailController.text,
+        phoneNumber: phoneNumberController.text,
+        password: passwordController.text));
   } else {
     Get.snackbar('Error', 'Failed to register user. Please try again.',
         backgroundColor: Colors.red);
