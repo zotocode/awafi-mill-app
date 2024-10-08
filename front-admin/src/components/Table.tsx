@@ -3,6 +3,7 @@ import React from 'react';
 interface TableColumn {
   header: string;
   accessor: string;
+  render?: (value: any) => React.ReactNode;
 }
 
 interface TableProps {
@@ -33,7 +34,9 @@ const Table: React.FC<TableProps> = ({ data, columns, actions }) => {
             >
               {columns.map((column) => (
                 <td key={column.accessor} className="px-6 py-4">
-                  {row[column.accessor]}
+                  {column.render
+                    ? column.render(row[column.accessor])
+                    : row[column.accessor]}
                 </td>
               ))}
               {actions && (
