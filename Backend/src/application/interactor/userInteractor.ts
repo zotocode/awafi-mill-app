@@ -51,12 +51,17 @@ export class UserInteractor implements IUserInteractor {
   async registerUser(email: string, name: string, password: string, phone: number): Promise<UserInteractorResp> {
   try {
    
-    
+    await RedisServices.deleteData(email);
     const existingUser = await RedisServices.getData<{ email: string; name: string; password: string; phone: number; otp: string }>(email);
     if (existingUser) {
+     
       return { success: false, message: "User already  under registration process" };
     }
     
+    const registeredUser = await this.userRepository.findUserEmail(email)
+    if(registeredUser){
+      return { success: false, message: "User already present" };
+    }
     
     // Generate OTP
     const otp = generateOTP();
@@ -66,8 +71,7 @@ export class UserInteractor implements IUserInteractor {
     // sendEmail--------------------
     await this.emailService.OtpEmail(email,otp)
     const dataSet={
-      email,
-      otp
+      email
     }
     return { success: true, data:dataSet, message: `User registcujuimration initiated, please verify OTP.${otp}` };
   } catch (error) {
