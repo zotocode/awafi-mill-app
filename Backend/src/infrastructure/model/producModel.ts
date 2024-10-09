@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import {Product} from '../../domain/entities/productSchema'
+import { ref, required } from 'joi';
 
 
 // Create the product schema
@@ -10,11 +11,8 @@ const productSchema = new Schema<Product>({
   originalPrice: { type: Number }, // Optional original price for discounts
   weight: { type: String, required: true },
   isListed: { type: Boolean,default:true,required:true },
-  stockStatus: {
-    quantity: { type: Number, required: true },
-    status: { type: String, enum: ['In Stock', 'Out of Stock'], required: true }
-  },
-  categories: [{ type: String }], // Optional product categories
+  stockQuantity: { type: Number, required: true,default:0 },
+  category: { type: mongoose.Schema.ObjectId,ref:'Category',required:true }, // Optional product categories
   images: [
     { type: String, required: true },
       
