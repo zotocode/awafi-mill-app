@@ -1,10 +1,6 @@
-import { Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
-// Define interfaces for nested types
-interface Image {
-  url: string;
-  altText?: string;
-}
+
 
 interface Variant {
   size: string;
@@ -14,24 +10,21 @@ interface Variant {
 
 interface StockStatus {
   quantity: number;
-  status: 'In Stock' | 'Out of Stock';
 }
-
 
 // Define the Product interface that extends Document
 export interface Product extends Document {
-  _id:string
+  _id: string; // MongoDB ID
   name: string;
   description: string;
   price: number;
-  originalPrice?: number; // Optional
+  originalPrice?: number; // Optional original price for discounts
   weight: string;
-  stockStatus: StockStatus;
-  categories?: string[]; // Optional
-  images?: string[]; // Optional
-  variants?: Variant[]; // Optional
+  stockQuantity:number;
+  category: mongoose.Schema.Types.ObjectId; // Reference to Category
+  images?: string[]; // Use Image interface for structured image data
+  variants?: Variant[]; // Optional product variants
   createdAt?: Date; // Automatically handled by mongoose
   updatedAt?: Date; // Automatically handled by mongoose
-  isListed: boolean; // Automatically handled by mongoose
+  isListed: boolean; // Indicates if the product is listed
 }
-Document

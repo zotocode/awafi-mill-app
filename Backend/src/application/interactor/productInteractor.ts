@@ -30,6 +30,9 @@ export class ProductInteractor implements IProductInteractor {
     if (productData.price <= 0) {
       throw  error('Price must be greater than zero');
     }
+    const totalStock=productData.variants?.reduce((acc,ele)=>{
+      return acc + ele.stockQuantity
+    },0)
 
     const createdProduct = await this.productRepo.addProduct(productData);
     return this.mapEntityToDto(createdProduct);
@@ -102,10 +105,7 @@ export class ProductInteractor implements IProductInteractor {
       throw error('Required fields are missing in ProductDTO');
     }
   
-    const stockStatus = {
-      quantity: productData.stockStatus.quantity,
-      status: productData.stockStatus.status,
-    };
+   
   
     return {
       name: productData.name,
@@ -113,8 +113,7 @@ export class ProductInteractor implements IProductInteractor {
       price: productData.price,
       originalPrice: productData.originalPrice,
       weight: productData.weight,
-      stockStatus: stockStatus,
-      categories: productData.categories,
+      category: productData.category,
       images: productData.images,
       variants: productData.variants,
       createdAt: new Date(),
@@ -133,8 +132,8 @@ export class ProductInteractor implements IProductInteractor {
       price: product.price,
       originalPrice: product.originalPrice,
       weight: product.weight,
-      stockStatus: product.stockStatus,
-      categories: product.categories,
+      stockQuantity: product.stockQuantity,
+      category: product.category,
       images: product.images,
       variants: product.variants,
       isListed:product.isListed
