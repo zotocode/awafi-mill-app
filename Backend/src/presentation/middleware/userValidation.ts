@@ -3,13 +3,13 @@ import express from "express";
 
 // validation schema
 const schema = Joi.object({
-  email: Joi.string().email().required().messages({
+  email: Joi.string().email().trim().required().messages({
     'string.email': 'Please provide a valid email address',
     'any.required': 'Email is required',
   }),
-  name: Joi.string().required().messages({
+  name: Joi.string().trim().required().messages({
     'any.required': 'Name is required',
-  }), // Added validation for name
+  }), // Added validation for name with trimming
   password: Joi.string().min(6).required().messages({
     'string.min': 'Password must be at least 6 characters long',
     'any.required': 'Password is required',
@@ -23,7 +23,8 @@ const schema = Joi.object({
 export const validateUserInput = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const { error } = schema.validate(req.body);
   if (error) {
-    return res.status(400).json({ message: error.details[0].message });
+    console.log("error", error);
+    return res.status(400).json({ status: false, message: error.details[0].message });
   }
-  next(); 
+  next();
 };
