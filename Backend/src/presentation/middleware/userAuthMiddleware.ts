@@ -18,11 +18,8 @@ export const verifyToken = (req: CustomRequest, res: Response, next: NextFunctio
   const { payload, message } = jwtService.verifyToken(token);
 
   if (!payload) {
-    return res.status(403).json({ message });
+    return res.status(403).json({status:false, message });
   }
-  console.log('====================================');
-  console.log("payload",payload);
-  console.log('====================================');
   (req as any).user = { id: payload.id };
   next();
 };
