@@ -1,7 +1,7 @@
 import React from 'react';
-import Navbar from '../components/Navbar';
+import Navbar from '../layouts/Navbar';
 import Table from '../components/Table';
-import Sidebar from '../components/Sidebar';
+import Sidebar from '../layouts/Sidebar';
 
 const Dashboard = () => {
   const productData = [
@@ -21,8 +21,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <Navbar />
-      <Sidebar />
+    
       <div className="p-4 sm:ml-64 mt-16">
         <Table data={productData} columns={columns} />
       </div>

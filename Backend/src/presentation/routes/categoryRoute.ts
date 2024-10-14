@@ -15,6 +15,7 @@ const categoryRoutes = express.Router();
 // Define routes
 categoryRoutes.post("/category",categoryController.addCategory.bind(categoryController));
 categoryRoutes.get("/category", categoryController.getAllCategories.bind(categoryController));
+categoryRoutes.get("/listedCategory", categoryController.getListedCategories.bind(categoryController));
 categoryRoutes.get("/category/:id", categoryController.getCategoryById.bind(categoryController));
 categoryRoutes.put("/category/:id", categoryController.updateCategory.bind(categoryController));
 categoryRoutes.patch("/category/:id", categoryController.toggleListStatus.bind(categoryController));

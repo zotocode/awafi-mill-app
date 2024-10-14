@@ -19,6 +19,14 @@ class CategoryApi{
           return error;
         }
       }
+    async fetchAllListedCategories(): Promise<any> {
+        try {
+          return await this.axiosInstance.get('/api/categories/listedCategory');
+        } catch (error: unknown) {
+         
+          return error;
+        }
+      }
     async deleteCategory(id:string): Promise<any> {
         try {
           return await this.axiosInstance.patch(`/api/categories/category/delete/${id}`);

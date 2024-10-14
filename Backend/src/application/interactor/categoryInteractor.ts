@@ -31,6 +31,12 @@ export class CategoryInteractor implements ICategoryInteractor {
     return categories.map(this.mapToDTO);
   }
 
+  // Get all listed categories
+  async getListedCategories(): Promise<categoryDTo[]> {
+    const categories = await this.categoryRepo.getListedCategories(); // Use repository method
+    return categories.map(this.mapToDTO);
+  }
+
   // Get a category by ID
   async getCategoryById(id: string): Promise<categoryDTo | null> {
     const category = await this.categoryRepo.getCategoryById(id); // Use repository method
