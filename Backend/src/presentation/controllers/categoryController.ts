@@ -42,6 +42,15 @@ export class CategoryController {
       next(error);
     }
   }
+  async getListedCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+   
+      const products = await this.categoryInteractor.getListedCategories();
+      res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  }
 
   // Get a product by ID (HTTP GET)
   async getCategoryById(req: Request, res: Response, next: NextFunction): Promise<void> {

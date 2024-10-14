@@ -1,5 +1,6 @@
 // src/components/Navbar.tsx
 import React from 'react';
+import { Outlet } from 'react-router-dom';
 
 interface NavbarProps {}
 
@@ -44,6 +45,7 @@ const Navbar: React.FC<NavbarProps> = () => {
   </div>
   </div>
 </nav>
+<Outlet/> 
 </>)
 }
 
