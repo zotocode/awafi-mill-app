@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^1.7.7",
     "lucide-react": "^0.447.0",
+    "mogoose": "^0.0.1-security",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.2",
