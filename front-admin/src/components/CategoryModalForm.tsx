@@ -64,7 +64,7 @@ const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
       let response;
       if (category) {
         // Edit existing category
-        response = await CategoryApi.updateCategory(category.id, {
+        response = await CategoryApi.updateCategory(category._id, {
           name,
           description,
           isListed,
@@ -79,7 +79,7 @@ const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
       }
   
       if (response.data) {
-        onSuccess(response.data.Category);
+        onSuccess(response.data);
         toast.success(`Category ${category ? 'updated' : 'created'} successfully`);
       }
       

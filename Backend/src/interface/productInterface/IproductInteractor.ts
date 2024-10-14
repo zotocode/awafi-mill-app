@@ -5,7 +5,7 @@ export default interface IProductInteractor {
   getAllProducts(): Promise<ProductDTO[]>;
   getProductById(id: string): Promise<ProductDTO | null>;
   updateProduct(id: string, data: Partial<ProductCreationDTO>): Promise<ProductDTO | null |resposeHandler>;
-  // deleteProduct(id: string): Promise<boolean>; 
+  deleteProduct(id: string): Promise<boolean>; 
   listById(id: string): Promise<resposeHandler | null>; 
   unListById(id: string): Promise<resposeHandler | null>; 
   updateImage(id:string,index:number,file:string):Promise<any>
