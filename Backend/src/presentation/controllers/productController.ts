@@ -15,14 +15,17 @@ export class ProductController {
   // Add a new product (HTTP POST)
   async addProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+        
       const photos: any = req.files || [];
-    
+      
       const productData: ProductCreationDTO = req.body;
       
       if (photos.length > 0 && !productData.images) {
         productData.images = photos.map((photo: any[0]) => photo.path.toString());
     
       }
+
+
       
       const result:any = await this.productInteractor.addProduct(productData);
       if(result?.status)
@@ -30,7 +33,7 @@ export class ProductController {
           res.status(result.status).json({ message: result.message});
         }
   
-      res.status(201).json({ message: "Product created successfully", product: result });
+      res.status(200).json({ message: "Product created successfully", product: result });
     } catch (error) {
       next(error);
     }
@@ -99,7 +102,6 @@ export class ProductController {
   // Update a product (HTTP PUT)
   async updateProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-
       const productId = req.params.id;
       const updatedData: Partial<ProductCreationDTO> = req.body; 
       const updatedProduct:any = await this.productInteractor.updateProduct(productId, updatedData);
