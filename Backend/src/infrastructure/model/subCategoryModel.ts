@@ -1,9 +1,10 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import Category from '../../domain/entities/categorySchema'
+import IsubCategory  from '../../domain/entities/subCategorySchema'
+
 
 
 // Define the Category schema
-const CategorySchema: Schema = new Schema(
+const SubCategorySchema: Schema = new Schema(
   {
     name: {
       type: String,
@@ -14,6 +15,11 @@ const CategorySchema: Schema = new Schema(
     description: {
       type: String,
       required: false, // Optional: make this field required or not
+      trim: true,
+    },
+    mainCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'MainCategory', // Optional: make this field required or not
       trim: true,
     },
     isListed: {
@@ -31,6 +37,6 @@ const CategorySchema: Schema = new Schema(
 );
 
 // Export the model
-const Category = mongoose.model<Category>('MainCategory', CategorySchema);
+const SubCategory = mongoose.model<IsubCategory >('SubCategory', SubCategorySchema);
 
-export default Category;
+export default SubCategory;

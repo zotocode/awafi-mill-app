@@ -1,75 +1,188 @@
-import React, { useState } from 'react';
-interface ModalFormProps {
-    isOpen: boolean;
-    onClose: () => void;
-  }
+import React, { useEffect, useState } from "react";
+import { Product, Description, Variant } from "../types/productTypes";
+import { Category } from "../types/categoryType";
+import categoryapi from "../api/categoryapi";
+import { toast } from "react-toastify";
+import productapi from "../api/productapi";
 
-  const ModalForm: React.FC<ModalFormProps> = ({ isOpen, onClose }) => {
-  // States to manage form data
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState<number | ''>('');
-  const [originalPrice, setOriginalPrice] = useState<number | ''>('');
+interface ModalFormProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onProductAdd: (newProduct: Product) => void;
+}
+
+const ProductModalForm: React.FC<ModalFormProps> = ({
+  isOpen,
+  onClose,
+  onProductAdd,
+}) => {
+  const [name, setName] = useState("");
+  const [descriptions, setDescriptions] = useState<Description[]>([
+    { header: "", content: "" },
+  ]);
   const [isListed, setIsListed] = useState(true);
-  const [categories, setCategories] = useState<string>('');
-  const [images, setImages] = useState<string[]>(['']);
-  const [variants, setVariants] = useState([
-    { size: '', price: '', stockQuantity: '' },
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [category, setCategory] = useState<Category | null>(null);
+  const [subCategories, setSubCategories] = useState<Category[]>([]);
+  const [images, setImages] = useState<File[]>([]);
+  const [subCategory, setSubCategory] = useState<Category | null>(null);
+  const [variants, setVariants] = useState<Variant[]>([
+    { weight: "", price: 0, stockQuantity: 0 },
   ]);
 
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const response = await categoryapi.fetchAllListedCategories();
+        if (response.status === 200) {
+          setCategories(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    }
+    fetchCategories();
+  }, []);
 
- 
-  
-  const handleAddImage = () => setImages([...images, '']);
-  const handleRemoveImage = (index: number) =>
-    setImages(images.filter((_, i) => i !== index));
+  useEffect(() => {
+    async function fetchSubCategories() {
+      if (category?._id) {
+        try {
+          const response = await categoryapi.fetchSubCategories(category._id);
+          if (response.status === 200) {
+            setSubCategories(response.data);
+          }
+        } catch (error) {
+          console.error("Error fetching subcategories:", error);
+        }
+      } else {
+        setSubCategories([]);
+      }
+    }
+    fetchSubCategories();
+  }, [category]);
+
+  const resetForm = () => {
+    setName("");
+    setDescriptions([{ header: "", content: "" }]);
+    setIsListed(true);
+    setCategory(null);
+    setSubCategory(null);
+    setVariants([{ weight: "", price: 0, stockQuantity: 0 }]);
+  };
+
+  const handleAddDescription = () => {
+    setDescriptions([...descriptions, { header: "", content: "" }]);
+  };
+
+  const handleRemoveDescription = (index: number) => {
+    setDescriptions(descriptions.filter((_, i) => i !== index));
+  };
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = e.target.files;
+    if (selectedFiles) {
+      // Convert FileList to an array of File objects
+      setImages(Array.from(selectedFiles));
+    }
+  };
+
+  const handleDescriptionChange = (
+    index: number,
+    field: "header" | "content",
+    value: string
+  ) => {
+    const newDescriptions = [...descriptions];
+    newDescriptions[index][field] = value;
+    setDescriptions(newDescriptions);
+  };
 
   const handleAddVariant = () =>
-    setVariants([...variants, { size: '', price: '', stockQuantity: '' }]);
+    setVariants([...variants, { weight: "", price: 0, stockQuantity: 0 }]);
+
   const handleRemoveVariant = (index: number) =>
     setVariants(variants.filter((_, i) => i !== index));
 
-  // Submit handler
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const productData = {
-      name,
-      description,
-      price,
-      originalPrice,
-      isListed,
-      categories,
-      images,
-      variants,
-    };
-    console.log('Product Data:', productData);
-    // Handle API call to add product
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("isListed", isListed.toString());
+
+    if (category?._id) {
+      formData.append("category", category._id);
+    }
+
+    if (subCategory?._id) {
+      formData.append("subCategory", subCategory._id);
+    }
+
+    descriptions.forEach((desc, index) => {
+      formData.append(`descriptions[${index}][header]`, desc.header || "");
+      formData.append(`descriptions[${index}][content]`, desc.content || "");
+    });
+
+    variants.forEach((variant, index) => {
+      formData.append(`variants[${index}][weight]`, variant.weight || "");
+      formData.append(`variants[${index}][price]`, variant.price.toString());
+      formData.append(
+        `variants[${index}][stockQuantity]`,
+        variant.stockQuantity.toString()
+      );
+    });
+    images.forEach((image, index) => {
+      formData.append(`images`, image);
+    });
+  
+
+    try {
+      const addProduct = await productapi.addProduct(formData);
+
+      if (addProduct.status === 200) {
+        onProductAdd(addProduct.data.product);
+        toast.success("Product added successfully");
+        resetForm();
+        onClose();
+      }
+    } catch (error) {
+      toast.error("Failed to add product");
+      console.error("Product save error:", error);
+    }
   };
 
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCategoryId = e.target.value;
+    const selectedCategory = categories.find(
+      (cat) => cat._id === selectedCategoryId
+    );
+    setCategory(selectedCategory || null);
+    setSubCategory(null); // Reset subcategory when main category changes
+  };
+
+  const handleSubCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedSubCategoryId = e.target.value;
+    const selectedSubCategory = subCategories.find(
+      (cat) => cat._id === selectedSubCategoryId
+    );
+    setSubCategory(selectedSubCategory || null);
+  };
+
+  if (!isOpen) return null;
+
   return (
-    <div  className={`${
-        isOpen ? 'fixed' : 'hidden'
-      } overflow-y-auto overflow-x-hidden inset-0 z-50 justify-center items-center w-full h-full bg-black bg-opacity-50`}>
-    <div
-      id="add-product-modal"
-      aria-hidden="true"
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden h-full"
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black bg-opacity-50">
       <div className="relative p-4 w-full max-w-4xl max-h-full">
-        {/* Modal content */}
         <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-          {/* Modal header */}
           <div className="flex items-center justify-between p-5 border-b rounded-t dark:border-gray-600">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
               Add Product
             </h3>
             <button
               type="button"
+              onClick={onClose}
               className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-              data-modal-hide="add-product-modal"
             >
               <svg
-              onClick={onClose}
                 className="w-5 h-5"
                 fill="none"
                 stroke="currentColor"
@@ -86,189 +199,204 @@ interface ModalFormProps {
             </button>
           </div>
 
-          {/* Modal body */}
-          <div className="p-6 space-y-6">
+          <div className="p-6 space-y-6 overflow-y-auto max-h-[70vh]">
             <form className="space-y-4" onSubmit={handleSubmit}>
-              {/* Name */}
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              <div className="flex flex-col">
+                <label
+                  htmlFor="productName"
+                  className="text-sm font-medium text-gray-900 dark:text-white mb-1"
+                >
                   Product Name
                 </label>
                 <input
+                  id="productName"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="bg-gray-50 border text-gray-900 rounded-lg w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                   required
                 />
               </div>
 
-              {/* Description */}
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Description
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                  Descriptions
                 </label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="bg-gray-50 border text-gray-900 rounded-lg w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
-                  required
-                />
-              </div>
-
-              {/* Price and Original Price */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Price
-                  </label>
-                  <input
-                    type="number"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.valueAsNumber)}
-                    className="bg-gray-50 border text-gray-900 rounded-lg w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Original Price
-                  </label>
-                  <input
-                    type="number"
-                    value={originalPrice}
-                    onChange={(e) => setOriginalPrice(e.target.valueAsNumber)}
-                    className="bg-gray-50 border text-gray-900 rounded-lg w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
-                  />
-                </div>
-              </div>
-
-            
-
-            
-
-              {/* Categories */}
-              <div>
-                
-               
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  category
-                </label>
-                <input
-                  type="text"
-                  value={categories}
-                  onChange={(e) => setCategories(e.target.value)}
-                  className="bg-gray-50 border text-gray-900 rounded-lg w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
-                  required
-                />
-             
-                
-                
-              </div>
-
-              {/* Images */}
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Images
-                </label>
-                {images.map((image, index) => (
-                  <div key={index} className="flex mb-2">
+                {descriptions.map((desc, index) => (
+                  <div
+                    key={index}
+                    className="mb-2 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg"
+                  >
                     <input
-                      type="file"
-                      value={image}
+                      type="text"
+                      placeholder="Header"
+                      value={desc.header}
                       onChange={(e) =>
-                        setImages(
-                          images.map((img, i) => (i === index ? e.target.value : img))
+                        handleDescriptionChange(index, "header", e.target.value)
+                      }
+                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mb-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    />
+                    <textarea
+                      placeholder="Content"
+                      value={desc.content}
+                      onChange={(e) =>
+                        handleDescriptionChange(
+                          index,
+                          "content",
+                          e.target.value
                         )
                       }
-                      className="bg-gray-50 border text-gray-900 rounded-lg p-2.5 flex-1 dark:bg-gray-600 dark:border-gray-500"
+                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                      rows={3}
                     />
                     <button
                       type="button"
-                      onClick={() => handleRemoveImage(index)}
-                      className="text-red-600 ml-2"
+                      onClick={() => handleRemoveDescription(index)}
+                      className="mt-2 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                     >
-                      Remove
+                      Remove Description
                     </button>
                   </div>
                 ))}
                 <button
                   type="button"
-                  onClick={handleAddImage}
-                  className="text-blue-600"
+                  onClick={handleAddDescription}
+                  className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                 >
-                  + Add Image
+                  + Add Description
                 </button>
               </div>
 
-              {/* Variants */}
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              <div className="flex flex-col">
+                <label
+                  htmlFor="category"
+                  className="text-sm font-medium text-gray-900 dark:text-white mb-1"
+                >
+                  Main Category
+                </label>
+                <select
+                  id="category"
+                  value={category?._id || ""}
+                  onChange={handleCategoryChange}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  required
+                >
+                  <option value="" disabled>
+                    Select a main category
+                  </option>
+                  {categories.map((cat) => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex flex-col">
+                <label
+                  htmlFor="subCategory"
+                  className="text-sm font-medium text-gray-900 dark:text-white mb-1"
+                >
+                  Sub Category
+                </label>
+                <select
+                  id="subCategory"
+                  value={subCategory?._id || ""}
+                  onChange={handleSubCategoryChange}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  disabled={!category}
+                >
+                  <option value="" disabled>
+                    Select a sub category
+                  </option>
+                  {subCategories.map((subCat) => (
+                    <option key={subCat._id} value={subCat._id}>
+                      {subCat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageChange}
+                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+              />
+
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-900 dark:text-white mb-1">
                   Variants
                 </label>
                 {variants.map((variant, index) => (
-                  <div key={index} className="grid grid-cols-3 gap-4 mb-2">
+                  <div
+                    key={index}
+                    className="grid grid-cols-3 gap-4 mb-2 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg"
+                  >
                     <input
                       type="text"
-                      placeholder="Size"
-                      value={variant.size}
+                      placeholder="Weight"
+                      value={variant.weight}
                       onChange={(e) =>
                         setVariants(
                           variants.map((v, i) =>
-                            i === index ? { ...v, size: e.target.value } : v
+                            i === index ? { ...v, weight: e.target.value } : v
                           )
                         )
                       }
-                      className="bg-gray-50 border text-gray-900 rounded-lg p-2.5 dark:bg-gray-600 dark:border-gray-500"
+                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                     />
                     <input
-  type="number"
-  placeholder="Price"
-  value={variant.price}
-  onChange={(e) =>
-    setVariants(
-      variants.map((v, i) =>
-        i === index ? { ...v, price: e.target.valueAsNumber.toString() } : v
-      )
-    )
-  }
-  className="bg-gray-50 border text-gray-900 rounded-lg p-2.5 dark:bg-gray-600 dark:border-gray-500"
-/>
-<input
-  type="number"
-  placeholder="Stock"
-  value={variant.stockQuantity}
-  onChange={(e) =>
-    setVariants(
-      variants.map((v, i) =>
-        i === index ? { ...v, stockQuantity: e.target.valueAsNumber.toString() } : v
-      )
-    )
-  }
-  className="bg-gray-50 border text-gray-900 rounded-lg p-2.5 dark:bg-gray-600 dark:border-gray-500"
-/>
-
+                      type="number"
+                      placeholder="Price"
+                      value={variant.price}
+                      onChange={(e) =>
+                        setVariants(
+                          variants.map((v, i) =>
+                            i === index
+                              ? { ...v, price: Number(e.target.value) }
+                              : v
+                          )
+                        )
+                      }
+                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Stock"
+                      value={variant.stockQuantity}
+                      onChange={(e) =>
+                        setVariants(
+                          variants.map((v, i) =>
+                            i === index
+                              ? { ...v, stockQuantity: Number(e.target.value) }
+                              : v
+                          )
+                        )
+                      }
+                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    />
                     <button
                       type="button"
                       onClick={() => handleRemoveVariant(index)}
-                      className="text-red-600 ml-2"
+                      className="col-span-3 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                     >
-                      Remove
+                      Remove Variant
                     </button>
                   </div>
                 ))}
                 <button
                   type="button"
                   onClick={handleAddVariant}
-                  className="text-blue-600"
+                  className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                   + Add Variant
                 </button>
               </div>
-
               <button
                 type="submit"
-                className="w-full text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700"
+                className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
                 Add Product
               </button>
@@ -277,8 +405,7 @@ interface ModalFormProps {
         </div>
       </div>
     </div>
-    </div>
   );
 };
 
-export default ModalForm;
+export default ProductModalForm;

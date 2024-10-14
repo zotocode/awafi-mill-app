@@ -1,9 +1,13 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
    const navigate=useNavigate()
-
+   const [isOpen, setIsOpen] = useState(false)  
+    const handleDropdownToggle = () => {
+      setIsOpen(!isOpen);
+    
+  }
   return (
     <div>
       <aside
@@ -82,31 +86,47 @@ const Sidebar = () => {
                 <span className="ms-3">Product Management</span>
               </a>
             </li>
-            <li onClick={()=>{navigate('/categories')}}>
-              <a
-                href="#"
-                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-              >
-                <svg
-                  className="w-6 h-6 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-width="2"
-                    d="M5 7h14M5 12h14M5 17h10"
-                  />
-                </svg>
+            <li>
+      <a
+        href="#"
+        className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+        onClick={handleDropdownToggle}
+      >
+        <svg
+          className="w-6 h-6 text-gray-800 dark:text-white"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-width="2"
+            d="M5 7h14M5 12h14M5 17h10"
+          />
+        </svg>
+        <span className="ms-3">Category Management</span>
+      </a>
 
-                <span className="ms-3">Category Management</span>
-              </a>
-            </li>
+      {isOpen && (
+        <ul className="ml-7 mt-2 space-y-2">
+          <li onClick={()=>navigate('/categories/main')}>
+            <span className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              Main Category 
+            </span>
+
+          </li>
+          <li onClick={()=>navigate('/categories/sub')}>
+            <span className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+              Sub Category 
+            </span>
+          </li>
+        </ul>
+      )}
+    </li>
             <li>
               <a
                 href="#"
@@ -136,8 +156,10 @@ const Sidebar = () => {
           </ul>
         </div>
       </aside>
+      <Outlet /> 
     </div>
   );
 };
 
-export default Sidebar;
+
+export default Sidebar
