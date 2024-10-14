@@ -24,7 +24,12 @@ const productSchema = new Schema<Product>({
   },
   category: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category',
+    ref: 'MainCategory',
+    required: true
+  },
+  subCategory: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'SubCategory',
     required: true
   },
   images: [

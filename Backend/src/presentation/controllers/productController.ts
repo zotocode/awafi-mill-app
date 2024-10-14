@@ -15,7 +15,6 @@ export class ProductController {
   // Add a new product (HTTP POST)
   async addProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        
       const photos: any = req.files || [];
       
       const productData: ProductCreationDTO = req.body;
@@ -146,17 +145,17 @@ export class ProductController {
 
 
   // Delete a product (HTTP DELETE)
-  // async deleteProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
-  //   try {
-  //     const productId = req.params.id;
-  //     const deleted = await this.productInteractor.deleteProduct(productId);
-  //     if (deleted) {
-  //       res.status(200).json({ message: "Product deleted successfully" });
-  //     } else {
-  //       res.status(404).json({ message: "Product not found" });
-  //     }
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
+  async deleteProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const productId = req.params.id;
+      const deleted = await this.productInteractor.deleteProduct(productId);
+      if (deleted) {
+        res.status(200).json({ message: "Product deleted successfully" });
+      } else {
+        res.status(404).json({ message: "Product not found" });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
 }

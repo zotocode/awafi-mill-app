@@ -53,6 +53,14 @@ class CategoryApi{
           return error;
         }
       }
+    async fetchSubCategories(id:string): Promise<any> {
+        try {
+          return await this.axiosInstance.get(`/api/categories/listedCategory/sub?mainCategory=${id}`);
+        } catch (error: unknown) {
+         
+          return error;
+        }
+      }
     
 }
 

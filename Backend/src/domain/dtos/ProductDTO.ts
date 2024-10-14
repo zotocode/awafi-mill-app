@@ -21,6 +21,7 @@ export interface ProductDTO {
   name: string;
   descriptions: Description[];
   category: mongoose.Schema.Types.ObjectId | null;
+  subCategory: mongoose.Schema.Types.ObjectId | null;
   images: string[];
   variants: Variant[];
   isListed:boolean
@@ -30,6 +31,7 @@ export interface ProductCreationDTO {
   descriptions: Description[];
   isListed: boolean;
   category: mongoose.Schema.Types.ObjectId | null;
+  subCategory: mongoose.Schema.Types.ObjectId | null;
   images: string[];
   variants: Variant[];
 }

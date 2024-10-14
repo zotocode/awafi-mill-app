@@ -23,6 +23,9 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
   const [isListed, setIsListed] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
+  const [subCategories, setSubCategories] = useState<Category[]>([]);
+  const [images, setImages] = useState<File[]>([]);
+  const [subCategory, setSubCategory] = useState<Category | null>(null);
   const [variants, setVariants] = useState<Variant[]>([
     { weight: "", price: 0, stockQuantity: 0 },
   ]);
@@ -41,11 +44,30 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
     fetchCategories();
   }, []);
 
+  useEffect(() => {
+    async function fetchSubCategories() {
+      if (category?._id) {
+        try {
+          const response = await categoryapi.fetchSubCategories(category._id);
+          if (response.status === 200) {
+            setSubCategories(response.data);
+          }
+        } catch (error) {
+          console.error("Error fetching subcategories:", error);
+        }
+      } else {
+        setSubCategories([]);
+      }
+    }
+    fetchSubCategories();
+  }, [category]);
+
   const resetForm = () => {
     setName("");
     setDescriptions([{ header: "", content: "" }]);
     setIsListed(true);
     setCategory(null);
+    setSubCategory(null);
     setVariants([{ weight: "", price: 0, stockQuantity: 0 }]);
   };
 
@@ -55,6 +77,13 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
 
   const handleRemoveDescription = (index: number) => {
     setDescriptions(descriptions.filter((_, i) => i !== index));
+  };
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = e.target.files;
+    if (selectedFiles) {
+      // Convert FileList to an array of File objects
+      setImages(Array.from(selectedFiles));
+    }
   };
 
   const handleDescriptionChange = (
@@ -80,8 +109,12 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
     formData.append("name", name);
     formData.append("isListed", isListed.toString());
 
-    if (category?.id) {
-      formData.append("category", category.id);
+    if (category?._id) {
+      formData.append("category", category._id);
+    }
+
+    if (subCategory?._id) {
+      formData.append("subCategory", subCategory._id);
     }
 
     descriptions.forEach((desc, index) => {
@@ -97,6 +130,10 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
         variant.stockQuantity.toString()
       );
     });
+    images.forEach((image, index) => {
+      formData.append(`images`, image);
+    });
+  
 
     try {
       const addProduct = await productapi.addProduct(formData);
@@ -116,9 +153,18 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCategoryId = e.target.value;
     const selectedCategory = categories.find(
-      (cat) => cat.id === selectedCategoryId
+      (cat) => cat._id === selectedCategoryId
     );
     setCategory(selectedCategory || null);
+    setSubCategory(null); // Reset subcategory when main category changes
+  };
+
+  const handleSubCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedSubCategoryId = e.target.value;
+    const selectedSubCategory = subCategories.find(
+      (cat) => cat._id === selectedSubCategoryId
+    );
+    setSubCategory(selectedSubCategory || null);
   };
 
   if (!isOpen) return null;
@@ -129,7 +175,7 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
         <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
           <div className="flex items-center justify-between p-5 border-b rounded-t dark:border-gray-600">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Add Product 
+              Add Product
             </h3>
             <button
               type="button"
@@ -221,41 +267,25 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
                 </button>
               </div>
 
-              <div className="flex items-center">
-                <input
-                  id="isListed"
-                  type="checkbox"
-                  checked={isListed}
-                  onChange={(e) => setIsListed(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                />
-                <label
-                  htmlFor="isListed"
-                  className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                >
-                  Is Listed
-                </label>
-              </div>
-
               <div className="flex flex-col">
                 <label
                   htmlFor="category"
                   className="text-sm font-medium text-gray-900 dark:text-white mb-1"
                 >
-                  Category
+                  Main Category
                 </label>
                 <select
                   id="category"
-                  value={category?.id || ""}
+                  value={category?._id || ""}
                   onChange={handleCategoryChange}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   required
                 >
                   <option value="" disabled>
-                    Select a category
+                    Select a main category
                   </option>
                   {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
+                    <option key={cat._id} value={cat._id}>
                       {cat.name}
                     </option>
                   ))}
@@ -263,17 +293,37 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
               </div>
 
               <div className="flex flex-col">
-                <label className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                  Images
+                <label
+                  htmlFor="subCategory"
+                  className="text-sm font-medium text-gray-900 dark:text-white mb-1"
+                >
+                  Sub Category
                 </label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4"></div>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-                />
+                <select
+                  id="subCategory"
+                  value={subCategory?._id || ""}
+                  onChange={handleSubCategoryChange}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  disabled={!category}
+                >
+                  <option value="" disabled>
+                    Select a sub category
+                  </option>
+                  {subCategories.map((subCat) => (
+                    <option key={subCat._id} value={subCat._id}>
+                      {subCat.name}
+                    </option>
+                  ))}
+                </select>
               </div>
+
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageChange}
+                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+              />
 
               <div className="flex flex-col">
                 <label className="text-sm font-medium text-gray-900 dark:text-white mb-1">

@@ -19,6 +19,7 @@ export default interface Product extends Document {
   descriptions: Description[];
   isListed: boolean;
   isDelete: boolean;
+  subCategory: mongoose.Schema.Types.ObjectId | null;
   category: mongoose.Schema.Types.ObjectId | null;
   images: string[];
   variants: Variant[];

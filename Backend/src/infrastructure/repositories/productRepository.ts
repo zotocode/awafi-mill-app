@@ -16,6 +16,7 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
  
       const productEntity = {
         name: productDTO.name,
+        subCategory:productDTO.subCategory,
         category:productDTO.category,
         descriptions: productDTO.descriptions,
         images: productDTO.images,
