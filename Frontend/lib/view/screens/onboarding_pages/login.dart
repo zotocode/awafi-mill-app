@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frondend/common/assigns.dart';
 import 'package:frondend/common/style.dart';
+import 'package:frondend/model/repos.dart/loading.dart';
+import 'package:frondend/model/repos.dart/login.dart';
 import 'package:frondend/view/components/widgets/auth_button.dart';
 import 'package:frondend/view/components/widgets/back_arrow.dart';
 import 'package:frondend/view/components/widgets/drop_down_field.dart';
@@ -75,6 +77,13 @@ class LoginScreen extends StatelessWidget {
                               SizedBox(height: 30),
                               loginProvider.isField == false
                                   ? CustomizableTextFieldwidget(
+                                      onValidate: (value) {
+                                        if (!value.contains('@gmail.com') ||
+                                            value.isEmpty) {
+                                          return 'Invalid Email';
+                                        }
+                                        return null;
+                                      },
                                       keyboardType: TextInputType.emailAddress,
                                       controller: emailController,
                                       labelText: Assigns.email,
@@ -105,6 +114,13 @@ class LoginScreen extends StatelessWidget {
                               ),
                               SizedBox(height: 10),
                               CustomizableTextFieldwidget(
+                                onValidate: (value) {
+                                  if (value.split('').length < 8 ||
+                                      value.isEmpty) {
+                                    return 'Password should be more than 8 charectors.';
+                                  }
+                                  return null;
+                                },
                                 controller: passwordController,
                                 labelText: Assigns.passwordLabelText,
                               ),
@@ -129,7 +145,9 @@ class LoginScreen extends StatelessWidget {
                               AuthenticateSaveButton(
                                 buttonText: Assigns.buttonLogin,
                                 onpressed: () {
-                                  Get.to(() => BottomScreen());
+                                  handleLoading(context);
+                                  LoginStatus(
+                                      emailController, passwordController);
                                 },
                               ),
                               SizedBox(height: 20),

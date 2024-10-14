@@ -135,7 +135,7 @@ class _HomeSearchScreenState extends State<HomeSearchScreen> {
     bool _isChecked2 = false;
     bool _isChecked3 = false;
     bool _isChecked4 = false;
-
+    RangeValues currentRangeValues = RangeValues(20, 200);
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -151,7 +151,7 @@ class _HomeSearchScreenState extends State<HomeSearchScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Filter',
+                        'Filters',
                         style: GoogleFonts.mulish(fontWeight: FontWeight.bold),
                       ),
                       Icon(Icons.filter_alt_outlined),
@@ -163,8 +163,23 @@ class _HomeSearchScreenState extends State<HomeSearchScreen> {
                   Row(
                     children: [Text('Price')],
                   ),
-                  SizedBox(height: 20),
-                  // Checkboxes with text
+                  SizedBox(height: 10),
+                  Text(
+                    '${currentRangeValues.start.toInt()}AED - ${currentRangeValues.end.toInt()} AED',
+                    style: GoogleFonts.mulish(
+                        fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                  RangeSlider(
+                    values: currentRangeValues,
+                    min: 20,
+                    max: 200,
+                    divisions: 18, // Optional: to control increments
+                    onChanged: (RangeValues values) {
+                      setState(() {
+                        currentRangeValues = values;
+                      });
+                    },
+                  ),
                   Row(
                     children: [
                       Checkbox(

@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:frondend/common/assigns.dart';
 import 'package:frondend/common/style.dart';
+import 'package:frondend/model/repos.dart/loading.dart';
 import 'package:frondend/model/repos.dart/register.dart';
 import 'package:frondend/view/components/widgets/auth_button.dart';
 import 'package:frondend/view/components/widgets/back_arrow.dart';
 import 'package:frondend/view/components/widgets/drop_down_field.dart';
 import 'package:frondend/view/components/widgets/text_field.dart';
+import 'package:frondend/view_model/provider.dart/loading.dart';
 import 'package:frondend/view_model/services.dart/user_credential.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatelessWidget {
-  const SignUpScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
+    final loadingProvider = Provider.of<LoadingProvider>(context);
+
     final TextEditingController nameController = TextEditingController();
     final TextEditingController phoneNumberController = TextEditingController();
     final TextEditingController emailController = TextEditingController();
@@ -88,6 +91,12 @@ class SignUpScreen extends StatelessWidget {
                                 ),
                                 SizedBox(height: 20),
                                 CustomizableTextFieldwidget(
+                                  onValidate: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Name is required';
+                                    }
+                                    return null;
+                                  },
                                   controller: nameController,
                                   labelText: Assigns.name,
                                 ),
@@ -96,33 +105,42 @@ class SignUpScreen extends StatelessWidget {
                                     controller: phoneNumberController,
                                     labelText: Assigns.numberText),
                                 CustomizableTextFieldwidget(
+                                  onValidate: (value) {
+                                    if (!value.contains('@gmail.com') ||
+                                        value.isEmpty) {
+                                      return 'Invalid Email';
+                                    }
+                                    return null;
+                                  },
                                   keyboardType: TextInputType.emailAddress,
                                   controller: emailController,
                                   labelText: Assigns.email,
                                 ),
                                 SizedBox(height: 16),
                                 CustomizableTextFieldwidget(
+                                  onValidate: (value) {
+                                    if (value.split('').length < 8 ||
+                                        value.isEmpty) {
+                                      return 'Password should be more than 8 charectors.';
+                                    }
+                                    return null;
+                                  },
                                   controller: passwordController,
                                   labelText: Assigns.passwordLabelText,
                                 ),
                                 SizedBox(height: 20),
                                 AuthenticateSaveButton(
+                                  isLoading: loadingProvider.isLoading,
                                   buttonText: Assigns.signUp,
                                   onpressed: () {
-                                    if (nameController.text.isNotEmpty &&
-                                        phoneNumberController.text.isNotEmpty &&
-                                        emailController.text.isNotEmpty &&
-                                        passwordController.text.isNotEmpty) {
-                                      registerUser(
-                                          authService,
-                                          nameController,
-                                          phoneNumberController,
-                                          emailController,
-                                          passwordController);
-                                    } else {
-                                      Get.snackbar(
-                                          'Error', 'All fields are required');
-                                    }
+                                    handleLoading(context);
+
+                                    registerUser(
+                                        authService,
+                                        nameController,
+                                        phoneNumberController,
+                                        emailController,
+                                        passwordController);
                                   },
                                 ),
                                 SizedBox(height: 10),

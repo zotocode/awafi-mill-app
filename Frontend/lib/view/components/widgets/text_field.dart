@@ -4,15 +4,19 @@ class CustomizableTextFieldwidget extends StatelessWidget {
   final String labelText;
   final TextEditingController controller;
   final TextInputType? keyboardType;
+  final FormFieldValidator? onValidate;
 
   const CustomizableTextFieldwidget(
       {super.key,
       required this.labelText,
       required this.controller,
-      this.keyboardType});
+      this.keyboardType,
+      this.onValidate});
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: onValidate,
       controller: controller,
       keyboardType: keyboardType,
       style: TextStyle(color: Colors.white),

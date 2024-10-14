@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Get.to(() => LoginScreen());
                       },
                       child: CircleAvatar(
-                        maxRadius: 22,
+                        maxRadius: 24,
                         child: Icon(
                           Icons.person,
                           size: 30,
