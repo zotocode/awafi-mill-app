@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
+import Navbar from "../layouts/Navbar";
 import Table from "../components/Table";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../layouts/Sidebar";
 import CategoryModalForm from "../components/CategoryModalForm";
 import categoryapi from "../api/categoryapi";
 import { toast } from "react-toastify";
@@ -154,8 +154,7 @@ const CategoryManagementPage = () => {
 
   return (
     <>
-      <Navbar />
-      <Sidebar />
+   
       <div className="p-4 sm:ml-64 mt-16">
         <div className="flex w-full p-5 justify-between items-center">
           <h1 className="text-2xl font-semibold">Category Management</h1>

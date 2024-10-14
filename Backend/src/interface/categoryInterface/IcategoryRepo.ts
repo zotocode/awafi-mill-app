@@ -1,11 +1,12 @@
-import {categoryCreationDTo} from '../../domain/dtos/CategoryDTO'
+import { categoryCreationDTo } from '../../domain/dtos/CategoryDTO';
+import ICategory from '../../domain/entities/categorySchema';
 
 export default interface ICategoryRepo {
-    addCategory(data: categoryCreationDTo): Promise<any>; // Return type can be adjusted as needed
-    getAllCategories(): Promise<any[]>; // Return type can be adjusted as needed
-    getCategoryById(id: string): Promise<any | null>; // Return type can be adjusted as needed
-    updateCategory(id: string, data: Partial<categoryCreationDTo>): Promise<any | null>; // Return type can be adjusted as needed
-    deleteCategory(id: string): Promise<boolean>; // Return type can be adjusted as needed
-    findByName(name:string):Promise<any>
-  }
-  
+  addCategory(data: categoryCreationDTo): Promise<ICategory>;
+  getAllCategories(): Promise<ICategory[]>;
+  getListedCategories(): Promise<ICategory[]>;
+  getCategoryById(id: string): Promise<ICategory | null>;
+  updateCategory(id: string, data: Partial<categoryCreationDTo>): Promise<ICategory | null>;
+  deleteCategory(id: string): Promise<boolean>;
+  findByName(name: string): Promise<ICategory | null>;
+}
