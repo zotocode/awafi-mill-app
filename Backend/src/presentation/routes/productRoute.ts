@@ -24,6 +24,7 @@ productRoutes.get("/product", productController.getAllProducts.bind(productContr
 productRoutes.get("/product/:id", productController.getProductById.bind(productController));
 productRoutes.put("/product/:id", productController.updateProduct.bind(productController));
 productRoutes.patch("/product/:id", productController.toggleListStatus.bind(productController));
+productRoutes.patch("/product/delete/:id", productController.deleteProduct.bind(productController));
 
 
 export default productRoutes;

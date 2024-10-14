@@ -20,7 +20,7 @@ export class ProductInteractor implements IProductInteractor {
   // Adding a new product
   async addProduct(productData: ProductCreationDTO): Promise<ProductDTO |resposeHandler> {
 
-  
+      // console.log('interactor',productData)
     const{name}=productData
     const isAvailable=await this.productRepo.findByName(name)
     if(isAvailable)
@@ -89,10 +89,10 @@ export class ProductInteractor implements IProductInteractor {
   }
 
   // Delete a product by ID
-  // async deleteProduct(id: string): Promise<boolean> {
-  //   const deletedProduct = await this.productRepo.delete(id);
-  //   return !!deletedProduct;
-  // }
+  async deleteProduct(id: string): Promise<boolean> {
+    const deletedProduct = await this.productRepo.delete(id);
+    return !!deletedProduct;
+  }
 
   // private mapDtoToEntity(productData: ProductDTO): Product {
   //   if (!productData.name || !productData.description || !productData.price) {
@@ -124,6 +124,7 @@ export class ProductInteractor implements IProductInteractor {
       name: product.name,
       descriptions:product.descriptions,
       category: product.category,
+      subCategory: product.subCategory,
       images: product.images,
       variants: product.variants,
       isListed:product.isListed

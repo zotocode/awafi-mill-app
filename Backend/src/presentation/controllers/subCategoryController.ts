@@ -1,14 +1,14 @@
 // src/presentation/controllers/ProductController.ts
 import { NextFunction, Request, Response } from "express";
-import ICategoryInteractor from "../../interface/categoryInterface/IcategoryInteractor"; // Import the interface
-import { categoryCreationDTo,categoryDTo } from "../../domain/dtos/CategoryDTO"; 
+import IsubCategoryInteractor from "../../interface/subCategoryInterface/IsubCategoryInteractory"; // Import the interface
+import { subCategoryCreationDTo} from "../../domain/dtos/SubCategoryDTO"; 
 
 
 
-export class CategoryController {
-  private categoryInteractor: ICategoryInteractor; // Use the interface type
+export class SubCategoryController {
+  private categoryInteractor: IsubCategoryInteractor; // Use the interface type
 
-  constructor(categoryInteractor: ICategoryInteractor) {
+  constructor(categoryInteractor: IsubCategoryInteractor) {
     this.categoryInteractor = categoryInteractor;
   }
 
@@ -16,7 +16,7 @@ export class CategoryController {
   async addCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
     
-      const category: categoryCreationDTo = req.body;
+      const category: subCategoryCreationDTo = req.body;
       //  console.log('data set',req.bodycod
     
       const result:any = await this.categoryInteractor.addCategory(category);
@@ -24,7 +24,7 @@ export class CategoryController {
       {
         res.status(result.status).json({ message: result.message});
       }
-      res.status(201).json({ message: "Category created successfully", data: result });
+      res.status(201).json({ message: "category created successfully", data: result });
     } catch (error) {
       next(error);
     }
@@ -35,18 +35,19 @@ export class CategoryController {
   
   async getAllCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-   
-      const products = await this.categoryInteractor.getAllCategories();
-      res.status(200).json(products);
+        const products = await this.categoryInteractor.getAllCategories();
+        
+        res.status(200).json(products );
     } catch (error) {
-      next(error);
+        next(error);
     }
-  }
+}
+
   async getListedCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-         
-       
-      const products = await this.categoryInteractor.getListedCategories();
+       const {mainCategory}=req.query
+
+      const products = await this.categoryInteractor.getListedCategories(mainCategory as string);
       res.status(200).json(products);
     } catch (error) {
       next(error);
@@ -73,7 +74,7 @@ export class CategoryController {
     try {
 
       const productId = req.params.id;
-      const updatedData: Partial<categoryCreationDTo> = req.body; 
+      const updatedData: Partial<subCategoryCreationDTo> = req.body; 
       const updatedProduct = await this.categoryInteractor.updateCategory(productId, updatedData);
       if (updatedProduct) {
         res.status(200).json(updatedProduct);

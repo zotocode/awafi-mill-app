@@ -1,17 +1,18 @@
-import IsubCategoryInteractory from "../../interface/categoryInterface/IcategoryInteractor";
+import ICategoryInteractor from "../../interface/subCategoryInterface/IsubCategoryInteractory";
 import { resposeHandler } from "../../types/commonTypes";
-import ICategoryRepo from "../../interface/categoryInterface/IcategoryRepo"; // Import your category repository interface
-import {categoryCreationDTo,categoryDTo} from '../../domain/dtos/CategoryDTO'
+import IsubCategoryRepo from "../../interface/subCategoryInterface/IsubCategoryRepo"; // Import your category repository interface
+import {subCategoryCreationDTo,subCategoryDTo} from '../../domain/dtos/SubCategoryDTO'
+import IsubCategoryInteractor from "../../interface/subCategoryInterface/IsubCategoryInteractory";
 
-export class CategoryInteractor implements IsubCategoryInteractory {
-  private categoryRepo: ICategoryRepo; // Use the category repository
+export class SubCategoryInteractor implements IsubCategoryInteractor {
+  private categoryRepo: IsubCategoryRepo; // Use the category repository
 
-  constructor(categoryRepo: ICategoryRepo) {
+  constructor(categoryRepo: IsubCategoryRepo) {
     this.categoryRepo = categoryRepo;
   }
 
   // Add a new category
-  async addCategory(data: categoryCreationDTo): Promise<categoryDTo |resposeHandler> {
+  async addCategory(data:subCategoryCreationDTo): Promise<subCategoryDTo |resposeHandler> {
     // console.log("data",data)
     const{name}=data
     const isAvailable=await this.categoryRepo.findByName(name)
@@ -26,25 +27,25 @@ export class CategoryInteractor implements IsubCategoryInteractory {
   }
 
   // Get all categories
-  async getAllCategories(): Promise<categoryDTo[]> {
+  async getAllCategories(): Promise<subCategoryDTo[]> {
     const categories = await this.categoryRepo.getAllCategories(); // Use repository method
     return categories.map(this.mapToDTO);
-  }
+}
 
   // Get all listed categories
-  async getListedCategories(): Promise<categoryDTo[]> {
-    const categories = await this.categoryRepo.getListedCategories(); // Use repository method
+  async getListedCategories(mainCategoryId:string): Promise<subCategoryDTo[]> {
+    const categories = await this.categoryRepo.getListedCategories(mainCategoryId); // Use repository method
     return categories.map(this.mapToDTO);
   }
 
   // Get a category by ID
-  async getCategoryById(id: string): Promise<categoryDTo | null> {
+  async getCategoryById(id: string): Promise<subCategoryDTo | null> {
     const category = await this.categoryRepo.getCategoryById(id); // Use repository method
     return category && !category.isDeleted ? this.mapToDTO(category) : null;
   }
 
   // Update a category
-  async updateCategory(id: string, data: Partial<categoryCreationDTo>): Promise<categoryDTo | resposeHandler | null> {
+  async updateCategory(id: string, data: Partial<subCategoryCreationDTo>): Promise<subCategoryDTo | resposeHandler | null> {
     if(data.name)
     {
       const isAvailable=await this.categoryRepo.findByName(data.name)
@@ -94,11 +95,12 @@ export class CategoryInteractor implements IsubCategoryInteractory {
   }
 
   // Map Category to ProductDTO
-  private mapToDTO(category: any): categoryDTo {
+  private mapToDTO(category: any): subCategoryDTo {
     return {
       _id: category._id.toString(),
       name: category.name,
       description: category.description,
+      mainCategory:category.mainCategory,
       isListed: category.isListed,
       isDeleted: category.isDeleted,
       createdAt: category.createdAt,

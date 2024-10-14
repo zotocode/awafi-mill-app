@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import Navbar from "../layouts/Navbar";
 import Table from "../components/Table";
-import Sidebar from "../layouts/Sidebar";
 import ProductModalForm from "../components/ProductModalForm";
 import productapi from "../api/productapi";
 import { Product } from "../types/productTypes";
@@ -18,7 +16,7 @@ const ProductManagement: React.FC = () => {
     try {
       const response = await productapi.fetchAllProducts();
       if (response.status === 200) {
-
+               
         setProducts(response.data);
       }
     } catch (error) {
@@ -49,7 +47,6 @@ const ProductManagement: React.FC = () => {
   const handleEditProduct = (product: Product) => {
 
      navigate(`/update-product/${product._id}`)
-     console.log("is handling")
     setSelectedProduct(product);
     setModal(true);
   };

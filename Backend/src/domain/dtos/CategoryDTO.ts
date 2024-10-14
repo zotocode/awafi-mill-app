@@ -4,7 +4,7 @@ export interface categoryCreationDTo {
   isListed?:boolean
 }
 export interface categoryDTo {
-  id:string,
+  _id:string,
   name: string;
   description: string;
   isListed: string;
