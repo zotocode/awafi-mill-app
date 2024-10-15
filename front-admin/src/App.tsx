@@ -9,6 +9,7 @@ import MainCategoryManagementPage from './pages/CategoryManagement';
 import UpdateProductPage from './pages/UpdateProductPage';
 import Navbar from './layouts/Navbar';
 import Sidebar from './layouts/Sidebar';
+import SubCategoryManagementPage from './pages/SubCategoryManagementPage';
 
 function App() {
   return (
@@ -22,7 +23,7 @@ function App() {
           <Route path="/products" element={<ProductManagementPage />} />
           <Route path="/update-product/:id" element={<UpdateProductPage />} />
           <Route path="/categories/main" element={<MainCategoryManagementPage />} />
-          <Route path="/categories/sub" element={<MainCategoryManagementPage />} />
+          <Route path="/categories/sub" element={<SubCategoryManagementPage />} />
           <Route path="/oreders" element={<DashboardPage />} />
         </Route>
         </Route>

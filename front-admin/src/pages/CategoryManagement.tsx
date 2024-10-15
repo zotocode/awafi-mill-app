@@ -112,8 +112,8 @@ const MainCategoryManagementPage = () => {
   const handleDelete = async (category: any) => {
     if (window.confirm(`Are you sure you want to delete ${category.name}?`)) {
       try {
-        await categoryapi.deleteCategory(category.id);
-        setCategories((prev) => prev.filter((cat) => cat._id !== category.id));
+        await categoryapi.deleteCategory(category._id);
+        setCategories((prev) => prev.filter((cat) => cat._id !== category._id));
         toast.success("Category deleted successfully");
       } catch (error) {
         toast.error("Failed to delete category");

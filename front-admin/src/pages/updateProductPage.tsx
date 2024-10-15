@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {  Description, Variant } from "../types/productTypes";
 import { Category ,subCategory} from "../types/categoryType";
 import categoryapi from "../api/categoryapi";
+import subcategoryapi from "../api/subcategoryapi";
 import productapi from "../api/productapi";
 import { toast } from "react-toastify";
 
@@ -55,7 +56,7 @@ const UpdateProductPage: React.FC = () => {
           ]);
 
           if (product.category) {
-            const subCategoriesResponse = await categoryapi.fetchSubCategories(product.category._id);
+            const subCategoriesResponse = await subcategoryapi.fetchAllListedCategories(product.category._id);
             if (subCategoriesResponse.status === 200) {
               setSubCategories(subCategoriesResponse.data);
             }
@@ -78,7 +79,7 @@ const UpdateProductPage: React.FC = () => {
     const fetchSubCategories = async () => {
       if (category?._id) {
         try {
-          const response = await categoryapi.fetchSubCategories(category._id);
+          const response = await subcategoryapi.fetchAllListedCategories(category._id);
           if (response.status === 200) {
             setSubCategories(response.data);
           }

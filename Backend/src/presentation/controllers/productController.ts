@@ -82,6 +82,17 @@ export class ProductController {
       next(error);
     }
   }
+  // fetch product by category-----
+  
+  async fetchByCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+   
+      const products = await this.productInteractor.getAllProducts();
+      res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  }
 
   // Get a product by ID (HTTP GET)
   async getProductById(req: Request, res: Response, next: NextFunction): Promise<void> {
