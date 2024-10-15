@@ -1,31 +1,37 @@
 // src/domain/dto/product.dto.ts
 
+import mongoose from "mongoose";
+
+interface Description {
+  header: string;
+  content: string;
+}
+
+interface Variant {
+  weight: string;
+  price: number;
+  stockQuantity: number;
+}
+
+// Define the Product interface
+
+
 export interface ProductDTO {
   _id:string
   name: string;
-  description: string;
-  price: number;
-  originalPrice?: number; // Optional
-  weight: string;
-  stockStatus: {
-    quantity: number;
-    status: "In Stock" | "Out of Stock";
-  };
-  categories?: string[]; // Optional
-  images?: string[];
-  variants?: { size: string; price: number; stockQuantity: number }[]; // Optional
+  descriptions: Description[];
+  category: mongoose.Schema.Types.ObjectId | null;
+  subCategory: mongoose.Schema.Types.ObjectId | null;
+  images: string[];
+  variants: Variant[];
+  isListed:boolean
 }
 export interface ProductCreationDTO {
   name: string;
-  description: string;
-  price: number;
-  originalPrice?: number; // Optional
-  weight: string;
-  stockQuantity:number,
-  status:"In Stock" | "Out of Stock",
-  categories?: string[]; // Optional
-  images?: string[];
-  variants?: { size: string; price: number; stockQuantity: number }[]; // Optional
-  createdAt?: Date;
-  updatedAt?: Date;
+  descriptions: Description[];
+  isListed: boolean;
+  category: mongoose.Schema.Types.ObjectId | null;
+  subCategory: mongoose.Schema.Types.ObjectId | null;
+  images: string[];
+  variants: Variant[];
 }
