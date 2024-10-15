@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Product, Description, Variant } from "../types/productTypes";
 import { Category } from "../types/categoryType";
 import categoryapi from "../api/categoryapi";
+import subcategoryapi from "../api/subcategoryapi";
 import { toast } from "react-toastify";
 import productapi from "../api/productapi";
 
@@ -48,7 +49,7 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
     async function fetchSubCategories() {
       if (category?._id) {
         try {
-          const response = await categoryapi.fetchSubCategories(category._id);
+          const response = await subcategoryapi.fetchAllListedCategories(category._id);
           if (response.status === 200) {
             setSubCategories(response.data);
           }

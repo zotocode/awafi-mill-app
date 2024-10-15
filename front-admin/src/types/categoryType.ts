@@ -16,3 +16,8 @@ _id?:string,
  description:string
  isListed:boolean
 }
+export interface creatingSubCategory{
+    name:string,
+    description:string
+    mainCategory:string
+   }

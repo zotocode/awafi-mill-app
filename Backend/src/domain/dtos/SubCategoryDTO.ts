@@ -4,7 +4,7 @@ export interface subCategoryCreationDTo {
     name: string;
     description: string;
     mainCategory:mongoose.Schema.Types.ObjectId | null;
-    isListed?:boolean
+   
   }
   export interface subCategoryDTo {
     _id:string,
