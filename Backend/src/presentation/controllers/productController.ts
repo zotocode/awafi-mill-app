@@ -84,11 +84,12 @@ export class ProductController {
   }
   // fetch product by category-----
   
-  async fetchByCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async FilterProducts(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
    
-      const products = await this.productInteractor.getAllProducts();
-      res.status(200).json(products);
+      const { mainCategoryId, subCategoryId } = req.query;
+      const products = await this.productInteractor.fetchByCategory(mainCategoryId as string, subCategoryId as string);
+       res.status(200).json(products);
     } catch (error) {
       next(error);
     }

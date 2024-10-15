@@ -17,6 +17,9 @@ const productController = new ProductController(productInteractor);
 
 const productRoutes = express.Router();
 
+// fuctional routes-----------
+productRoutes.get("/product/filter", productController.FilterProducts.bind(productController));
+
 // Define routes
 productRoutes.post("/product",upload.array('images', 5),productController.addProduct.bind(productController));
 productRoutes.patch("/product/update-img",upload.single('image'),productController.updateImage.bind(productController));
@@ -27,7 +30,7 @@ productRoutes.patch("/product/:id", productController.toggleListStatus.bind(prod
 productRoutes.patch("/product/delete/:id", productController.deleteProduct.bind(productController));
 
 
-productRoutes.patch("/product/delete/:id", productController.fetchByCategory.bind(productController));
+
 
 
 
