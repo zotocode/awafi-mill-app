@@ -54,8 +54,8 @@ node_modules/
 dist/
 
 #enviroment variable
-/.env
-Backend/.env
+.env
+*.env
 
 dist/
 
