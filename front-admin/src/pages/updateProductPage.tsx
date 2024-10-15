@@ -1,32 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {  Description, Variant } from "../types/productTypes";
-import { Category ,subCategory} from "../types/categoryType";
+import { Product, Description, Variant } from "../types/productTypes";
+import { Category } from "../types/categoryType";
 import categoryapi from "../api/categoryapi";
-import subcategoryapi from "../api/subcategoryapi";
 import productapi from "../api/productapi";
 import { toast } from "react-toastify";
 
+
+
 const MAX_IMAGES = 5;
-
 const UpdateProductPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+    const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
+  
+    const [name, setName] = useState("");
+    const [descriptions, setDescriptions] = useState<Description[]>([
+      { header: "", content: "" },
+    ]);
+    const [isListed, setIsListed] = useState(true);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [category, setCategory] = useState<Category | null>(null);
+    const [images, setImages] = useState<(string | File |null)[]>(Array(MAX_IMAGES).fill(null));
+    const [variants, setVariants] = useState<Variant[]>([
+      { weight: "", price: 0, stockQuantity: 0 },
+    ]);
+    const [isLoading, setIsLoading] = useState(true);
 
-  const [name, setName] = useState("");
-  const [descriptions, setDescriptions] = useState<Description[]>([
-    { header: "", content: "" },
-  ]);
-  const [isListed, setIsListed] = useState(true);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [category, setCategory] = useState<Category | null>(null);
-  const [subCategories, setSubCategories] = useState<subCategory[]>([]);
-  const [subCategory, setSubCategory] = useState<Category | null>(null);
-  const [images, setImages] = useState<(string | File | null)[]>(Array(MAX_IMAGES).fill(null));
-  const [variants, setVariants] = useState<Variant[]>([
-    { weight: "", price: 0, stockQuantity: 0 },
-  ]);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,6 +34,8 @@ const UpdateProductPage: React.FC = () => {
           categoryapi.fetchAllListedCategories(),
           productapi.fetchProductById(id!),
         ]);
+
+       
 
         if (categoryResponse.status === 200) {
           setCategories(categoryResponse.data);
@@ -46,21 +47,14 @@ const UpdateProductPage: React.FC = () => {
           setDescriptions(product.descriptions || [{ header: "", content: "" }]);
           setIsListed(product.isListed);
           setCategory(product.category || null);
-          setSubCategory(product.subCategory || null);
           setVariants(product.variants || [{ weight: "", price: 0, stockQuantity: 0 }]);
           
+          // Initialize images array with existing images and null placeholders
           const existingImages = product.images || [];
           setImages([
             ...existingImages,
             ...Array(MAX_IMAGES - existingImages.length).fill(null)
           ]);
-
-          if (product.category) {
-            const subCategoriesResponse = await subcategoryapi.fetchAllListedCategories(product.category._id);
-            if (subCategoriesResponse.status === 200) {
-              setSubCategories(subCategoriesResponse.data);
-            }
-          }
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -74,26 +68,6 @@ const UpdateProductPage: React.FC = () => {
       fetchData();
     }
   }, [id]);
-
-  useEffect(() => {
-    const fetchSubCategories = async () => {
-      if (category?._id) {
-        try {
-          const response = await subcategoryapi.fetchAllListedCategories(category._id);
-          if (response.status === 200) {
-            setSubCategories(response.data);
-          }
-        } catch (error) {
-          console.error("Error fetching subcategories:", error);
-          toast.error("Failed to load subcategories");
-        }
-      } else {
-        setSubCategories([]);
-      }
-    };
-
-    fetchSubCategories();
-  }, [category]);
 
   const handleImageChange = (index: number, file: File | null) => {
     const newImages = [...images];
@@ -151,7 +125,6 @@ const UpdateProductPage: React.FC = () => {
       name,
       isListed,
       category: category?._id,
-      subCategory: subCategory?._id,
       descriptions,
       variants
     };
@@ -169,228 +142,220 @@ const UpdateProductPage: React.FC = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-indigo-500"></div>
-      </div>
-    );
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
   return (
-    <div className="p-4 sm:ml-64 mt-16">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">Update Product</h1>
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-700">Images</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {images.map((image, index) => (
-              <div key={index} className="flex flex-col items-center">
-                <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden bg-gray-50">
-                  {image ? (
-                    <img
-                      src={image instanceof File ? URL.createObjectURL(image) : `../../../../Backend/${image}`}
-                      alt={`Product ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-gray-400">No image</span>
+    <>
+    
+      <div className="p-4 sm:ml-64 mt-16">
+        <h1 className="text-2xl font-bold mb-4">Update Product</h1>
+        <div className="bg-white shadow-md rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-4">Images</h2>
+            <div className="grid grid-cols-5 gap-4">
+              {images.map((image, index) => (
+                <div key={index} className="flex flex-col items-center">
+                  <div className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
+                    {image ? (
+                      <img
+                        src={image instanceof File ? URL.createObjectURL(image) : `../../../../Backend/${image}`}
+                        alt={`Product ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-gray-400">No image</span>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageChange(index, e.target.files?.[0] || null)}
+                    className="hidden"
+                    id={`image-input-${index}`}
+                  />
+                  <label
+                    htmlFor={`image-input-${index}`}
+                    className="mt-2 cursor-pointer text-sm text-indigo-600 hover:text-indigo-800"
+                  >
+                    {image ? 'Change' : 'Add Image'}
+                  </label>
+                  {image instanceof File && (
+                    <button
+                      type="button"
+                      onClick={() => handleImageUpload(index)}
+                      className="mt-1 text-xs text-green-600 hover:text-green-800"
+                    >
+                      Upload
+                    </button>
                   )}
                 </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleImageChange(index, e.target.files?.[0] || null)}
-                  className="hidden"
-                  id={`image-input-${index}`}
-                />
-                <label
-                  htmlFor={`image-input-${index}`}
-                  className="mt-3 cursor-pointer text-sm font-medium text-indigo-600 hover:text-indigo-800"
-                >
-                  {image ? 'Change' : 'Add Image'}
+              ))}
+            </div>
+          </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="bg-white shadow-md rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="productName" className="block text-sm font-medium text-gray-700 mb-1">
+                  Product Name
                 </label>
-                {image instanceof File && (
-                  <button
-                    type="button"
-                    onClick={() => handleImageUpload(index)}
-                    className="mt-2 text-xs font-medium text-green-600 hover:text-green-800"
-                  >
-                    Upload
-                  </button>
-                )}
+                <input
+                  id="productName"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  required
+                />
               </div>
-            ))}
-          </div>
-        </div>
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+                  Category
+                </label>
+                <select
+  id="category"
+  value={category?._id || ""}
+  onChange={(e) => {
+    const selectedCategory = categories.find(
+      (cat) => cat.id === e.target.value
+    );
+    setCategory(selectedCategory || null);  // Update selected category
+  }}
+  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+  required
+>
+  <option value={category?._id}>{category?.name || "Select a category"}</option> {/* Default option */}
+  {categories.map((cat) => 
+    cat.id !== category?._id && (
+      <option key={cat.id} value={cat.id}>
+        {cat.name} {/* Display the category name */}
+      </option>
+    )
+  )}
+</select>
 
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-700">Basic Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="productName" className="block text-sm font-medium text-gray-700 mb-1">
-                Product Name
-              </label>
-              <input
-                id="productName"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                required
-              />
+
+              </div>
             </div>
-            <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-                Main Category
-              </label>
-              <select
-                id="category"
-                value={category?._id || ""}
-                onChange={(e) => {
-                  const selectedCategory = categories.find(cat => cat._id === e.target.value);
-                  setCategory(selectedCategory || null);
-                  setSubCategory(null);
-                }}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                required
-              >
-                <option value="">Select a category</option>
-                {categories.map((cat) => (
-                  <option key={cat._id} value={cat._id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label htmlFor="subCategory" className="block text-sm font-medium text-gray-700 mb-1">
-                Sub Category
-              </label>
-              <select
-                id="subCategory"
-                value={subCategory?._id || ""}
-                onChange={(e) => {
-                  const selectedSubCategory = subCategories.find(subCat => subCat._id === e.target.value);
-                  setSubCategory(selectedSubCategory || null);
-                }}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                disabled={!category}
-              >
-                <option value="">Select a sub category</option>
-                {subCategories.map((subCat) => (
-                  <option key={subCat._id} value={subCat._id}>
-                    {subCat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex items-center">
-              <input
-                id="isListed"
-                type="checkbox"
-                checked={isListed}
-                onChange={(e) => setIsListed(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-              />
-              <label htmlFor="isListed" className="ml-2 block text-sm text-gray-700">
-                Listed
+            <div className="mt-4">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={isListed}
+                  onChange={(e) => setIsListed(e.target.checked)}
+                  className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                />
+                <span className="ml-2 text-sm text-gray-600">Listed</span>
               </label>
             </div>
           </div>
-        </div>
 
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-700">Descriptions</h2>
-          {descriptions.map((desc, index) => (
-            <div key={index} className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <input
-                type="text"
-                placeholder="Header"
-                value={desc.header}
-                onChange={(e) => handleDescriptionChange(index, "header", e.target.value)}
-                className="mb-3 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              />
-              <textarea
-                placeholder="Content"
-                value={desc.content}
-                onChange={(e) => handleDescriptionChange(index, "content", e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                rows={4}
-              />
-              <button
-                type="button"
-                onClick={() => handleRemoveDescription(index)}
-                className="mt-3 text-sm font-medium text-red-600 hover:text-red-800"
-              >
-                Remove Description
-              </button>
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={handleAddDescription}
-            className="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Add Description
-          </button>
-        </div>
-
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-700">Variants</h2>
-          {variants.map((variant, index) => (
-            <div key={index} className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <div className="grid grid-cols-3 gap-4">
+          <div className="bg-white shadow-md rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-4">Descriptions</h2>
+            {descriptions.map((desc, index) => (
+              <div key={index} className="mb-4 p-4 bg-gray-50 rounded-lg">
                 <input
                   type="text"
-                  placeholder="Weight"
-                  value={variant.weight}
-                  onChange={(e) =>
-                    setVariants(variants.map((v, i) =>
-                      i === index ? { ...v, weight: e.target.value } : v
-                    ))
-                  }
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  placeholder="Header"
+                  value={desc.header}
+                  onChange={(e) => handleDescriptionChange(index, "header", e.target.value)}
+                  className="mb-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
-                <input
-                  type="number"
-                  placeholder="Stock"
-                  value={variant.stockQuantity}
-                  onChange={(e) =>
-                    setVariants(variants.map((v, i) =>
-                      i === index ? { ...v, stockQuantity: Number(e.target.value) } : v
-                    ))
-                  }
+                <textarea
+                  placeholder="Content"
+                  value={desc.content}
+                  onChange={(e) => handleDescriptionChange(index, "content", e.target.value)}
                   className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  rows={3}
                 />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveDescription(index)}
+                  className="mt-2 text-sm text-red-600 hover:text-red-800"
+                >
+                  Remove Description
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => handleRemoveVariant(index)}
-                className="mt-3 text-sm font-medium text-red-600 hover:text-red-800"
-              >
-                Remove Variant
-              </button>
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={handleAddVariant}
-            className="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Add Variant
-          </button>
-        </div>
+            ))}
+            <button
+              type="button"
+              onClick={handleAddDescription}
+              className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Add Description
+            </button>
+          </div>
 
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Update Product
-          </button>
-        </div>
-      </form>
-    </div>
+
+          <div className="bg-white shadow-md rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-4">Variants</h2>
+            {variants.map((variant, index) => (
+              <div key={index} className="mb-4 p-4 bg-gray-50 rounded-lg">
+                <div className="grid grid-cols-3 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Weight"
+                    value={variant.weight}
+                    onChange={(e) =>
+                      setVariants(variants.map((v, i) =>
+                        i === index ? { ...v, weight: e.target.value } : v
+                      ))
+                    }
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Price"
+                    value={variant.price}
+                    onChange={(e) =>
+                      setVariants(variants.map((v, i) =>
+                        i === index ? { ...v, price: Number(e.target.value) } : v
+                      ))
+                    }
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Stock"
+                    value={variant.stockQuantity}
+                    onChange={(e) =>
+                      setVariants(variants.map((v, i) =>
+                        i === index ? { ...v, stockQuantity: Number(e.target.value) } : v
+                      ))
+                    }
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveVariant(index)}
+                  className="mt-2 text-sm text-red-600 hover:text-red-800"
+                >
+                  Remove Variant
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={handleAddVariant}
+              className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Add Variant
+            </button>
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Update Product
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
   );
 };
 
