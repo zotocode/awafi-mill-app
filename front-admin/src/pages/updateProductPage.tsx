@@ -351,6 +351,21 @@ const UpdateProductPage: React.FC = () => {
                   }
                   className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
+                 <input
+                      type="number"
+                      placeholder="Price"
+                      value={variant.price}
+                      onChange={(e) =>
+                        setVariants(
+                          variants.map((v, i) =>
+                            i === index
+                              ? { ...v, price: Number(e.target.value) }
+                              : v
+                          )
+                        )
+                      }
+                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    />
                 <input
                   type="number"
                   placeholder="Stock"
