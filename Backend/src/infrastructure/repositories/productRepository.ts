@@ -34,6 +34,20 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
       return await this.model.find().populate('category').exec();
   
   }
+  async fetchByCategory(mainCategoryId?: string, subCategoryId?: string): Promise<Product[]> {
+    const filter: any = {};
+    
+    if (mainCategoryId) {
+      filter.category = mainCategoryId;
+    }
+    if (subCategoryId) {
+      filter.subCategory = subCategoryId;
+    }
+  
+    
+    // Fetch products with the filter, or all products if no IDs are provided
+    return await this.model.find(filter).exec();
+  }
  
   async findByName(name: string): Promise<Product | null> {
     const regex = new RegExp(`^${name}$`, 'i'); 
