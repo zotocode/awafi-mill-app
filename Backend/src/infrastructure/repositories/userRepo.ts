@@ -64,5 +64,15 @@ export class UserRepo extends BaseRepository<IuserDocument> implements IUserRepo
       );
       
     }
+
+    async find(): Promise<any> {
+      try {
+        return await this.model.find({}); 
+      } catch (error) {
+        console.error("Error finding user:", error);
+        throw error;
+      }
+    }
+
     
 }
