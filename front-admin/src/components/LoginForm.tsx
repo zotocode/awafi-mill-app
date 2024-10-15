@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import AuthApi from '../api/adminLogin'; // Correct import
 
 interface LoginFormProps {
   onLogin: (email: string, password: string) => void;
@@ -7,12 +9,36 @@ interface LoginFormProps {
 const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Here you would typically validate the form and then call the onLogin function
-    console.log('Login attempt:', email, password);
-    onLogin(email, password);
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await AuthApi.adminAuth(email, password);
+      if (response.status === 200 && response.data.status) {
+        // Store token in local storage
+        localStorage.setItem('authToken', response.data.token);
+        
+        onLogin(email, password);
+        console.log('Login successful:', response.data);
+
+        // Navigate to dashboard after successful login
+        navigate('/dashboard');
+      } else {
+        setError('Invalid login credentials');
+      }
+    } catch (error) {
+      setError('Failed to login. Please try again later.');
+      console.error('Login error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,47 +79,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-start">
-          <div className="flex items-center h-5">
-            <input
-              id="remember"
-              aria-describedby="remember"
-              type="checkbox"
-              className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-            />
-          </div>
-          <div className="ml-3 text-sm">
-            <label
-              htmlFor="remember"
-              className="text-gray-500 dark:text-gray-300"
-            >
-              Remember me
-            </label>
-          </div>
-        </div>
-        <a
-          href="#"
-          className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500"
-        >
-          Forgot password?
-        </a>
-      </div>
       <button
         type="submit"
-        className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+        className="w-full text-white bg-gray-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+        disabled={loading}
       >
-        Sign in
+        {loading ? 'Signing in...' : 'Sign in'}
       </button>
-      <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-        Don’t have an account yet?{' '}
-        <a
-          href="#"
-          className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-        >
-          Sign up
-        </a>
-      </p>
+      {error && <p className="text-sm text-red-600">{error}</p>}
     </form>
   );
 };
