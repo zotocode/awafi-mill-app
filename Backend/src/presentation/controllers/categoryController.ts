@@ -24,7 +24,7 @@ export class CategoryController {
       {
         res.status(result.status).json({ message: result.message});
       }
-      res.status(201).json({ message: "Product created successfully", Category: result });
+      res.status(201).json({ message: "Category created successfully", data: result });
     } catch (error) {
       next(error);
     }
@@ -42,6 +42,16 @@ export class CategoryController {
       next(error);
     }
   }
+  async getListedCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+         
+       
+      const products = await this.categoryInteractor.getListedCategories();
+      res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  }
 
   // Get a product by ID (HTTP GET)
   async getCategoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -51,7 +61,7 @@ export class CategoryController {
       if (product) {
         res.status(200).json(product);
       } else {
-        res.status(404).json({ message: "Product not found" });
+        res.status(404).json({ message: "category not found" });
       }
     } catch (error) {
       next(error);
@@ -66,9 +76,9 @@ export class CategoryController {
       const updatedData: Partial<categoryCreationDTo> = req.body; 
       const updatedProduct = await this.categoryInteractor.updateCategory(productId, updatedData);
       if (updatedProduct) {
-        res.status(200).json({Category:updatedProduct});
+        res.status(200).json(updatedProduct);
       } else {
-        res.status(404).json({ message: "Product not found" });
+        res.status(404).json({ message: "category not found" });
       }
     } catch (error) {
       next(error);
@@ -107,9 +117,9 @@ export class CategoryController {
       const productId = req.params.id;
       const deleted = await this.categoryInteractor.deleteCategory(productId);
       if (deleted) {
-        res.status(200).json({ message: "Product deleted successfully" });
+        res.status(200).json({ message: "category deleted successfully" });
       } else {
-        res.status(404).json({ message: "Product not found" });
+        res.status(404).json({ message: "category not found" });
       }
     } catch (error) {
       next(error);

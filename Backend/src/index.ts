@@ -8,6 +8,7 @@ import { connectDB } from "./infrastructure/database/dbConfig";
 import cors from "cors";
 import morgan from "morgan";
 import adminRoute from "./presentation/routes/adminRoute";
+import logger from "./utilities/logger";
 
 
 const startServer = async (): Promise<void> => {
@@ -41,7 +42,7 @@ const startServer = async (): Promise<void> => {
 
     // 500 - Internal Server Error handler
     app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-      console.error("Error:", err.message);
+      logger.error('Errors :', err);
       res.status(500).json({
         success: false,
         message: "Internal Server Error",

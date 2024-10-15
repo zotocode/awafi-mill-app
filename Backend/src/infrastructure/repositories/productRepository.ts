@@ -1,6 +1,6 @@
 import { ProductDTO, ProductCreationDTO } from "../../domain/dtos/ProductDTO";
 import { Model } from "mongoose";
-import { Product } from "../../domain/entities/productSchema"; 
+import Product  from "../../domain/entities/productSchema"; 
 import { BaseRepository } from "./baseRepository";
 import {IproductRepo} from '../../interface/productInterface/IproductRepo'
 
@@ -16,11 +16,9 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
  
       const productEntity = {
         name: productDTO.name,
-        description: productDTO.description,
-        price: productDTO.price,
-        originalPrice: productDTO.originalPrice,
-        stockQuantity:productDTO.stockQuantity,
-        categories: productDTO.categories,
+        subCategory:productDTO.subCategory,
+        category:productDTO.category,
+        descriptions: productDTO.descriptions,
         images: productDTO.images,
         variants: productDTO.variants,
         createdAt: new Date(),
@@ -33,18 +31,40 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
 
   async findAllProducts(): Promise<Product[]> {
 
-      return await this.model.find().exec();
+      return await this.model.find().populate('category').exec();
   
   }
-
+  async fetchByCategory(mainCategoryId?: string, subCategoryId?: string): Promise<Product[]> {
+    const filter: any = {};
+    
+    if (mainCategoryId) {
+      filter.category = mainCategoryId;
+    }
+    if (subCategoryId) {
+      filter.subCategory = subCategoryId;
+    }
+  
+    
+    // Fetch products with the filter, or all products if no IDs are provided
+    return await this.model.find(filter).exec();
+  }
+ 
   async findByName(name: string): Promise<Product | null> {
     const regex = new RegExp(`^${name}$`, 'i'); 
     return await super.findOne({ name: regex });
   }
+  async findByNameAndNotCurrentId(id:string,name: string): Promise<Product | null> {
+    const regex = new RegExp(`^${name}$`, 'i'); 
+    return await super.findOne({
+      _id: { $ne: id },  
+      name: { $regex: regex }
+    });
+    
+  }
 
   async productFindById(id: string): Promise<Product | null> {
  
-      return await this.model.findById(id).exec();
+      return await this.model.findById(id).populate('category').exec();
   }
   async isListedProduct(id: string): Promise<Product | null> {
  
@@ -61,7 +81,7 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
     return await this.model.updateOne({_id:id}, { $set: { [`images.${index}`]: photo } } );
   }
 
-  async updateProduct(id: string, data: Partial<any>): Promise<ProductDTO | null> {
+  async updateProduct(id: string, data: Partial<any>): Promise<Product | null> {
 
       return await this.model.findByIdAndUpdate(id, data, { new: true }).exec();
    

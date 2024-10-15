@@ -1,20 +1,14 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
 import Table from "../components/Table";
-import Sidebar from "../components/Sidebar";
 import CategoryModalForm from "../components/CategoryModalForm";
 import categoryapi from "../api/categoryapi";
 import { toast } from "react-toastify";
 import { ListMinus, ListPlus, Pencil, Trash2 } from "lucide-react";
+import {Category} from '../types/categoryType'
 
-interface Category {
-  id: number; // or string, based on your API
-  name: string;
-  description: string;
-  isListed: boolean;
-}
 
-const CategoryManagementPage = () => {
+
+const MainCategoryManagementPage = () => {
   const [isModal, setModal] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
@@ -61,9 +55,8 @@ const CategoryManagementPage = () => {
   };
 
   const handleSuccess = (newCategory: Category) => {
-     console.log("new",newCategory)
     setCategories(prev => {
-      const existingCategoryIndex = prev.findIndex(cat => cat.id === newCategory.id);
+      const existingCategoryIndex = prev.findIndex(cat => cat._id === newCategory._id);
       
       // If category exists, update it. Otherwise, add the new category
       if (existingCategoryIndex !== -1) {
@@ -77,7 +70,6 @@ const CategoryManagementPage = () => {
   
     setModal(false);
     setSelectedCategory(null);
-    console.log("worked yet")
     // toast.success(`Category ${newCategory.id ? 'updated' : 'added'} successfully`);
   };
   
@@ -120,8 +112,8 @@ const CategoryManagementPage = () => {
   const handleDelete = async (category: any) => {
     if (window.confirm(`Are you sure you want to delete ${category.name}?`)) {
       try {
-        await categoryapi.deleteCategory(category.id);
-        setCategories((prev) => prev.filter((cat) => cat.id !== category.id));
+        await categoryapi.deleteCategory(category._id);
+        setCategories((prev) => prev.filter((cat) => cat._id !== category._id));
         toast.success("Category deleted successfully");
       } catch (error) {
         toast.error("Failed to delete category");
@@ -140,7 +132,7 @@ const CategoryManagementPage = () => {
         if (response.status === 200) {
           setCategories((prev) =>
             prev.map((cat) =>
-              cat.id === category.id ? { ...cat, isListed: !cat.isListed } : cat
+              cat._id === category.id ? { ...cat, isListed: !cat.isListed } : cat
             )
           );
           toast.success(`Category ${action}ed successfully`);
@@ -154,8 +146,7 @@ const CategoryManagementPage = () => {
 
   return (
     <>
-      <Navbar />
-      <Sidebar />
+   
       <div className="p-4 sm:ml-64 mt-16">
         <div className="flex w-full p-5 justify-between items-center">
           <h1 className="text-2xl font-semibold">Category Management</h1>
@@ -183,4 +174,4 @@ const CategoryManagementPage = () => {
   );
 };
 
-export default CategoryManagementPage;
+export default MainCategoryManagementPage;

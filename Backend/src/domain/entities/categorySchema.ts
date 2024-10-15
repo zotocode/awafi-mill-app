@@ -1,6 +1,7 @@
 import { Document } from "mongoose";
 // Define the interface for the Category document
-export default interface Category extends Document {
+export default interface ICategory extends Document {
+    _id:string;
     name: string;
     description: string;
     isListed: boolean;

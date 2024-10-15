@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import express from "express";
+import logger from '../../utilities/logger';
 
 // Validation schema for ProductCreationDTO
 const productSchema = Joi.object({
@@ -83,6 +84,7 @@ const productSchema = Joi.object({
 export const validateProductInput = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const { error } = productSchema.validate(req.body);
   if (error) {
+    logger.error(error)
     return res.status(400).json({ message: error.details[0].message });
   }
   next();
