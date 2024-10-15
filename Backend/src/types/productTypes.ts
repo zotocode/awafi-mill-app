@@ -27,4 +27,3 @@ export default interface Product {
 
 
 
-  
