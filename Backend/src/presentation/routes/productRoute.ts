@@ -27,4 +27,10 @@ productRoutes.patch("/product/:id", productController.toggleListStatus.bind(prod
 productRoutes.patch("/product/delete/:id", productController.deleteProduct.bind(productController));
 
 
+productRoutes.patch("/product/delete/:id", productController.fetchByCategory.bind(productController));
+
+
+
+
+
 export default productRoutes;
