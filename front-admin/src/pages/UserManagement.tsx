@@ -64,6 +64,7 @@ const UserManagementPage = () => {
 
   const handleEdit = (user: User) => {
     // setSelectedUser(user);
+    // edit function is here
     // Open your modal here
   };
 
