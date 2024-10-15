@@ -1,9 +1,9 @@
-import ICategoryInteractor from "../../interface/categoryInterface/IcategoryInteractor";
+import IsubCategoryInteractory from "../../interface/categoryInterface/IcategoryInteractor";
 import { resposeHandler } from "../../types/commonTypes";
 import ICategoryRepo from "../../interface/categoryInterface/IcategoryRepo"; // Import your category repository interface
 import {categoryCreationDTo,categoryDTo} from '../../domain/dtos/CategoryDTO'
 
-export class CategoryInteractor implements ICategoryInteractor {
+export class CategoryInteractor implements IsubCategoryInteractory {
   private categoryRepo: ICategoryRepo; // Use the category repository
 
   constructor(categoryRepo: ICategoryRepo) {
@@ -28,6 +28,12 @@ export class CategoryInteractor implements ICategoryInteractor {
   // Get all categories
   async getAllCategories(): Promise<categoryDTo[]> {
     const categories = await this.categoryRepo.getAllCategories(); // Use repository method
+    return categories.map(this.mapToDTO);
+  }
+
+  // Get all listed categories
+  async getListedCategories(): Promise<categoryDTo[]> {
+    const categories = await this.categoryRepo.getListedCategories(); // Use repository method
     return categories.map(this.mapToDTO);
   }
 
@@ -90,7 +96,7 @@ export class CategoryInteractor implements ICategoryInteractor {
   // Map Category to ProductDTO
   private mapToDTO(category: any): categoryDTo {
     return {
-      id: category._id.toString(),
+      _id: category._id.toString(),
       name: category.name,
       description: category.description,
       isListed: category.isListed,

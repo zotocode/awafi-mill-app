@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
 import Table from "../components/Table";
-import Sidebar from "../components/Sidebar";
 import userApi from "../api/userApi";
 import { toast } from "react-toastify";
 import { Pencil, Trash2 } from "lucide-react";
@@ -15,30 +13,34 @@ interface User {
 
 const UserManagementPage = () => {
   const [users, setUsers] = useState<User[]>([]);
- 
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
   async function fetchUsers() {
+    setError(null);
     try {
       const response = await userApi.fetchAllUserData();
       console.log(response);
       
-      if (response.status === 200) {   
+      if (response.status === 200 && response.data) {   
         setUsers(response.data.data);
+      } else {
+        throw new Error('Invalid response from API');
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
-      toast.error("Failed to fetch users");
+      setError('Failed to fetch users');
+      // toast.error(error.message || 'An unknown error occurred');
     }
   }
 
   const userColumns = [
     { header: "Name", accessor: "name" },
     { header: "Email", accessor: "email" },
-    { header: "status", accessor: "role" },
+    { header: "Status", accessor: "role" },
   ];
 
   const userActions = (row: User) => (
@@ -61,7 +63,7 @@ const UserManagementPage = () => {
   );
 
   const handleEdit = (user: User) => {
-    setSelectedUser(user);
+    // setSelectedUser(user);
     // Open your modal here
   };
 
@@ -71,7 +73,7 @@ const UserManagementPage = () => {
         setUsers((prev) => prev.filter((u) => u.id !== user.id));
         toast.success("User deleted successfully");
       } catch (error) {
-        toast.error("Failed to delete user");
+        // toast.error(error.message || 'An unknown error occurred');
         console.error("Error deleting user:", error);
       }
     }
@@ -79,22 +81,26 @@ const UserManagementPage = () => {
 
   return (
     <>
-      <Navbar />
-      <Sidebar />
+
+      
       <div className="p-4 sm:ml-64 mt-16">
         <div className="flex w-full p-5 justify-between items-center">
           <h1 className="text-2xl font-semibold">User Management</h1>
           <button
-            onClick={() => setSelectedUser(null)} // You may add functionality to open a modal here
+            // onClick={() => setSelectedUser(null)}
             type="button"
             className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
             Add User
           </button>
         </div>
+        {error ? (
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+            <p>{error}</p>
+          </div>
+        ) : null}
         <Table data={users} columns={userColumns} actions={userActions} />
       </div>
-      {/* Add a modal similar to CategoryModalForm for user handling */}
     </>
   );
 };

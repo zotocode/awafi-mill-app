@@ -1,39 +1,43 @@
-// src/infrastructure/repositories/CategoryRepository.ts
-import { Document, Model } from 'mongoose';
-import {BaseRepository} from './baseRepository';
+import { Model } from 'mongoose';
+import { BaseRepository } from './baseRepository';
 import ICategoryRepo from '../../interface/categoryInterface/IcategoryRepo';
-import Category from '../../domain/entities/categorySchema';
-import { ProductCreationDTO } from '../../domain/dtos/ProductDTO';
+import ICategory from '../../domain/entities/categorySchema';
+import { categoryCreationDTo } from '../../domain/dtos/CategoryDTO'; // Correct import for category DTO
 
+export class CategoryRepository extends BaseRepository<ICategory> implements ICategoryRepo {
+  constructor(model: Model<ICategory>) {
+    super(model);
+  }
 
-export class CategoryRepository extends BaseRepository<Category> implements ICategoryRepo {
-    constructor(model: Model<Category>) {
-        super(model);
-      }
-
-  async addCategory(data: ProductCreationDTO): Promise<Category> {
+  // Correct the DTO used in addCategory
+  async addCategory(data: categoryCreationDTo): Promise<ICategory> {
     return await super.create(data);
   }
 
-  async getAllCategories(): Promise<Category[]> {
-    return await this.model.find();
+  async getAllCategories(): Promise<ICategory[]> {
+    return await this.model.find({isDeleted:false});
+  }
+  async getListedCategories(): Promise<ICategory[]> {
+    return await this.model.find({isListed:true,isDeleted:false});
   }
 
-  async findByName(name: string): Promise<Category | null> {
+  async findByName(name: string): Promise<ICategory | null> {
     const regex = new RegExp(`^${name}$`, 'i'); 
     return await super.findOne({ name: regex });
   }
-  
 
-  async getCategoryById(id: string): Promise<Category | null> {
+  async getCategoryById(id: string): Promise<ICategory | null> {
     return await super.findById(id);
   }
 
-  async updateCategory(id: string, data: Partial<ProductCreationDTO>): Promise<Category | null> {
+  // Correct the DTO used in updateCategory
+  async updateCategory(id: string, data: Partial<categoryCreationDTo>): Promise<ICategory | null> {
     return await super.update(id, data);
   }
 
-  async deleteCategory(id: string): Promise<any> {
-    return await super.delete(id);
+  // Correct the return type to boolean
+  async deleteCategory(id: string): Promise<boolean> {
+    const result = await super.delete(id);
+    return result !== null; // Assuming `super.delete` returns null when no document is found
   }
 }
