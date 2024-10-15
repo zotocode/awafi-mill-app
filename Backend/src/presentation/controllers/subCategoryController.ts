@@ -24,7 +24,7 @@ export class SubCategoryController {
       {
         res.status(result.status).json({ message: result.message});
       }
-      res.status(201).json({ message: "category created successfully", data: result });
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }
@@ -37,7 +37,7 @@ export class SubCategoryController {
     try {
         const products = await this.categoryInteractor.getAllCategories();
         
-        res.status(200).json(products );
+        res.status(200).json(products);
     } catch (error) {
         next(error);
     }
@@ -92,7 +92,7 @@ export class SubCategoryController {
     try {
       const { id } = req.params;
       const { action } = req.query; // action can be 'list' or 'unlist'
-  
+     console.log('is working',req.query)
       if (typeof action !== 'string' || (action !== 'list' && action !== 'unlist')) {
         throw new Error('Invalid action. Expected "list" or "unlist".');
       }

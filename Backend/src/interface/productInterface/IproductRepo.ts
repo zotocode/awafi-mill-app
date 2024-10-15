@@ -2,6 +2,7 @@
 
 export interface IproductRepo{
     addProduct(product:any):Promise<any>
+    fetchByCategory(mainCategoryId:string,subCategoryId:string):Promise<any>
     findAllProducts():Promise<any>
     updateListing(id:string,UpdateQuery:any):Promise<any>
     productFindById(id:string):Promise<any>

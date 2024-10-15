@@ -82,6 +82,18 @@ export class ProductController {
       next(error);
     }
   }
+  // fetch product by category-----
+  
+  async FilterProducts(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+   
+      const { mainCategoryId, subCategoryId } = req.query;
+      const products = await this.productInteractor.fetchByCategory(mainCategoryId as string, subCategoryId as string);
+       res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  }
 
   // Get a product by ID (HTTP GET)
   async getProductById(req: Request, res: Response, next: NextFunction): Promise<void> {
