@@ -1,9 +1,9 @@
 import { useApi } from './axiosConfig'
-import { creatingSubCategory } from '../types/categoryType';
+import { creatingCategory } from '../types/categoryType';
 
 class CategoryApi{
     axiosInstance :any=useApi()
-    async addCategory(data:creatingSubCategory): Promise<any> {
+    async addCategory(data:creatingCategory): Promise<any> {
         try {
           return await this.axiosInstance.post('/api/categories/category',data);
         } catch (error: unknown) {
@@ -35,7 +35,7 @@ class CategoryApi{
           return error;
         }
       }
-    async updateCategory(id:string,data:Partial<creatingSubCategory>): Promise<any> {
+    async updateCategory(id:string,data:Partial<creatingCategory>): Promise<any> {
         try {
     
           return await this.axiosInstance.put(`/api/categories/category/${id}`,data);
