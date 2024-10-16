@@ -6,25 +6,26 @@ import categoryapi from "../api/categoryapi";
 import productapi from "../api/productapi";
 import { toast } from "react-toastify";
 
+
+
 const MAX_IMAGES = 5;
 const UpdateProductPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+    const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
+  
+    const [name, setName] = useState("");
+    const [descriptions, setDescriptions] = useState<Description[]>([
+      { header: "", content: "" },
+    ]);
+    const [isListed, setIsListed] = useState(true);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [category, setCategory] = useState<Category | null>(null);
+    const [images, setImages] = useState<(string | File |null)[]>(Array(MAX_IMAGES).fill(null));
+    const [variants, setVariants] = useState<Variant[]>([
+      { weight: "", price: 0, stockQuantity: 0 },
+    ]);
+    const [isLoading, setIsLoading] = useState(true);
 
-  const [name, setName] = useState("");
-  const [descriptions, setDescriptions] = useState<Description[]>([
-    { header: "", content: "" },
-  ]);
-  const [isListed, setIsListed] = useState(true);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [category, setCategory] = useState<Category | null>(null);
-  const [images, setImages] = useState<(string | File | null)[]>(
-    Array(MAX_IMAGES).fill(null)
-  );
-  const [variants, setVariants] = useState<Variant[]>([
-    { weight: "", price: 0, stockQuantity: 0 },
-  ]);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,6 +35,8 @@ const UpdateProductPage: React.FC = () => {
           productapi.fetchProductById(id!),
         ]);
 
+       
+
         if (categoryResponse.status === 200) {
           setCategories(categoryResponse.data);
         }
@@ -41,20 +44,16 @@ const UpdateProductPage: React.FC = () => {
         if (productResponse.status === 200) {
           const product = productResponse.data;
           setName(product.name);
-          setDescriptions(
-            product.descriptions || [{ header: "", content: "" }]
-          );
+          setDescriptions(product.descriptions || [{ header: "", content: "" }]);
           setIsListed(product.isListed);
           setCategory(product.category || null);
-          setVariants(
-            product.variants || [{ weight: "", price: 0, stockQuantity: 0 }]
-          );
-
+          setVariants(product.variants || [{ weight: "", price: 0, stockQuantity: 0 }]);
+          
           // Initialize images array with existing images and null placeholders
           const existingImages = product.images || [];
           setImages([
             ...existingImages,
-            ...Array(MAX_IMAGES - existingImages.length).fill(null),
+            ...Array(MAX_IMAGES - existingImages.length).fill(null)
           ]);
         }
       } catch (error) {
@@ -80,7 +79,7 @@ const UpdateProductPage: React.FC = () => {
     const image = images[index];
     if (image instanceof File) {
       const formData = new FormData();
-      formData.append("image", image);
+      formData.append('image', image);
       try {
         // const response = await productapi.updateProductImage(id!, formData, index);
         // if (response.status === 200) {
@@ -127,7 +126,7 @@ const UpdateProductPage: React.FC = () => {
       isListed,
       category: category?._id,
       descriptions,
-      variants,
+      variants
     };
 
     try {
@@ -143,74 +142,62 @@ const UpdateProductPage: React.FC = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
-      </div>
-    );
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
   return (
     <>
+    
       <div className="p-4 sm:ml-64 mt-16">
         <h1 className="text-2xl font-bold mb-4">Update Product</h1>
         <div className="bg-white shadow-md rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Images</h2>
-          <div className="grid grid-cols-5 gap-4">
-            {images.map((image, index) => (
-              <div key={index} className="flex flex-col items-center">
-                <div className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
-                  {image ? (
-                    <img
-                      src={
-                        image instanceof File
-                          ? URL.createObjectURL(image)
-                          : `../../../../Backend/${image}`
-                      }
-                      alt={`Product ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-gray-400">No image</span>
+            <h2 className="text-xl font-semibold mb-4">Images</h2>
+            <div className="grid grid-cols-5 gap-4">
+              {images.map((image, index) => (
+                <div key={index} className="flex flex-col items-center">
+                  <div className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
+                    {image ? (
+                      <img
+                        src={image instanceof File ? URL.createObjectURL(image) : `../../../../Backend/${image}`}
+                        alt={`Product ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-gray-400">No image</span>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageChange(index, e.target.files?.[0] || null)}
+                    className="hidden"
+                    id={`image-input-${index}`}
+                  />
+                  <label
+                    htmlFor={`image-input-${index}`}
+                    className="mt-2 cursor-pointer text-sm text-indigo-600 hover:text-indigo-800"
+                  >
+                    {image ? 'Change' : 'Add Image'}
+                  </label>
+                  {image instanceof File && (
+                    <button
+                      type="button"
+                      onClick={() => handleImageUpload(index)}
+                      className="mt-1 text-xs text-green-600 hover:text-green-800"
+                    >
+                      Upload
+                    </button>
                   )}
                 </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    handleImageChange(index, e.target.files?.[0] || null)
-                  }
-                  className="hidden"
-                  id={`image-input-${index}`}
-                />
-                <label
-                  htmlFor={`image-input-${index}`}
-                  className="mt-2 cursor-pointer text-sm text-indigo-600 hover:text-indigo-800"
-                >
-                  {image ? "Change" : "Add Image"}
-                </label>
-                {image instanceof File && (
-                  <button
-                    type="button"
-                    onClick={() => handleImageUpload(index)}
-                    className="mt-1 text-xs text-green-600 hover:text-green-800"
-                  >
-                    Upload
-                  </button>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="bg-white shadow-md rounded-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label
-                  htmlFor="productName"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
+                <label htmlFor="productName" className="block text-sm font-medium text-gray-700 mb-1">
                   Product Name
                 </label>
                 <input
@@ -223,37 +210,32 @@ const UpdateProductPage: React.FC = () => {
                 />
               </div>
               <div>
-                <label
-                  htmlFor="category"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
                   Category
                 </label>
                 <select
-                  id="category"
-                  value={category?._id || ""}
-                  onChange={(e) => {
-                    const selectedCategory = categories.find(
-                      (cat) => cat._id === e.target.value
-                    );
-                    setCategory(selectedCategory || null); // Update selected category
-                  }}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  required
-                >
-                  <option value={category?._id}>
-                    {category?.name || "Select a category"}
-                  </option>{" "}
-                  {/* Default option */}
-                  {categories.map(
-                    (cat) =>
-                      cat._id !== category?._id && (
-                        <option key={cat._id} value={cat._id}>
-                          {cat.name} {/* Display the category name */}
-                        </option>
-                      )
-                  )}
-                </select>
+  id="category"
+  value={category?._id || ""}
+  onChange={(e) => {
+    const selectedCategory = categories.find(
+      (cat) => cat.id === e.target.value
+    );
+    setCategory(selectedCategory || null);  // Update selected category
+  }}
+  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+  required
+>
+  <option value={category?._id}>{category?.name || "Select a category"}</option> {/* Default option */}
+  {categories.map((cat) => 
+    cat.id !== category?._id && (
+      <option key={cat.id} value={cat.id}>
+        {cat.name} {/* Display the category name */}
+      </option>
+    )
+  )}
+</select>
+
+
               </div>
             </div>
             <div className="mt-4">
@@ -277,17 +259,13 @@ const UpdateProductPage: React.FC = () => {
                   type="text"
                   placeholder="Header"
                   value={desc.header}
-                  onChange={(e) =>
-                    handleDescriptionChange(index, "header", e.target.value)
-                  }
+                  onChange={(e) => handleDescriptionChange(index, "header", e.target.value)}
                   className="mb-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
                 <textarea
                   placeholder="Content"
                   value={desc.content}
-                  onChange={(e) =>
-                    handleDescriptionChange(index, "content", e.target.value)
-                  }
+                  onChange={(e) => handleDescriptionChange(index, "content", e.target.value)}
                   className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   rows={3}
                 />
@@ -309,6 +287,7 @@ const UpdateProductPage: React.FC = () => {
             </button>
           </div>
 
+
           <div className="bg-white shadow-md rounded-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Variants</h2>
             {variants.map((variant, index) => (
@@ -319,11 +298,9 @@ const UpdateProductPage: React.FC = () => {
                     placeholder="Weight"
                     value={variant.weight}
                     onChange={(e) =>
-                      setVariants(
-                        variants.map((v, i) =>
-                          i === index ? { ...v, weight: e.target.value } : v
-                        )
-                      )
+                      setVariants(variants.map((v, i) =>
+                        i === index ? { ...v, weight: e.target.value } : v
+                      ))
                     }
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
@@ -332,13 +309,9 @@ const UpdateProductPage: React.FC = () => {
                     placeholder="Price"
                     value={variant.price}
                     onChange={(e) =>
-                      setVariants(
-                        variants.map((v, i) =>
-                          i === index
-                            ? { ...v, price: Number(e.target.value) }
-                            : v
-                        )
-                      )
+                      setVariants(variants.map((v, i) =>
+                        i === index ? { ...v, price: Number(e.target.value) } : v
+                      ))
                     }
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
@@ -347,13 +320,9 @@ const UpdateProductPage: React.FC = () => {
                     placeholder="Stock"
                     value={variant.stockQuantity}
                     onChange={(e) =>
-                      setVariants(
-                        variants.map((v, i) =>
-                          i === index
-                            ? { ...v, stockQuantity: Number(e.target.value) }
-                            : v
-                        )
-                      )
+                      setVariants(variants.map((v, i) =>
+                        i === index ? { ...v, stockQuantity: Number(e.target.value) } : v
+                      ))
                     }
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
