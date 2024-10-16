@@ -218,7 +218,7 @@ const UpdateProductPage: React.FC = () => {
   value={category?._id || ""}
   onChange={(e) => {
     const selectedCategory = categories.find(
-      (cat) => cat.id === e.target.value
+      (cat) => cat._id === e.target.value
     );
     setCategory(selectedCategory || null);  // Update selected category
   }}
@@ -227,8 +227,8 @@ const UpdateProductPage: React.FC = () => {
 >
   <option value={category?._id}>{category?.name || "Select a category"}</option> {/* Default option */}
   {categories.map((cat) => 
-    cat.id !== category?._id && (
-      <option key={cat.id} value={cat.id}>
+    cat._id !== category?._id && (
+      <option key={cat._id} value={cat._id}>
         {cat.name} {/* Display the category name */}
       </option>
     )
