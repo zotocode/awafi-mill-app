@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {  Description, Variant } from "../types/productTypes";
-import { Category ,subCategory} from "../types/categoryType";
+import { Description, Variant } from "../types/productTypes";
+import { Category, subCategory } from "../types/categoryType";
 import categoryapi from "../api/categoryapi";
+import subcategoryapi from "../api/subcategoryapi";
 import productapi from "../api/productapi";
 import { toast } from "react-toastify";
 
@@ -23,7 +24,7 @@ const UpdateProductPage: React.FC = () => {
   const [subCategory, setSubCategory] = useState<Category | null>(null);
   const [images, setImages] = useState<(string | File | null)[]>(Array(MAX_IMAGES).fill(null));
   const [variants, setVariants] = useState<Variant[]>([
-    { weight: "", price: 0, stockQuantity: 0 },
+    { weight: "", inPrice: 0, outPrice: 0, stockQuantity: 0 },
   ]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -46,16 +47,16 @@ const UpdateProductPage: React.FC = () => {
           setIsListed(product.isListed);
           setCategory(product.category || null);
           setSubCategory(product.subCategory || null);
-          setVariants(product.variants || [{ weight: "", price: 0, stockQuantity: 0 }]);
-          
+          setVariants(product.variants || [{ weight: "", inPrice: 0, outPrice: 0, stockQuantity: 0 }]);
+
           const existingImages = product.images || [];
           setImages([
             ...existingImages,
-            ...Array(MAX_IMAGES - existingImages.length).fill(null)
+            ...Array(MAX_IMAGES - existingImages.length).fill(null),
           ]);
 
           if (product.category) {
-            const subCategoriesResponse = await categoryapi.fetchSubCategories(product.category._id);
+            const subCategoriesResponse = await subcategoryapi.fetchAllListedCategories(product.category._id);
             if (subCategoriesResponse.status === 200) {
               setSubCategories(subCategoriesResponse.data);
             }
@@ -78,7 +79,7 @@ const UpdateProductPage: React.FC = () => {
     const fetchSubCategories = async () => {
       if (category?._id) {
         try {
-          const response = await categoryapi.fetchSubCategories(category._id);
+          const response = await subcategoryapi.fetchAllListedCategories(category._id);
           if (response.status === 200) {
             setSubCategories(response.data);
           }
@@ -104,7 +105,7 @@ const UpdateProductPage: React.FC = () => {
     const image = images[index];
     if (image instanceof File) {
       const formData = new FormData();
-      formData.append('image', image);
+      formData.append("image", image);
       try {
         // const response = await productapi.updateProductImage(id!, formData, index);
         // if (response.status === 200) {
@@ -139,7 +140,10 @@ const UpdateProductPage: React.FC = () => {
   };
 
   const handleAddVariant = () =>
-    setVariants([...variants, { weight: "", price: 0, stockQuantity: 0 }]);
+    setVariants([
+      ...variants,
+      { weight: "", inPrice: 0, outPrice: 0, stockQuantity: 0 },
+    ]);
 
   const handleRemoveVariant = (index: number) =>
     setVariants(variants.filter((_, i) => i !== index));
@@ -152,7 +156,7 @@ const UpdateProductPage: React.FC = () => {
       category: category?._id,
       subCategory: subCategory?._id,
       descriptions,
-      variants
+      variants,
     };
 
     try {
@@ -350,6 +354,36 @@ const UpdateProductPage: React.FC = () => {
                   }
                   className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
+                 <input
+                      type="number"
+                      placeholder="Price"
+                      value={variant.inPrice}
+                      onChange={(e) =>
+                        setVariants(
+                          variants.map((v, i) =>
+                            i === index
+                              ? { ...v, price: Number(e.target.value) }
+                              : v
+                          )
+                        )
+                      }
+                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    />
+                 <input
+                      type="number"
+                      placeholder="Price"
+                      value={variant.outPrice}
+                      onChange={(e) =>
+                        setVariants(
+                          variants.map((v, i) =>
+                            i === index
+                              ? { ...v, price: Number(e.target.value) }
+                              : v
+                          )
+                        )
+                      }
+                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    />
                 <input
                   type="number"
                   placeholder="Stock"
@@ -390,7 +424,7 @@ const UpdateProductPage: React.FC = () => {
         </div>
       </form>
     </div>
-  );
+ );
 };
 
 export default UpdateProductPage;

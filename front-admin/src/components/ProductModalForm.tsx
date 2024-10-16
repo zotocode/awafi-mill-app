@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Product, Description, Variant } from "../types/productTypes";
 import { Category } from "../types/categoryType";
 import categoryapi from "../api/categoryapi";
+import subcategoryapi from "../api/subcategoryapi";
 import { toast } from "react-toastify";
 import productapi from "../api/productapi";
 
@@ -27,7 +28,7 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
   const [images, setImages] = useState<File[]>([]);
   const [subCategory, setSubCategory] = useState<Category | null>(null);
   const [variants, setVariants] = useState<Variant[]>([
-    { weight: "", price: 0, stockQuantity: 0 },
+    { weight: "", inPrice: 0,outPrice:0, stockQuantity: 0 },
   ]);
 
   useEffect(() => {
@@ -48,7 +49,7 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
     async function fetchSubCategories() {
       if (category?._id) {
         try {
-          const response = await categoryapi.fetchSubCategories(category._id);
+          const response = await subcategoryapi.fetchAllListedCategories(category._id);
           if (response.status === 200) {
             setSubCategories(response.data);
           }
@@ -68,7 +69,7 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
     setIsListed(true);
     setCategory(null);
     setSubCategory(null);
-    setVariants([{ weight: "", price: 0, stockQuantity: 0 }]);
+    setVariants([{ weight: "", inPrice: 0,outPrice:0, stockQuantity: 0 }]);
   };
 
   const handleAddDescription = () => {
@@ -97,7 +98,7 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
   };
 
   const handleAddVariant = () =>
-    setVariants([...variants, { weight: "", price: 0, stockQuantity: 0 }]);
+    setVariants([...variants, { weight: "", inPrice: 0,outPrice:0, stockQuantity: 0 }]);
 
   const handleRemoveVariant = (index: number) =>
     setVariants(variants.filter((_, i) => i !== index));
@@ -124,7 +125,8 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
 
     variants.forEach((variant, index) => {
       formData.append(`variants[${index}][weight]`, variant.weight || "");
-      formData.append(`variants[${index}][price]`, variant.price.toString());
+      formData.append(`variants[${index}][inPrice]`, variant.inPrice.toString());
+      formData.append(`variants[${index}][outPrice]`, variant.inPrice.toString());
       formData.append(
         `variants[${index}][stockQuantity]`,
         variant.stockQuantity.toString()
@@ -350,12 +352,27 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
                     <input
                       type="number"
                       placeholder="Price"
-                      value={variant.price}
+                      value={variant.inPrice}
                       onChange={(e) =>
                         setVariants(
                           variants.map((v, i) =>
                             i === index
-                              ? { ...v, price: Number(e.target.value) }
+                              ? { ...v, inPrice: Number(e.target.value) }
+                              : v
+                          )
+                        )
+                      }
+                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Price"
+                      value={variant.outPrice}
+                      onChange={(e) =>
+                        setVariants(
+                          variants.map((v, i) =>
+                            i === index
+                              ? { ...v, outPrice: Number(e.target.value) }
                               : v
                           )
                         )

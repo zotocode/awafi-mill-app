@@ -1,7 +1,8 @@
+// src/components/Dashboard.tsx
 import React from 'react';
-import Navbar from '../layouts/Navbar';
 import Table from '../components/Table';
-import Sidebar from '../layouts/Sidebar';
+import { useSelector } from 'react-redux';
+import { RootState } from '../state/store'; 
 
 const Dashboard = () => {
   const productData = [
@@ -18,13 +19,10 @@ const Dashboard = () => {
     { header: 'Category', accessor: 'category' },
     { header: 'Price', accessor: 'price' },
   ];
-
   return (
     <div>
-     
-      
-      <div className="p-4 sm:ml-64 mt-16">
-        <Table data={productData} columns={columns} />
+      <div className="p-4 sm:ml-64 mt-16">  
+          <Table data={productData} columns={columns} />   
       </div>
     </div>
   );

@@ -44,6 +44,10 @@ export class ProductInteractor implements IProductInteractor {
     const products = await this.productRepo.findAllProducts();
     return products.map((p) => this.mapEntityToDto(p));
   }
+  // filter by category-----
+  async fetchByCategory(mainCategoryId: string, subCategoryId: string): Promise<ProductDTO[] |null> {
+    return await this.productRepo.fetchByCategory(mainCategoryId, subCategoryId);
+  }
 
   // Retrieve a product by ID
   async getProductById(id: string): Promise<ProductDTO | null> {
