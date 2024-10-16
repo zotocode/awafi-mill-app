@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.frondend.app-mergeDebugResources-24:/values-v21/values-v21.xml",
+            "outputFile": "com.example.frondend.app-mergeDebugResources-25:/values-v21/values-v21.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Lenovo\\.gradle\\caches\\transforms-3\\c666c258fca39b3353b46678a6b928ab\\transformed\\core-1.13.1\\res\\values-v21\\values-v21.xml",
