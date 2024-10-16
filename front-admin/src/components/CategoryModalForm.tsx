@@ -17,22 +17,20 @@ const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [isListed, setIsListed] = useState(false);
   const [errors, setErrors] = useState({ name: '', description: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Prepopulate the form with selected category data (if editing)
   useEffect(() => {
-    console.log("use effet",category)
+
+
     if (category) {
       setName(category.name || '');
       setDescription(category.description || '');
-      setIsListed(category.isListed || false);
     } else {
       // Reset fields when adding a new category
       setName('');
       setDescription('');
-      setIsListed(false);
     }
   }, [category,onSuccess]);
 
@@ -67,14 +65,13 @@ const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
         response = await CategoryApi.updateCategory(category._id, {
           name,
           description,
-          isListed,
+      
         });
       } else {
         // Add new category
         response = await CategoryApi.addCategory({
           name,
           description,
-          isListed,
         });
       }
   
@@ -147,18 +144,7 @@ const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
               />
               {errors.description && <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.description}</p>}
             </div>
-            <div>
-              <label htmlFor="isListed" className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  id="isListed"
-                  checked={isListed}
-                  onChange={(e) => setIsListed(e.target.checked)}
-                  className="mr-2"
-                />
-                Listed
-              </label>
-            </div>
+          
             <button
               type="submit"
               disabled={isSubmitting}

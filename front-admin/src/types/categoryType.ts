@@ -1,7 +1,6 @@
 export interface creatingCategory{
  name:string,
  description:string
- isListed:boolean
 }
 
 export interface Category {
@@ -11,7 +10,7 @@ export interface Category {
     isListed: boolean;
   }
   
-  export interface SubCategory {
+  export interface subCategory {
     _id?: string;
     name: string;
     mainCategory: string;

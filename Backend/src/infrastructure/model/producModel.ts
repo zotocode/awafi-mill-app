@@ -38,7 +38,8 @@ const productSchema = new Schema<Product>({
   variants: [
     {
       weight: { type: String, required: true },
-      price: { type: Number, required: true },
+      inPrice: { type: Number, required: true },
+      outPrice: { type: Number, required: true },
       stockQuantity: { type: Number, required: true }
     }
   ]
