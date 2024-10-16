@@ -33,9 +33,7 @@ export class UserController {
   //=========================================register====================
   async userRegister(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("====================================");
-      console.log("user reg");
-      console.log("====================================");
+    
       const { email, password, phone, name } = req.body;
       const result = await this.userInteractor.registerUser(
         email,
@@ -43,14 +41,16 @@ export class UserController {
         password,
         phone
       );
-      if (result.success) {
+     
+            if (result.success) {
         return res
           .status(200)
-          .json({ message: result.message, otp: result.otp });
+          .json({ status:true, message: result.message, otp: result.otp });
       } else {
-        return res.status(401).json({ message: result.message });
+        return res.status(401).json({status:false, message: result.message });
       }
     } catch (error) {
+   
       next(error);
     }
   }
@@ -62,9 +62,9 @@ export class UserController {
 
       // Handle the response based on the result of OTP verification
       if (result.success) {
-        return res.status(200).json({ message: result.message });
+        return res.status(200).json({status:true, message: result.message });
       } else {
-        return res.status(400).json({ message: result.message });
+        return res.status(400).json({ status:false, message: result.message });
       }
     } catch (err) {
       next(err);
@@ -82,7 +82,7 @@ export class UserController {
       if (result.success) {
         return res.status(200).json({status:true, message: "user data update" });
       } else {
-        return res.status(400).json({ message: result.message });
+        return res.status(400).json({status:false, message: result.message });
       }
     } catch (err) {
       next(err);
@@ -95,12 +95,12 @@ export class UserController {
       console.log(req.user);
       const id = req.user?.id;
       if (!id) {
-        return res.status(400).json({ message: "User ID not found in token" });
+        return res.status(400).json({ status:false,message: "User ID not found in token" });
       }
       console.log("Decoded Payload ID:", id);
       // Use the id in profileData (ensured to be a string now)
       const profileData = await this.userInteractor.profileData(id);
-      return res.status(200).json(profileData);
+      return res.status(200).json({status:true,profileData});
     } catch (error) {
       next(error);
     }
@@ -128,4 +128,5 @@ export class UserController {
       next(error);
     }
   }
+
 }
