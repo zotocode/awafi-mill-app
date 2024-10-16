@@ -27,5 +27,5 @@ export class ReviewInteractor implements IReviewInteractor {
       rating: iReview.rating,
       comment: iReview.comment,
     };
-  }
+  } 
 }
