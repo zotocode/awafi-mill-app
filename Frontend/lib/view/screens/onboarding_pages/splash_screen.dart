@@ -19,6 +19,7 @@ class _AnimationExampleState extends State<AnimationExample>
   late Animation<double> _popupSizeAnimation;
   late Animation<double> _imageScaleAnimation;
   late Animation<double> _imageRotationAnimation;
+  late Animation<BorderRadius?> _borderRadiusAnimation;
 
   @override
   void initState() {
@@ -27,12 +28,20 @@ class _AnimationExampleState extends State<AnimationExample>
     // Initialize AnimationController
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 2),
     );
 
     // Bottom-left popup expanding and covering the full screen
     _popupSizeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+    );
+
+    // Border radius animation (from rounded to rectangle)
+    _borderRadiusAnimation = BorderRadiusTween(
+      begin: BorderRadius.circular(70.0), // Circular start
+      end: BorderRadius.circular(0.0), // Fully rectangular when expanded
+    ).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
     );
 
     // Image scaling and rotating
@@ -46,7 +55,6 @@ class _AnimationExampleState extends State<AnimationExample>
     // Start the animation
     _controller.forward();
 
-    // Listen for animation completion
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         Future.delayed(Duration(milliseconds: 600), () {
@@ -71,7 +79,7 @@ class _AnimationExampleState extends State<AnimationExample>
         backgroundColor: Style.themeColor,
         body: Stack(
           children: [
-            // Bottom-left white popup expanding from a circle to full screen
+            // Bottom-left white popup expanding from a circle to full screen with smooth transition
             AnimatedBuilder(
               animation: _popupSizeAnimation,
               builder: (context, child) {
@@ -86,11 +94,8 @@ class _AnimationExampleState extends State<AnimationExample>
                     height: size, // Animating the height
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(
-                        _popupSizeAnimation.value < 0.5
-                            ? size / 2 // Circular shape initially
-                            : size / 2, // No border radius when fully expanded
-                      ),
+                      borderRadius: _borderRadiusAnimation
+                          .value, // Animating border radius
                     ),
                   ),
                 );
@@ -127,12 +132,8 @@ class _AnimationExampleState extends State<AnimationExample>
                   AnimatedBuilder(
                     animation: _popupSizeAnimation,
                     builder: (context, child) {
-                      // Determine text color based on popup's expansion
-                      double popupThreshold =
-                          MediaQuery.of(context).size.height / 2;
-                      Color textColor = _popupSizeAnimation.value *
-                                  MediaQuery.of(context).size.longestSide >=
-                              popupThreshold
+                      // Adjust color change more smoothly based on the animation's value
+                      Color textColor = (_popupSizeAnimation.value > 0.5)
                           ? Colors.black
                           : Colors.white;
 
@@ -145,11 +146,11 @@ class _AnimationExampleState extends State<AnimationExample>
                         child: AnimatedTextKit(
                           animatedTexts: [
                             TypewriterAnimatedText(
-                              'AWAFI MILL',
+                              'AWAFI MILLL',
                               textStyle: GoogleFonts.sixtyfour(
-                                  letterSpacing: 2, fontSize: 24),
+                                  letterSpacing: 1, fontSize: 24),
                               speed: const Duration(
-                                  milliseconds: 200), // Slower typing speed
+                                  milliseconds: 300), // Slower typing speed
                             ),
                           ],
                           isRepeatingAnimation: false,
