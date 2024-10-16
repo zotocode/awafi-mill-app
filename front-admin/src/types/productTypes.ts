@@ -8,7 +8,8 @@ export interface Description {
   
  export interface Variant {
     weight: string;
-    price: number;
+    inPrice: number;
+    outPrice:number;
     stockQuantity: number;
   }
   
