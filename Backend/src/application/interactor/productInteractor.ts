@@ -4,22 +4,35 @@ import IProductInteractor from "../../interface/productInterface/IproductInterac
 import Product  from "../../domain/entities/productSchema";
 import { error } from "console";
 import {resposeHandler} from '../../types/commonTypes'
+import { ICloudinaryService } from "../../interface/serviceInterface/IcloudinaryInterface";
 
 
 
 
 export class ProductInteractor implements IProductInteractor {
   private productRepo: ProductRepository;
+  private cloudinaryService: ICloudinaryService;
 
 
-  constructor(productRepo: ProductRepository) {
+  constructor(productRepo: ProductRepository,cloudinaryService:ICloudinaryService) {
     this.productRepo = productRepo;
+    this.cloudinaryService=cloudinaryService
+
   
   }
 
   // Adding a new product
   async addProduct(productData: ProductCreationDTO): Promise<ProductDTO |resposeHandler> {
 
+    const uploadedImages = await Promise.all(
+    productData.images.map(async (path) => {
+      const uploadResult = await this.cloudinaryService.uploadProductImage(path);
+      return uploadResult.secure_url; // Return the Cloudinary URL
+    })
+  );
+
+  productData.images = uploadedImages;
+   
       // console.log('interactor',productData)
     const{name}=productData
     const isAvailable=await this.productRepo.findByName(name)

@@ -25,6 +25,13 @@ export class CategoryRepository extends BaseRepository<ICategory> implements ICa
     const regex = new RegExp(`^${name}$`, 'i'); 
     return await super.findOne({ name: regex });
   }
+  async findByNameNotId(id:string,name: string): Promise<ICategory | null> {
+    const regex = new RegExp(`^${name}$`, 'i'); 
+    return await super.findOne({
+      _id: { $ne: id },  
+      name: { $regex: regex }
+    });
+  }
 
   async getCategoryById(id: string): Promise<ICategory | null> {
     return await super.findById(id);

@@ -26,6 +26,13 @@ export class SubCategoryRepository extends BaseRepository<IsubCategory> implemen
     const regex = new RegExp(`^${name}$`, 'i'); 
     return await super.findOne({ name: regex });
   }
+  async findByNameNotId(id:string,name: string): Promise<IsubCategory | null> {
+    const regex = new RegExp(`^${name}$`, 'i'); 
+    return await super.findOne({
+      _id: { $ne: id },  
+      name: { $regex: regex }
+    });
+  }
 
   async getCategoryById(id: string): Promise<IsubCategory | null> {
     return await super.findById(id);

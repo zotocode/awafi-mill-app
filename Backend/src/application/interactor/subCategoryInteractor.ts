@@ -45,10 +45,10 @@ export class SubCategoryInteractor implements IsubCategoryInteractor {
   }
 
   // Update a category
-  async updateCategory(id: string, data: Partial<subCategoryCreationDTo>): Promise<subCategoryDTo | resposeHandler | null> {
+  async updateCategory(categoryId: string, data: Partial<subCategoryCreationDTo>): Promise<subCategoryDTo | resposeHandler | null> {
     if(data.name)
     {
-      const isAvailable=await this.categoryRepo.findByName(data.name)
+      const isAvailable=await this.categoryRepo.findByNameNotId(categoryId,data.name)
       if(isAvailable)
       {
         return { message: "Category always in your bucket", status: 409 };
@@ -57,7 +57,7 @@ export class SubCategoryInteractor implements IsubCategoryInteractor {
 
     }
    
-    const updatedCategory = await this.categoryRepo.updateCategory(id, data); // Use repository method
+    const updatedCategory = await this.categoryRepo.updateCategory(categoryId, data); // Use repository method
     return updatedCategory && !updatedCategory.isDeleted ? this.mapToDTO(updatedCategory) : null;
   }
 
