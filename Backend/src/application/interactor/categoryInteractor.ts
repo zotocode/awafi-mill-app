@@ -47,7 +47,7 @@ export class CategoryInteractor implements IsubCategoryInteractory {
   async updateCategory(id: string, data: Partial<categoryCreationDTo>): Promise<categoryDTo | resposeHandler | null> {
     if(data.name)
     {
-      const isAvailable=await this.categoryRepo.findByName(data.name)
+      const isAvailable=await this.categoryRepo.findByNameNotId(id,data.name)
       if(isAvailable)
       {
         return { message: "Category always in your bucket", status: 409 };

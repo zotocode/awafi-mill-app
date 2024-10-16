@@ -24,7 +24,7 @@ export class CategoryController {
       {
         res.status(result.status).json({ message: result.message});
       }
-      res.status(201).json({ message: "Category created successfully", data: result });
+      res.status(201).json(result);
     } catch (error) {
       next(error);
     }
@@ -72,9 +72,9 @@ export class CategoryController {
   async updateCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
 
-      const productId = req.params.id;
+      const categoryId = req.params.id;
       const updatedData: Partial<categoryCreationDTo> = req.body; 
-      const updatedProduct = await this.categoryInteractor.updateCategory(productId, updatedData);
+      const updatedProduct = await this.categoryInteractor.updateCategory(categoryId, updatedData);
       if (updatedProduct) {
         res.status(200).json(updatedProduct);
       } else {

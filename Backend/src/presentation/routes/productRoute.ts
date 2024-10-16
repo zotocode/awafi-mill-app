@@ -6,13 +6,15 @@ import { ProductInteractor } from "../../application/interactor/productInteracto
 import { ProductModel } from "../../infrastructure/model/producModel";
 import { upload } from "../../config/multerConfig";
 import { validateProductInput } from "../middleware/produtValidation";
+import CloudinaryService from "../../application/services/cloudinary";
 
 
 
 
 
 const productRepo = new ProductRepository(ProductModel);
-const productInteractor = new ProductInteractor(productRepo);
+const cloudinaryService=new CloudinaryService()
+const productInteractor = new ProductInteractor(productRepo,cloudinaryService);
 const productController = new ProductController(productInteractor);
 
 const productRoutes = express.Router();

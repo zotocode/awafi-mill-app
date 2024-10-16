@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
+    "@reduxjs/toolkit": "^2.3.0",
     "axios": "^1.7.7",
     "lucide-react": "^0.447.0",
     "mogoose": "^0.0.1-security",

@@ -33,7 +33,7 @@ class ProductApi{
       }
     async deleteProduct(id:string): Promise<any> {
         try {
-          return await this.axiosInstance.patch(`/api/products/product/:${id}`);
+          return await this.axiosInstance.patch(`/api/products/product/delete/${id}`);
         } catch (error: unknown) {
          
           return error;

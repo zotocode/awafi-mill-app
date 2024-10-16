@@ -9,4 +9,5 @@ export default interface ICategoryRepo {
   updateCategory(id: string, data: Partial<categoryCreationDTo>): Promise<ICategory | null>;
   deleteCategory(id: string): Promise<boolean>;
   findByName(name: string): Promise<ICategory | null>;
+  findByNameNotId(id:string,name: string): Promise<ICategory | null>;
 }
