@@ -3,10 +3,10 @@ name: Backend CI/CD Pipeline
 on:
   push:
     paths:
-      - 'backend/**'
+      - 'Backend/**'
   pull_request:
     paths:
-      - 'backend/**'
+      - 'Backend/**'
 
 jobs:
   build-and-deploy:
@@ -23,10 +23,10 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd backend
+        cd Backend
         npm install
 
     - name: Build TypeScript
       run: |
-        cd backend
+        cd Backend
         npm run build
