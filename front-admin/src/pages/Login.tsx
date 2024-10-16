@@ -6,13 +6,12 @@ import LoginContainer from '../components/LoginContainer';
 const LoginPage = () => {
     const handleLogin = (email: string, password: string) => {
         console.log('Login successful:', email, password);
-        // Here you would typically redirect to a dashboard or home page
+        // Redirect to dashboard or home page
       };
-    
 
   return (
     <>
-      <Navbar />
+      <Navbar showLogoutButton={false} />
       <LoginContainer onLogin={handleLogin} />
     </>
   );
