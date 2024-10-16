@@ -360,3 +360,7 @@ const UpdateProductPage: React.FC = () => {
 };
 
 export default UpdateProductPage;
+
+
+
+//  changed the file names 
