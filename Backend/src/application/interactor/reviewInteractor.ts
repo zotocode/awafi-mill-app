@@ -26,6 +26,6 @@ export class ReviewInteractor implements IReviewInteractor {
       productId: iReview.product.toString(),
       rating: iReview.rating,
       comment: iReview.comment,
-    };
+    }; 
   } 
 }
