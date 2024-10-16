@@ -6,7 +6,7 @@ import DashboardPage from './pages/Dashboard';
 import UserManagementPage from './pages/UserManagement';
 import ProductManagementPage from './pages/ProductManagement';
 import MainCategoryManagementPage from './pages/CategoryManagement';
-import UpdateProductPage from './pages/UpdateProductPage';
+import UpdateProductPage from './pages/updateProductPage';
 import Navbar from './layouts/Navbar';
 import Sidebar from './layouts/Sidebar';
 import SubCategoryManagementPage from './pages/SubCategoryManagementPage';
