@@ -24,7 +24,7 @@ const UpdateProductPage: React.FC = () => {
   const [subCategory, setSubCategory] = useState<Category | null>(null);
   const [images, setImages] = useState<(string | File | null)[]>(Array(MAX_IMAGES).fill(null));
   const [variants, setVariants] = useState<Variant[]>([
-    { weight: "", price: 0, stockQuantity: 0 },
+    { weight: "", inPrice: 0,outPrice:0, stockQuantity: 0 },
   ]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -47,7 +47,7 @@ const UpdateProductPage: React.FC = () => {
           setIsListed(product.isListed);
           setCategory(product.category || null);
           setSubCategory(product.subCategory || null);
-          setVariants(product.variants || [{ weight: "", price: 0, stockQuantity: 0 }]);
+          setVariants(product.variants || [{ weight: "", inPrice: 0,outPrice:0, stockQuantity: 0 }]);
           
           const existingImages = product.images || [];
           setImages([
@@ -140,7 +140,7 @@ const UpdateProductPage: React.FC = () => {
   };
 
   const handleAddVariant = () =>
-    setVariants([...variants, { weight: "", price: 0, stockQuantity: 0 }]);
+    setVariants([...variants, { weight: "", inPrice: 0,outPrice:0, stockQuantity: 0 }]);
 
   const handleRemoveVariant = (index: number) =>
     setVariants(variants.filter((_, i) => i !== index));
@@ -354,7 +354,22 @@ const UpdateProductPage: React.FC = () => {
                  <input
                       type="number"
                       placeholder="Price"
-                      value={variant.price}
+                      value={variant.inPrice}
+                      onChange={(e) =>
+                        setVariants(
+                          variants.map((v, i) =>
+                            i === index
+                              ? { ...v, price: Number(e.target.value) }
+                              : v
+                          )
+                        )
+                      }
+                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    />
+                 <input
+                      type="number"
+                      placeholder="Price"
+                      value={variant.outPrice}
                       onChange={(e) =>
                         setVariants(
                           variants.map((v, i) =>

@@ -1,6 +1,4 @@
-import Navbar from '../layouts/Navbar';
 import Table from '../components/Table';
-import Sidebar from '../layouts/Sidebar';
 
 
 const UserManagementPage = () => {
