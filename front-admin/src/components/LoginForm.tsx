@@ -1,6 +1,10 @@
+// src/components/LoginForm.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux'; // Import useDispatch
+import { loginSuccess } from '../state/adminSlice';
 import AuthApi from '../api/adminLogin'; // Correct import
+import { toast } from "react-toastify";
 
 interface LoginFormProps {
   onLogin: (email: string, password: string) => void;
@@ -13,6 +17,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate(); // Initialize useNavigate
+  const dispatch = useDispatch(); // Initialize dispatch
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,13 +30,21 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
         // Store token in local storage
         localStorage.setItem('authToken', response.data.token);
         
+        // Dispatch loginSuccess action with token and message
+        dispatch(loginSuccess({
+          token: response.data.token,
+          message: response.data.message,
+        }));
+        
         onLogin(email, password);
         console.log('Login successful:', response.data);
-
+        toast.success("Admin Login Successfully");
+        
         // Navigate to dashboard after successful login
         navigate('/dashboard');
       } else {
         setError('Invalid login credentials');
+        toast.error('Invalid Username or Password');
       }
     } catch (error) {
       setError('Failed to login. Please try again later.');
