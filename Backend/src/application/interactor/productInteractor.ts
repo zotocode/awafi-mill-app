@@ -1,20 +1,20 @@
 import { ProductCreationDTO, ProductDTO } from "../../domain/dtos/ProductDTO";
-import { ProductRepository } from "../../infrastructure/repositories/productRepository";
 import IProductInteractor from "../../interface/productInterface/IproductInteractor";
 import Product  from "../../domain/entities/productSchema";
 import { error } from "console";
 import {resposeHandler} from '../../types/commonTypes'
 import { ICloudinaryService } from "../../interface/serviceInterface/IcloudinaryInterface";
+import { IproductRepo } from "../../interface/productInterface/IproductRepo";
 
 
 
 
 export class ProductInteractor implements IProductInteractor {
-  private productRepo: ProductRepository;
+  private productRepo: IproductRepo;
   private cloudinaryService: ICloudinaryService;
 
 
-  constructor(productRepo: ProductRepository,cloudinaryService:ICloudinaryService) {
+  constructor(productRepo: IproductRepo,cloudinaryService:ICloudinaryService) {
     this.productRepo = productRepo;
     this.cloudinaryService=cloudinaryService
 
@@ -45,16 +45,29 @@ export class ProductInteractor implements IProductInteractor {
     const createdProduct = await this.productRepo.addProduct(productData);
     return this.mapEntityToDto(createdProduct);
   }
-  async updateImage(id:string,index:number,photo:string): Promise<boolean> {
-    const updatedProduct = await this.productRepo.updateImage(
-      id,index,photo
-    );
-    return updatedProduct.nModified >0 ? true: false;
+
+  async updateImage(id: string, index: number, path: string): Promise<boolean | string> {
+
+      const uploadResult = await this.cloudinaryService.uploadProductImage(path);
+      const updatedProduct = await this.productRepo.updateImage(
+        id,
+        index,
+        uploadResult.secure_url
+      );
+      return updatedProduct.modifiedCount > 0 ? uploadResult.secure_url : false;
+    
   }
+  
 
   // Retrieve all products
   async getAllProducts(): Promise<ProductDTO[]> {
     const products = await this.productRepo.findAllProducts();
+    return products.map((p) => this.mapEntityToDto(p));
+  }
+
+  // Retrieve all listed products
+  async getAllListedProducts(): Promise<ProductDTO[]> {
+    const products = await this.productRepo.findListedAllProducts();
     return products.map((p) => this.mapEntityToDto(p));
   }
   // filter by category-----
@@ -107,7 +120,7 @@ export class ProductInteractor implements IProductInteractor {
 
   // Delete a product by ID
   async deleteProduct(id: string): Promise<boolean> {
-    const deletedProduct = await this.productRepo.delete(id);
+    const deletedProduct = await this.productRepo.deleteProduct(id);
     return !!deletedProduct;
   }
 

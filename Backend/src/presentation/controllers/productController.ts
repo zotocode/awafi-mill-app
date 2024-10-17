@@ -41,7 +41,7 @@ export class ProductController {
   async updateImage(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       // Extract id and index from the query
-      const { id, index } = req.query;
+      const { productId, index } = req.query;
   
       if (!req.file) {
         throw new Error('Photo is not provided');
@@ -50,7 +50,7 @@ export class ProductController {
       const { path } = req.file;
   
       // Ensure id is a string and index is a valid number
-      if (typeof id !== 'string' || typeof index !== 'string') {
+      if (typeof productId !== 'string' || typeof index !== 'string') {
         throw new Error('Invalid id or index');
       }
   
@@ -60,7 +60,7 @@ export class ProductController {
       }
   
       // Call your productInteractor to update the image
-      const products = await this.productInteractor.updateImage(id, currentIndex, path);
+      const products = await this.productInteractor.updateImage(productId, currentIndex, path);
   
       res.status(200).json(products);
     } catch (error) {
@@ -75,6 +75,18 @@ export class ProductController {
     try {
    
       const products = await this.productInteractor.getAllProducts();
+      res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Get all listed products (HTTP GET)
+  
+  async getAllListedProducts(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+   
+      const products = await this.productInteractor.getAllListedProducts();
       res.status(200).json(products);
     } catch (error) {
       next(error);
