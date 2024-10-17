@@ -1,4 +1,4 @@
-name: Backend CI/CD Pipeline
+name: Backend CI/CD Pipeline - abhiabhishektr
 
 on:
   push:
@@ -30,3 +30,14 @@ jobs:
       run: |
         cd Backend
         npm run build
+
+    # Step to auto-close the PR if the build fails
+    - name: Close PR on Failure
+      if: failure() && github.event_name == 'pull_request'
+      run: |
+        curl -X PATCH \
+        -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+        -H "Content-Type: application/json" \
+        -d '{"state": "closed"}' \
+        https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}
+
