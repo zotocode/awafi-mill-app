@@ -1,7 +1,7 @@
-import { Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
 // Define the interface for the Category document
 export default interface ICategory extends Document {
-    _id:string;
+    _id:mongoose.Types.ObjectId;
     name: string;
     description: string;
     isListed: boolean;

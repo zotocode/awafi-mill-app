@@ -93,6 +93,7 @@ const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
       }
 
       if (response.data) {
+        console.log("response of update sub category",response.data)
         onSuccess(response.data);
         toast.success(
           `Category ${category ? "updated" : "created"} successfully`

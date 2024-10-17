@@ -1,5 +1,5 @@
 // src/infrastructure/repositories/baseRepository.ts
-import { Model, Document, FilterQuery, UpdateQuery } from 'mongoose';
+import mongoose, { Model, Document, FilterQuery, UpdateQuery } from 'mongoose';
 
 export abstract class BaseRepository<T extends Document> {
   constructor(protected readonly model: Model<T>) {}
@@ -21,12 +21,12 @@ export abstract class BaseRepository<T extends Document> {
   }
 
   // Find an entity by its ID
-  async findById(id: string): Promise<T | null> {
+  async findById(id: mongoose.Types.ObjectId): Promise<T | null> {
     return await this.model.findById(id);
   }
 
   // Update an entity by its ID and return the updated entity
-  async update(id: string, update: UpdateQuery<T>): Promise<T | null> {
+  async update(id: mongoose.Types.ObjectId, update: UpdateQuery<T>): Promise<T | null> {
     return await this.model.findByIdAndUpdate(id, update, { new: true });
   }
 
@@ -36,7 +36,8 @@ export abstract class BaseRepository<T extends Document> {
   }
 
   // Delete an entity by its ID
-  async delete(id: string): Promise<T | null> {
+  async delete(id: mongoose.Types.ObjectId): Promise<T | null> {
     return await this.model.findByIdAndDelete(id);
   }
 }
+

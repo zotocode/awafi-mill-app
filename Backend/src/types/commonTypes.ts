@@ -1,4 +1,4 @@
-export type resposeHandler={
+export type responseHandler={
     message:string
     status?:number
   }
