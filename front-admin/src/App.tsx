@@ -10,6 +10,7 @@ import UserManagementPage from "./pages/UserManagement";
 import ProductManagementPage from "./pages/ProductManagement";
 import MainCategoryManagementPage from "./pages/CategoryManagement";
 import UpdateProductPage from "./pages/UpdateProductPage";
+import Banner from "./pages/BannerManagement";
 import Navbar from "./layouts/Navbar";
 import Sidebar from "./layouts/Sidebar";
 import SubCategoryManagementPage from "./pages/SubCategoryManagementPage";
@@ -84,6 +85,15 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+             <Route
+                path="/banners"
+                element={
+                  <ProtectedRoute>
+                    <Banner />
+                  </ProtectedRoute>
+                }
+              />
+
             </Route>
           </Route>
         </Routes>

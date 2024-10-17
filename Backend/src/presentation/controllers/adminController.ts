@@ -33,4 +33,26 @@ export class AdminController {
       next(error);
     }
   }
+
+  async blockUser(req: Request, res: Response, next: NextFunction){
+    const result = await this.adminInteractor.blockUser(req.body.email)
+    if (result.success) {
+      return res
+        .status(200)
+        .json({ status: true, message:'User successfully blocked'});
+    } else {
+      return res.status(401).json({ status: false, message: result.message });
+    }
+  }
+
+  async unblockUser(req: Request, res: Response, next: NextFunction){
+    const result = await this.adminInteractor.unblockUser(req.body.email)
+    if (result.success) {
+      return res
+        .status(200)
+        .json({ status: true, message:'User successfully unblocked'});
+    } else {
+      return res.status(401).json({ status: false, message: result.message });
+    }
+  }
 }

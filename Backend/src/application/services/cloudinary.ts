@@ -24,21 +24,22 @@ class CloudinaryService implements ICloudinaryService{
       throw new Error(`Failed to upload image: ${error.message}`);
     }
   }
-    //uploadofferBanner
-    async uploadOfferBaner(filePath: string): Promise<any> {
-      try {
-        const result = await this.uploader.upload(filePath, {
-          folder: 'offerBanner',
-          resource_type: 'auto', // Automatically detects the file type
-        });
-          // Remove the image from local storage after successful upload
-          await fs.unlink(filePath);
-        return result;
-      } catch (error:any) {
-        throw new Error(`Failed to upload image: ${error.message}`);
-      }
+
+  //uploadofferBanner
+  async uploadOfferBaner(filePath: string): Promise<any> {
+    try {
+      const result = await this.uploader.upload(filePath, {
+        folder: 'offerBanner',
+        resource_type: 'auto', // Automatically detects the file type
+      });
+        // Remove the image from local storage after successful upload
+        await fs.unlink(filePath);
+      return result;
+    } catch (error:any) {
+      throw new Error(`Failed to upload image: ${error.message}`);
     }
-  
+  }
+
 }
 
 export default CloudinaryService;
