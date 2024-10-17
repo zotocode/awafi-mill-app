@@ -17,4 +17,5 @@ adminRoute.post('/login',adminController.adminLogin.bind(adminController))
 adminRoute.get('/allUser',adminController.allUsers.bind(adminController))
 
 
+
 export default adminRoute;
