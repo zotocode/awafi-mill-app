@@ -1,7 +1,5 @@
-import React from 'react';
-import Navbar from '../layouts/Navbar';
+
 import Table from '../components/Table';
-import Sidebar from '../layouts/Sidebar';
 
 const Dashboard = () => {
   const productData = [

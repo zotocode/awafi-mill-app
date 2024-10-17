@@ -1,4 +1,4 @@
-import { cloudinaryConfig } from "../../config/cloudinary";
+import { uploader } from "../../config/cloudinary";
 import { ICloudinaryService } from "../../interface/serviceInterface/IcloudinaryInterface";
 import { promises as fs } from 'fs';
 
@@ -6,7 +6,8 @@ class CloudinaryService implements ICloudinaryService{
   private uploader: any;
 
   constructor() {
-    this.uploader = cloudinaryConfig.uploader;
+    this.uploader = uploader;
+
   }
 
   // Uploads a product image to the 'ProductImages' folder

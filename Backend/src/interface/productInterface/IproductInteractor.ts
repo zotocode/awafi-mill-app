@@ -4,6 +4,7 @@ export default interface IProductInteractor {
   addProduct(data: ProductCreationDTO): Promise<ProductDTO |resposeHandler>;
   fetchByCategory(mainCategoryId:string,subCategoryId:string): Promise<ProductDTO[] | null>;
   getAllProducts(): Promise<ProductDTO[]>;
+  getAllListedProducts(): Promise<ProductDTO[]>;
   getProductById(id: string): Promise<ProductDTO | null>;
   updateProduct(id: string, data: Partial<ProductCreationDTO>): Promise<ProductDTO | null |resposeHandler>;
   deleteProduct(id: string): Promise<boolean>; 

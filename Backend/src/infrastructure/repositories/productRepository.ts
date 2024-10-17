@@ -14,7 +14,6 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
   }
 
   async addProduct(productDTO: ProductCreationDTO): Promise<Product> {
-
     const productEntity = {
       name: productDTO.name,
       subCategory: productDTO.subCategory,
@@ -35,6 +34,11 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
     return await this.model.find().populate('category').exec();
 
   }
+
+  async findListedAllProducts(): Promise<Product[]> {
+    return await this.model.find({ isListed: true, isDelete: false }).populate('category').exec();
+  }
+
   async fetchByCategory(mainCategoryId?: string, subCategoryId?: string): Promise<Product[]> {
     const filter: any = {};
 
@@ -63,17 +67,16 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
 
   }
 
-  async productFindById(id: mongoose.Schema.Types.ObjectId): Promise<Product | null> {
+  async productFindById(id: string): Promise<Product | null> {
 
     return await this.model.findById(id).populate('category').exec();
   }
-  async isListedProduct(id: string): Promise<Product | null> {
 
+  async isListedProduct(id: string): Promise<Product | null> {
     return await this.model.findOne({ _id: id, isListed: true }).exec();
   }
 
   async updateListing(id: string, UpdateQuery: listing): Promise<any | null> {
-
     return await this.model.updateOne({ _id: id }, UpdateQuery);
   }
 
@@ -96,11 +99,8 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
   }
 
 
-  // async delete(id: string): Promise<boolean> {
-  //   try {
-  //     return await this.model.findByIdAndDelete(id).exec();
-  //   } catch (error) {
-  //     throw new error('An error occurred while deleting the product', 500);
-  //   }
-  // }
+  async deleteProduct(id: string): Promise<boolean> {
+    const result = await this.model.findByIdAndDelete(id).exec();
+    return !!result;
+  }
 }
