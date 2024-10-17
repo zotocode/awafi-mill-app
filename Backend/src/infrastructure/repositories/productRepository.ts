@@ -39,7 +39,7 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
     return await this.model.find({ isListed: true, isDelete: false }).populate('category').exec();
   }
 
-  async fetchByCategory(mainCategoryId?: string, subCategoryId?: string): Promise<Product[]> {
+  async fetchByCategory(mainCategoryId?: mongoose.Types.ObjectId | null, subCategoryId?: mongoose.Types.ObjectId | null): Promise<Product[]> {
     const filter: any = {};
 
     if (mainCategoryId) {
@@ -58,7 +58,7 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
     const regex = new RegExp(`^${name}$`, 'i');
     return await super.findOne({ name: regex });
   }
-  async findByNameAndNotCurrentId(id: string, name: string): Promise<Product | null> {
+  async findByNameAndNotCurrentId(id: mongoose.Types.ObjectId, name: string): Promise<Product | null> {
     const regex = new RegExp(`^${name}$`, 'i');
     return await super.findOne({
       _id: { $ne: id },
@@ -67,39 +67,39 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
 
   }
 
-  async productFindById(id: string): Promise<Product | null> {
+  async productFindById(id: mongoose.Types.ObjectId): Promise<Product | null> {
 
-    return await this.model.findById(id).populate('category').exec();
+    return await this.model.findById(id).populate('category').populate('subCategory').exec();
   }
 
-  async isListedProduct(id: string): Promise<Product | null> {
+  async isListedProduct(id: mongoose.Types.ObjectId): Promise<Product | null> {
     return await this.model.findOne({ _id: id, isListed: true }).exec();
   }
 
-  async updateListing(id: string, UpdateQuery: listing): Promise<any | null> {
+  async updateListing(id: mongoose.Types.ObjectId, UpdateQuery: listing): Promise<any | null> {
     return await this.model.updateOne({ _id: id }, UpdateQuery);
   }
 
-  async updateImage(id: string, index: number, photo: string): Promise<any | null> {
+  async updateImage(id: mongoose.Types.ObjectId, index: number, photo: string): Promise<any | null> {
     return await this.model.updateOne({ _id: id }, { $set: { [`images.${index}`]: photo } });
   }
 
-  async updateProduct(id: string, data: Partial<any>): Promise<Product | null> {
-
-    return await this.model.findByIdAndUpdate(id, data, { new: true }).exec();
-
-  }
-  
-  async updateVariantQuantity(productId: string, variantId: string, quantity: number): Promise<Product | null> {
+  async updateVariantQuantity(productId: mongoose.Types.ObjectId, variantId: string, quantity: number): Promise<Product | null> {
     return await this.model.findOneAndUpdate(
       { _id: productId, 'variants._id': variantId }, // Find the product and the specific variant
       { $inc: { 'variants.$.stockQuantity': quantity } }, // Increment or decrement the stock quantity
       { new: true } // Return the updated product
     ).exec();
   }
+  // Update in productRepository.ts
+
+async updateProduct(id: mongoose.Types.ObjectId, data: Partial<ProductCreationDTO>): Promise<Product | null> {
+  return await this.model.findByIdAndUpdate(id, data, { new: true }).exec();
+}
 
 
-  async deleteProduct(id: string): Promise<boolean> {
+
+  async deleteProduct(id: mongoose.Types.ObjectId): Promise<boolean> {
     const result = await this.model.findByIdAndDelete(id).exec();
     return !!result;
   }

@@ -6,7 +6,7 @@ import { ProductInteractor } from "../../application/interactor/productInteracto
 import { ProductModel } from "../../infrastructure/model/producModel";
 import { upload } from "../../config/multerConfig";
 import { validateProductInput } from "../middleware/produtValidation";
-import CloudinaryService from "../../application/services/cloudinary";
+import CloudinaryService from "../../application/services/cloudinaryService";
 
 
 

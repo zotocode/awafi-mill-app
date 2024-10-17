@@ -1,8 +1,10 @@
 import ICategoryInteractor from "../../interface/subCategoryInterface/IsubCategoryInteractory";
-import { resposeHandler } from "../../types/commonTypes";
+import { responseHandler } from "../../types/commonTypes";
 import IsubCategoryRepo from "../../interface/subCategoryInterface/IsubCategoryRepo"; // Import your category repository interface
 import {subCategoryCreationDTo,subCategoryDTo} from '../../domain/dtos/SubCategoryDTO'
 import IsubCategoryInteractor from "../../interface/subCategoryInterface/IsubCategoryInteractory";
+import mongoose from "mongoose";
+
 
 export class SubCategoryInteractor implements IsubCategoryInteractor {
   private categoryRepo: IsubCategoryRepo; // Use the category repository
@@ -12,7 +14,7 @@ export class SubCategoryInteractor implements IsubCategoryInteractor {
   }
 
   // Add a new category
-  async addCategory(data:subCategoryCreationDTo): Promise<subCategoryDTo |resposeHandler> {
+  async addCategory(data:subCategoryCreationDTo): Promise<subCategoryDTo |responseHandler> {
     // console.log("data",data)
     const{name}=data
     const isAvailable=await this.categoryRepo.findByName(name)
@@ -33,19 +35,19 @@ export class SubCategoryInteractor implements IsubCategoryInteractor {
 }
 
   // Get all listed categories
-  async getListedCategories(mainCategoryId:string): Promise<subCategoryDTo[]> {
+  async getListedCategories(mainCategoryId:mongoose.Types.ObjectId): Promise<subCategoryDTo[]> {
     const categories = await this.categoryRepo.getListedCategories(mainCategoryId); // Use repository method
     return categories.map(this.mapToDTO);
   }
 
   // Get a category by ID
-  async getCategoryById(id: string): Promise<subCategoryDTo | null> {
+  async getCategoryById(id: mongoose.Types.ObjectId): Promise<subCategoryDTo | null> {
     const category = await this.categoryRepo.getCategoryById(id); // Use repository method
     return category && !category.isDeleted ? this.mapToDTO(category) : null;
   }
 
   // Update a category
-  async updateCategory(categoryId: string, data: Partial<subCategoryCreationDTo>): Promise<subCategoryDTo | resposeHandler | null> {
+  async updateCategory(categoryId: mongoose.Types.ObjectId, data: Partial<subCategoryCreationDTo>): Promise<subCategoryDTo | responseHandler | null> {
     if(data.name)
     {
       const isAvailable=await this.categoryRepo.findByNameNotId(categoryId,data.name)
@@ -62,12 +64,12 @@ export class SubCategoryInteractor implements IsubCategoryInteractor {
   }
 
   // Soft delete a category
-  async deleteCategory(id: string): Promise<boolean> {
+  async deleteCategory(id: mongoose.Types.ObjectId): Promise<boolean> {
     return await this.categoryRepo.deleteCategory(id); // Use repository method
   }
 
   // List a category
-  async listById(id: string): Promise<resposeHandler | null> {
+  async listById(id: mongoose.Types.ObjectId): Promise<responseHandler | null> {
     const category = await this.categoryRepo.getCategoryById(id); // Use repository method
     if (category && !category.isDeleted) {
       if (category.isListed) {
@@ -81,7 +83,7 @@ export class SubCategoryInteractor implements IsubCategoryInteractor {
   }
 
   // Unlist a category
-  async unListById(id: string): Promise<resposeHandler | null> {
+  async unListById(id: mongoose.Types.ObjectId): Promise<responseHandler | null> {
     const category = await this.categoryRepo.getCategoryById(id); // Use repository method
     if (category && !category.isDeleted) {
       if (!category.isListed) {

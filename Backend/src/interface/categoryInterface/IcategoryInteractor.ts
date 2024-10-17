@@ -1,13 +1,15 @@
+import mongoose from 'mongoose';
 import {categoryCreationDTo,categoryDTo} from '../../domain/dtos/CategoryDTO'
-import {resposeHandler} from '../../types/commonTypes'
+import {responseHandler} from '../../types/commonTypes'
 export default interface ICategoryInteractor {
-  addCategory(data: categoryCreationDTo): Promise<categoryDTo | resposeHandler>;
+  addCategory(data: categoryCreationDTo): Promise<categoryDTo | responseHandler>;
   getAllCategories(): Promise<categoryDTo[]>;
   getListedCategories(): Promise<categoryDTo[]>;
-  getCategoryById(id: string): Promise<categoryDTo | null>;
-  updateCategory(id: string, data: Partial<categoryCreationDTo>): Promise<categoryDTo | null |resposeHandler>;
-  deleteCategory(id: string): Promise<boolean>; 
-  listById(id: string): Promise<resposeHandler | null>; 
-  unListById(id: string): Promise<resposeHandler | null>; 
+  getCategoryById(id: mongoose.Types.ObjectId): Promise<categoryDTo | null>;
+  updateCategory(id: mongoose.Types.ObjectId, data: Partial<categoryCreationDTo>): Promise<categoryDTo | null |responseHandler>;
+  deleteCategory(id: mongoose.Types.ObjectId): Promise<boolean>; 
+  listById(id: mongoose.Types.ObjectId): Promise<responseHandler | null>; 
+  unListById(id: mongoose.Types.ObjectId): Promise<responseHandler | null>; 
   
 }
+

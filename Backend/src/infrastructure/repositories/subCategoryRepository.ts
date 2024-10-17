@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { BaseRepository } from './baseRepository';
 import IsubCategoryRepo from '../../interface/subCategoryInterface/IsubCategoryRepo';
 import IsubCategory from '../../domain/entities/subCategorySchema';
@@ -18,7 +18,7 @@ export class SubCategoryRepository extends BaseRepository<IsubCategory> implemen
     return await this.model.find({ isDeleted: false });
 }
 
-  async getListedCategories(mainCategoryId:string): Promise<IsubCategory[]> {
+  async getListedCategories(mainCategoryId:mongoose.Types.ObjectId): Promise<IsubCategory[]> {
     return await this.model.find({isListed:true,isDeleted:false,mainCategory:mainCategoryId});
   }
 
@@ -26,7 +26,7 @@ export class SubCategoryRepository extends BaseRepository<IsubCategory> implemen
     const regex = new RegExp(`^${name}$`, 'i'); 
     return await super.findOne({ name: regex });
   }
-  async findByNameNotId(id:string,name: string): Promise<IsubCategory | null> {
+  async findByNameNotId(id:mongoose.Types.ObjectId,name: string): Promise<IsubCategory | null> {
     const regex = new RegExp(`^${name}$`, 'i'); 
     return await super.findOne({
       _id: { $ne: id },  
@@ -34,18 +34,19 @@ export class SubCategoryRepository extends BaseRepository<IsubCategory> implemen
     });
   }
 
-  async getCategoryById(id: string): Promise<IsubCategory | null> {
+  async getCategoryById(id: mongoose.Types.ObjectId): Promise<IsubCategory | null> {
     return await super.findById(id);
   }
 
   // Correct the DTO used in updateCategory
-  async updateCategory(id: string, data: Partial<categoryCreationDTo>): Promise<IsubCategory | null> {
+  async updateCategory(id: mongoose.Types.ObjectId, data: Partial<categoryCreationDTo>): Promise<IsubCategory | null> {
     return await super.update(id, data);
   }
 
   // Correct the return type to boolean
-  async deleteCategory(id: string): Promise<boolean> {
+  async deleteCategory(id: mongoose.Types.ObjectId): Promise<boolean> {
     const result = await super.delete(id);
     return result !== null; // Assuming `super.delete` returns null when no document is found
   }
 }
+

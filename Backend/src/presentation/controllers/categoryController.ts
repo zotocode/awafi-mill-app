@@ -1,9 +1,7 @@
-// src/presentation/controllers/ProductController.ts
 import { NextFunction, Request, Response } from "express";
+import mongoose from "mongoose"; // Add mongoose for ObjectId
 import ICategoryInteractor from "../../interface/categoryInterface/IcategoryInteractor"; // Import the interface
-import { categoryCreationDTo,categoryDTo } from "../../domain/dtos/CategoryDTO"; 
-
-
+import { categoryCreationDTo } from "../../domain/dtos/CategoryDTO"; 
 
 export class CategoryController {
   private categoryInteractor: ICategoryInteractor; // Use the interface type
@@ -12,40 +10,35 @@ export class CategoryController {
     this.categoryInteractor = categoryInteractor;
   }
 
-  // Add a new product (HTTP POST)
+  // Add a new category (HTTP POST)
   async addCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-    
       const category: categoryCreationDTo = req.body;
-      //  console.log('data set',req.bodycod
-    
-      const result:any = await this.categoryInteractor.addCategory(category);
-      if(result?.status)
-      {
-        res.status(result.status).json({ message: result.message});
+      const result: any = await this.categoryInteractor.addCategory(category);
+
+      if (result?.status) {
+        res.status(result.status).json({ message: result.message });
+      } else {
+        res.status(201).json(result);
       }
-      res.status(201).json(result);
     } catch (error) {
       next(error);
     }
   }
 
-
   // Get all categories (HTTP GET)
-  
   async getAllCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-   
       const products = await this.categoryInteractor.getAllCategories();
       res.status(200).json(products);
     } catch (error) {
       next(error);
     }
   }
+
+  // Get listed categories (HTTP GET)
   async getListedCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-         
-       
       const products = await this.categoryInteractor.getListedCategories();
       res.status(200).json(products);
     } catch (error) {
@@ -53,77 +46,77 @@ export class CategoryController {
     }
   }
 
-  // Get a product by ID (HTTP GET)
+  // Get a category by ID (HTTP GET)
   async getCategoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const productId = req.params.id;
-      const product = await this.categoryInteractor.getCategoryById(productId);
-      if (product) {
-        res.status(200).json(product);
+      const categoryId = new mongoose.Types.ObjectId(req.params.id); // Convert string to ObjectId
+      const category = await this.categoryInteractor.getCategoryById(categoryId);
+
+      if (category) {
+        res.status(200).json(category);
       } else {
-        res.status(404).json({ message: "category not found" });
+        res.status(404).json({ message: "Category not found" });
       }
     } catch (error) {
       next(error);
     }
   }
 
-  // Update a product (HTTP PUT)
+  // Update a category (HTTP PUT)
   async updateCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      const categoryId = new mongoose.Types.ObjectId(req.params.id); // Convert string to ObjectId
+      const updatedData: Partial<categoryCreationDTo> = req.body;
+      const updatedCategory = await this.categoryInteractor.updateCategory(categoryId, updatedData);
 
-      const categoryId = req.params.id;
-      const updatedData: Partial<categoryCreationDTo> = req.body; 
-      const updatedProduct = await this.categoryInteractor.updateCategory(categoryId, updatedData);
-      if (updatedProduct) {
-        res.status(200).json(updatedProduct);
+      if (updatedCategory) {
+        res.status(200).json(updatedCategory);
       } else {
-        res.status(404).json({ message: "category not found" });
+        res.status(404).json({ message: "Category not found" });
       }
     } catch (error) {
       next(error);
     }
   }
 
-  // list  product---------------------------------
-  
+  // Toggle list status of a category (HTTP PUT)
   async toggleListStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
-      const { action } = req.query; // action can be 'list' or 'unlist'
-  
+      const { action } = req.query;
+
       if (typeof action !== 'string' || (action !== 'list' && action !== 'unlist')) {
         throw new Error('Invalid action. Expected "list" or "unlist".');
       }
-  
-      let product;
+
+      const categoryId = new mongoose.Types.ObjectId(id); // Convert string to ObjectId
+      let category;
+
       if (action === 'list') {
-        product = await this.categoryInteractor.listById(id);
+        category = await this.categoryInteractor.listById(categoryId);
       } else if (action === 'unlist') {
-        product = await this.categoryInteractor.unListById(id);
+        category = await this.categoryInteractor.unListById(categoryId);
       }
-  
-      res.status(200).json(product);
+
+      res.status(200).json(category);
     } catch (error) {
       next(error);
     }
   }
-  
 
-
-//   Delete a product (HTTP DELETE)
+  // Delete a category (HTTP DELETE)
   async deleteCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const productId = req.params.id;
-      const deleted = await this.categoryInteractor.deleteCategory(productId);
+      const categoryId = new mongoose.Types.ObjectId(req.params.id); // Convert string to ObjectId
+      const deleted = await this.categoryInteractor.deleteCategory(categoryId);
+
       if (deleted) {
-        res.status(200).json({ message: "category deleted successfully" });
+        res.status(200).json({ message: "Category deleted successfully" });
       } else {
-        res.status(404).json({ message: "category not found" });
+        res.status(404).json({ message: "Category not found" });
       }
     } catch (error) {
       next(error);
     }
   }
 }
-

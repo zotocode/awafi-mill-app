@@ -15,7 +15,7 @@ interface Variant {
 
 // Define the Product interface
 export default interface Product extends Document {
-  _id:string
+  _id:mongoose.Types.ObjectId
   name: string;
   descriptions: Description[];
   isListed: boolean;
