@@ -14,6 +14,17 @@ class ProductApi{
           return error;
         }
       }
+    async updateProductImage(productId:string,data:FormData,index:number): Promise<any> {
+        try {
+          return await this.axiosInstance.patch(`/api/products/product/update-img?productId=${productId}&index=${index}`,data,{
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            }});
+        } catch (error: unknown) {
+         
+          return error;
+        }
+      }
     async updateProduct(data:any,ProductId:string): Promise<any> {
         try {
 

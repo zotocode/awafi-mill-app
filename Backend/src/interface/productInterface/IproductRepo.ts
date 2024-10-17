@@ -1,13 +1,17 @@
+import { ProductCreationDTO, ProductDTO } from "../../domain/dtos/ProductDTO";
+import Product from "../../domain/entities/productSchema";
 
-
-export interface IproductRepo{
-    addProduct(product:any):Promise<any>
-    fetchByCategory(mainCategoryId:string,subCategoryId:string):Promise<any>
-    findAllProducts():Promise<any>
-    updateListing(id:string,UpdateQuery:any):Promise<any>
-    productFindById(id:string):Promise<any>
-    updateImage(id:string,index:number,photo:string):Promise<any>
-    updateProduct(id:string,data:any):Promise<any>
-    isListedProduct(id:string):Promise<any>
-    findByName(id:string):Promise<any>
-   }
+export interface IproductRepo {
+  addProduct(productData: ProductCreationDTO): Promise<Product>;
+  update(id: string, data: Partial<ProductCreationDTO>): Promise<Product | null>;
+  findByName(name: string): Promise<Product | null>;
+  findByNameAndNotCurrentId(id: string, name: string): Promise<Product | null>;
+  findAllProducts(): Promise<Product[]>;
+  findListedAllProducts(): Promise<Product[]>;
+  productFindById(id: string): Promise<Product | null>;
+  fetchByCategory(mainCategoryId: string, subCategoryId: string): Promise<ProductDTO[] | null>;
+  updateImage(id: string, index: number, imageUrl: string): Promise<{ modifiedCount: number }>;
+  deleteProduct(id: string): Promise<boolean>;
+  updateListing(id: string, data: { isListed: boolean }): Promise<{ modifiedCount: number }>;
+  isListedProduct(id: string): Promise<Product |null>;
+}
