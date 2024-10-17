@@ -51,7 +51,7 @@ export class ProductInteractor implements IProductInteractor {
 
   // Retrieve a product by ID
   async getProductById(id: string): Promise<ProductDTO | null> {
-
+//@ts-ignore
     const product = await this.productRepo.productFindById(id);
     return product ? this.mapEntityToDto(product) : null;
   }
