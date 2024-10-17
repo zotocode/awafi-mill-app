@@ -7,7 +7,7 @@ export interface subCategoryCreationDTo {
    
   }
   export interface subCategoryDTo {
-    _id:string,
+    _id:mongoose.Types.ObjectId,
     name: string;
     description: string;
     mainCategory:mongoose.Schema.Types.ObjectId | null;
@@ -16,5 +16,6 @@ export interface subCategoryCreationDTo {
     createdAt: Date;
     updatedAt: Date;
   }
+  mongoose
   
   

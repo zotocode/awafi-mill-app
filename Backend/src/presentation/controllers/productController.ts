@@ -1,12 +1,10 @@
-// src/presentation/controllers/ProductController.ts
 import { NextFunction, Request, Response } from "express";
-import IProductInteractor from "../../interface/productInterface/IproductInteractor"; // Import the interface
-import { ProductCreationDTO } from "../../domain/dtos/ProductDTO"; 
-
-
+import IProductInteractor from "../../interface/productInterface/IproductInteractor";
+import { ProductCreationDTO } from "../../domain/dtos/ProductDTO";
+import mongoose from "mongoose";
 
 export class ProductController {
-  private productInteractor: IProductInteractor; // Use the interface type
+  private productInteractor: IProductInteractor;
 
   constructor(productInteractor: IProductInteractor) {
     this.productInteractor = productInteractor;
@@ -16,64 +14,55 @@ export class ProductController {
   async addProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const photos: any = req.files || [];
-      
       const productData: ProductCreationDTO = req.body;
-      
+
       if (photos.length > 0 && !productData.images) {
         productData.images = photos.map((photo: any[0]) => photo.path.toString());
-    
       }
-      
-      const result:any = await this.productInteractor.addProduct(productData);
-      if(result?.status)
-        {
-          res.status(result.status).json({ message: result.message});
-        }
-  
-      res.status(200).json({ message: "Product created successfully", product: result });
+
+      const result: any = await this.productInteractor.addProduct(productData);
+      if (result?.status) {
+        res.status(result.status).json({ message: result.message });
+      } else {
+        res.status(200).json({ message: "Product created successfully", product: result });
+      }
     } catch (error) {
       next(error);
     }
   }
-  // update single image----------------------------
 
-
+  // Update single image
   async updateImage(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      // Extract id and index from the query
       const { productId, index } = req.query;
-  
+
       if (!req.file) {
         throw new Error('Photo is not provided');
       }
-  
+
       const { path } = req.file;
-  
-      // Ensure id is a string and index is a valid number
+
       if (typeof productId !== 'string' || typeof index !== 'string') {
-        throw new Error('Invalid id or index');
+        throw new Error('Invalid productId or index');
       }
-  
+
       const currentIndex = parseInt(index, 10);
       if (isNaN(currentIndex)) {
         throw new Error('Index must be a valid number');
       }
-  
-      // Call your productInteractor to update the image
-      const products = await this.productInteractor.updateImage(productId, currentIndex, path);
-  
+
+      const productObjectId = new mongoose.Types.ObjectId(productId);
+
+      const products = await this.productInteractor.updateImage(productObjectId, currentIndex, path);
       res.status(200).json(products);
     } catch (error) {
       next(error);
     }
   }
-  
 
   // Get all products (HTTP GET)
-  
   async getAllProducts(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-   
       const products = await this.productInteractor.getAllProducts();
       res.status(200).json(products);
     } catch (error) {
@@ -82,24 +71,24 @@ export class ProductController {
   }
 
   // Get all listed products (HTTP GET)
-  
   async getAllListedProducts(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-   
       const products = await this.productInteractor.getAllListedProducts();
       res.status(200).json(products);
     } catch (error) {
       next(error);
     }
   }
-  // fetch product by category-----
-  
+
+  // Fetch products by category
   async FilterProducts(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-   
       const { mainCategoryId, subCategoryId } = req.query;
-      const products = await this.productInteractor.fetchByCategory(mainCategoryId as string, subCategoryId as string);
-       res.status(200).json(products);
+      const MainCategoryId = mainCategoryId ? new mongoose.Types.ObjectId(mainCategoryId as string) : null;
+      const SubCategoryId = subCategoryId ? new mongoose.Types.ObjectId(subCategoryId as string) : null;
+
+      const products = await this.productInteractor.fetchByCategory(MainCategoryId, SubCategoryId);
+      res.status(200).json(products);
     } catch (error) {
       next(error);
     }
@@ -108,7 +97,7 @@ export class ProductController {
   // Get a product by ID (HTTP GET)
   async getProductById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const productId = req.params.id;
+      const productId = new mongoose.Types.ObjectId(req.params.id);
       const product = await this.productInteractor.getProductById(productId);
       if (product) {
         res.status(200).json(product);
@@ -123,14 +112,13 @@ export class ProductController {
   // Update a product (HTTP PUT)
   async updateProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const productId = req.params.id;
-      const updatedData: Partial<ProductCreationDTO> = req.body; 
-      const updatedProduct:any = await this.productInteractor.updateProduct(productId, updatedData);
-      if(updatedProduct?.status)
-        {
-          res.status(updatedProduct.status).json({ message: updatedProduct.message});
-        }
-      if (updatedProduct) {
+      const productId = new mongoose.Types.ObjectId(req.params.id);
+      const updatedData: Partial<ProductCreationDTO> = req.body;
+      const updatedProduct: any = await this.productInteractor.updateProduct(productId, updatedData);
+
+      if (updatedProduct?.status) {
+        res.status(updatedProduct.status).json({ message: updatedProduct.message });
+      } else if (updatedProduct) {
         res.status(200).json(updatedProduct);
       } else {
         res.status(404).json({ message: "Product not found" });
@@ -140,37 +128,35 @@ export class ProductController {
     }
   }
 
-  // list  product---------------------------------
-  
+  // List or unlist a product
   async toggleListStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { id } = req.params;
+      const id = new mongoose.Types.ObjectId(req.params.id);
       const { action } = req.query; // action can be 'list' or 'unlist'
-  
+
       if (typeof action !== 'string' || (action !== 'list' && action !== 'unlist')) {
         throw new Error('Invalid action. Expected "list" or "unlist".');
       }
-  
+
       let product;
       if (action === 'list') {
         product = await this.productInteractor.listById(id);
       } else if (action === 'unlist') {
         product = await this.productInteractor.unListById(id);
       }
-  
+
       res.status(200).json(product);
     } catch (error) {
       next(error);
     }
   }
-  
-
 
   // Delete a product (HTTP DELETE)
   async deleteProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const productId = req.params.id;
+      const productId = new mongoose.Types.ObjectId(req.params.id);
       const deleted = await this.productInteractor.deleteProduct(productId);
+
       if (deleted) {
         res.status(200).json({ message: "Product deleted successfully" });
       } else {

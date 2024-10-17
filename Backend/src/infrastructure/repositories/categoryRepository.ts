@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { BaseRepository } from './baseRepository';
 import ICategoryRepo from '../../interface/categoryInterface/IcategoryRepo';
 import ICategory from '../../domain/entities/categorySchema';
@@ -25,7 +25,7 @@ export class CategoryRepository extends BaseRepository<ICategory> implements ICa
     const regex = new RegExp(`^${name}$`, 'i'); 
     return await super.findOne({ name: regex });
   }
-  async findByNameNotId(id:string,name: string): Promise<ICategory | null> {
+  async findByNameNotId(id:mongoose.Types.ObjectId,name: string): Promise<ICategory | null> {
     const regex = new RegExp(`^${name}$`, 'i'); 
     return await super.findOne({
       _id: { $ne: id },  
@@ -33,18 +33,19 @@ export class CategoryRepository extends BaseRepository<ICategory> implements ICa
     });
   }
 
-  async getCategoryById(id: string): Promise<ICategory | null> {
+  async getCategoryById(id: mongoose.Types.ObjectId): Promise<ICategory | null> {
     return await super.findById(id);
   }
 
   // Correct the DTO used in updateCategory
-  async updateCategory(id: string, data: Partial<categoryCreationDTo>): Promise<ICategory | null> {
+  async updateCategory(id: mongoose.Types.ObjectId, data: Partial<categoryCreationDTo>): Promise<ICategory | null> {
     return await super.update(id, data);
   }
 
   // Correct the return type to boolean
-  async deleteCategory(id: string): Promise<boolean> {
+  async deleteCategory(id: mongoose.Types.ObjectId): Promise<boolean> {
     const result = await super.delete(id);
     return result !== null; // Assuming `super.delete` returns null when no document is found
   }
 }
+

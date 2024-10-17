@@ -1,7 +1,7 @@
 import mongoose, { Document } from "mongoose";
 // Define the interface for the Category document
 export default interface IsubCategory extends Document {
-    _id:string;
+    _id:mongoose.Types.ObjectId;
     name: string;
     description: string;
     mainCategory: mongoose.Schema.Types.ObjectId | null;
@@ -10,5 +10,6 @@ export default interface IsubCategory extends Document {
     createdAt: Date;
     updatedAt: Date;
   }
+  
 
   
