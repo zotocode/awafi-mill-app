@@ -1,6 +1,7 @@
 import { IadminInteractor } from "../../interface/adminInterface/IadminInteractor";
 import { IUserRepo } from "../../interface/userInterface/IuserRepo";
 import { Ijwt } from "../../interface/serviceInterface/IjwtInterface";
+import { log } from "winston";
 
 export class AdminInteractor implements IadminInteractor {
   private userRepository: IUserRepo;
@@ -33,4 +34,44 @@ export class AdminInteractor implements IadminInteractor {
 
     }
   }
+
+  async blockUser(email: string): Promise<any> { 
+    try {
+      const user = await this.userRepository.findUserEmail(email);
+           if (!user) {
+        console.log('User not found');
+        return { success: false, message: 'User not found' };
+      }  
+      console.log('User found:', user);
+      user.isBlocked = true; 
+      await user.save(); 
+  
+      console.log('User successfully blocked');
+      return { success: true};
+  
+    } catch (error) {
+      console.error("Error blocking user:", error);
+      return { success: false };
+    }
+  }
+
+  async unblockUser(email: string): Promise<any> { 
+    try {
+      const user = await this.userRepository.findUserEmail(email);
+           if (!user) {
+        console.log('User not found');
+        return { success: false, message: 'User not found' };
+      }  
+      console.log('User foundunblock', user);
+      user.isBlocked = false; 
+      await user.save(); 
+      console.log('User successfully unblocked');
+      return { success: true};
+    } catch (error) {
+      console.error("Error blocking user:", error);
+      return { success: false };
+    }
+  }
+
+
 }

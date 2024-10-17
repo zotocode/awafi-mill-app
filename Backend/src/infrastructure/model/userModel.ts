@@ -6,6 +6,7 @@ export interface IuserDocument extends Document {
   name: string;
   email: string;
   phone:number;
+  isBlocked:boolean;
   password: string;
 }
 
@@ -25,6 +26,11 @@ const userSchema: Schema<IuserDocument> = new Schema(
         type: Number,
         required: false,
     },
+    isBlocked: {
+      type: Boolean,
+      default: false, 
+    },
+
     password: {
       type: String,
       default: null,
