@@ -6,13 +6,15 @@ import { ProductInteractor } from "../../application/interactor/productInteracto
 import { ProductModel } from "../../infrastructure/model/producModel";
 import { upload } from "../../config/multerConfig";
 import { validateProductInput } from "../middleware/produtValidation";
+import CloudinaryService from "../../application/services/cloudinaryService";
 
 
 
 
 
 const productRepo = new ProductRepository(ProductModel);
-const productInteractor = new ProductInteractor(productRepo);
+const cloudinaryService=new CloudinaryService()
+const productInteractor = new ProductInteractor(productRepo,cloudinaryService);
 const productController = new ProductController(productInteractor);
 
 const productRoutes = express.Router();
@@ -24,6 +26,7 @@ productRoutes.get("/product/filter", productController.FilterProducts.bind(produ
 productRoutes.post("/product",upload.array('images', 5),productController.addProduct.bind(productController));
 productRoutes.patch("/product/update-img",upload.single('image'),productController.updateImage.bind(productController));
 productRoutes.get("/product", productController.getAllProducts.bind(productController));
+productRoutes.get("/product/listed", productController.getAllListedProducts.bind(productController));
 productRoutes.get("/product/:id", productController.getProductById.bind(productController));
 productRoutes.put("/product/:id", productController.updateProduct.bind(productController));
 productRoutes.patch("/product/:id", productController.toggleListStatus.bind(productController));

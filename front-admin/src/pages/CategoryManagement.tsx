@@ -128,11 +128,11 @@ const MainCategoryManagementPage = () => {
       window.confirm(`Are you sure you want to ${action} ${category.name}?`)
     ) {
       try {
-        const response = await categoryapi.blockCategory(category.id, action);
+        const response = await categoryapi.blockCategory(category._id, action);
         if (response.status === 200) {
           setCategories((prev) =>
             prev.map((cat) =>
-              cat._id === category.id ? { ...cat, isListed: !cat.isListed } : cat
+              cat._id === category._id ? { ...cat, isListed: !cat.isListed } : cat
             )
           );
           toast.success(`Category ${action}ed successfully`);
