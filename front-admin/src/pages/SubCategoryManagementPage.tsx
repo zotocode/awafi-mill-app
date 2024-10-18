@@ -4,12 +4,12 @@ import SubCategoryModalForm from "../components/SubCategoryModalForm";
 import subcategoryapi from "../api/subcategoryapi";
 import { toast } from "react-toastify";
 import { ListMinus, ListPlus, Pencil, Trash2 } from "lucide-react";
-import {subCategory} from '../types/categoryType'
+import {SubCategory} from '../types/categoryType'
 
 const SubCategoryManagementPage = () => {
     const [isModal, setModal] = useState(false);
-    const [categories, setCategories] = useState<subCategory[]>([]);
-    const [selectedCategory, setSelectedCategory] = useState<subCategory | null>(
+    const [categories, setCategories] = useState<SubCategory[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<SubCategory | null>(
       null
     );
   
@@ -53,7 +53,7 @@ const SubCategoryManagementPage = () => {
       setSelectedCategory(null);
     };
   
-    const handleSuccess = (newCategory: subCategory) => {
+    const handleSuccess = (newCategory: SubCategory) => {
       setCategories(prev => {
         const existingCategoryIndex = prev.findIndex(cat => cat._id === newCategory._id);
         

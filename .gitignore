@@ -52,7 +52,7 @@ app.*.map.json
 # Backend
 node_modules/
 dist/
-
+Backend/.env
 #enviroment variable
 .env
 *.env
