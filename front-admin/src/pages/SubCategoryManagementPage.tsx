@@ -124,7 +124,6 @@ const SubCategoryManagementPage = () => {
     };
   
     const handleList = async (category: any) => {
-      console.log('catgory',category)
       const action = category.isListed ? "unlist" : "list";
       if (
         window.confirm(`Are you sure you want to ${action} ${category.name}?`)

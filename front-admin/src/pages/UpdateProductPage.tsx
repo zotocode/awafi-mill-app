@@ -17,7 +17,6 @@ const UpdateProductPage: React.FC = () => {
   const [descriptions, setDescriptions] = useState<Description[]>([
     { header: "", content: "" },
   ]);
-  const [isListed, setIsListed] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
   const [subCategories, setSubCategories] = useState<subCategory[]>([]);
@@ -40,11 +39,11 @@ const UpdateProductPage: React.FC = () => {
           setCategories(categoryResponse.data);
         }
 
-        if (productResponse.status === 200) {
+        if (productResponse.status === 200) 
+          {
           const product = productResponse.data;
           setName(product.name);
           setDescriptions(product.descriptions || [{ header: "", content: "" }]);
-          setIsListed(product.isListed);
           setCategory(product.category || null);
           setSubCategory(product.subCategory || null);
           setVariants(product.variants || [{ weight: "", inPrice: 0, outPrice: 0, stockQuantity: 0 }]);
@@ -103,17 +102,18 @@ const UpdateProductPage: React.FC = () => {
 
   const handleImageUpload = async (index: number) => {
     const image = images[index];
-    if (image instanceof File) {
+    if (image instanceof File && id) {
       const formData = new FormData();
       formData.append("image", image);
       try {
-        // const response = await productapi.updateProductImage(id!, formData, index);
-        // if (response.status === 200) {
-        //   const newImages = [...images];
-        //   newImages[index] = response.data.imageUrl;
-        //   setImages(newImages);
-        //   toast.success("Image updated successfully");
-        // }
+        const response = await productapi.updateProductImage(id, formData, index);
+        if (response.status === 200) {
+          console.log("response",response)
+          const newImages = [...images];
+          newImages[index] = response.data;
+          setImages(newImages);
+          toast.success("Image updated successfully");
+        }
       } catch (error) {
         console.error("Error updating image:", error);
         toast.error("Failed to update image");
@@ -152,7 +152,6 @@ const UpdateProductPage: React.FC = () => {
     e.preventDefault();
     const productData = {
       name,
-      isListed,
       category: category?._id,
       subCategory: subCategory?._id,
       descriptions,
@@ -187,41 +186,49 @@ const UpdateProductPage: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-6 text-gray-700">Images</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {images.map((image, index) => (
-              <div key={index} className="flex flex-col items-center">
-                <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden bg-gray-50">
-                  {image ? (
-                    <img
-                      src={image instanceof File ? URL.createObjectURL(image) : `../../../../Backend/${image}`}
-                      alt={`Product ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-gray-400">No image</span>
-                  )}
-                </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleImageChange(index, e.target.files?.[0] || null)}
-                  className="hidden"
-                  id={`image-input-${index}`}
-                />
-                <label
-                  htmlFor={`image-input-${index}`}
-                  className="mt-3 cursor-pointer text-sm font-medium text-indigo-600 hover:text-indigo-800"
-                >
-                  {image ? 'Change' : 'Add Image'}
-                </label>
-                {image instanceof File && (
-                  <button
-                    type="button"
-                    onClick={() => handleImageUpload(index)}
-                    className="mt-2 text-xs font-medium text-green-600 hover:text-green-800"
-                  >
-                    Upload
-                  </button>
-                )}
-              </div>
+               <div key={index} className="flex flex-col items-center">
+               <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden bg-gray-50">
+                 {image ? (
+                   typeof image === "string" ? (
+                     <img
+                       src={image}
+                       alt={`Product ${index + 1}`}
+                       className="w-full h-full object-cover"
+                     />
+                   ) : (
+                     <img
+                       src={URL.createObjectURL(image)}
+                       alt={`Product ${index + 1}`}
+                       className="w-full h-full object-cover"
+                     />
+                   )
+                 ) : (
+                   <span className="text-gray-400">No image</span>
+                 )}
+               </div>
+               <input
+                 type="file"
+                 accept="image/*"
+                 onChange={(e) => handleImageChange(index, e.target.files?.[0] || null)}
+                 className="hidden"
+                 id={`image-input-${index}`}
+               />
+               <label
+                 htmlFor={`image-input-${index}`}
+                 className="mt-3 cursor-pointer text-sm font-medium text-indigo-600 hover:text-indigo-800"
+               >
+                 {image ? 'Change' : 'Add Image'}
+               </label>
+               {image instanceof File && (
+                 <button
+                   type="button"
+                   onClick={() => handleImageUpload(index)}
+                   className="mt-2 text-xs font-medium text-green-600 hover:text-green-800"
+                 >
+                   Upload
+                 </button>
+               )}
+             </div>
             ))}
           </div>
         </div>
@@ -257,7 +264,7 @@ const UpdateProductPage: React.FC = () => {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 required
               >
-                <option value="">Select a category</option>
+                <option value={category ?  category ._id :""}>{category ?  category.name :"Select a sub category"}</option>
                 {categories.map((cat) => (
                   <option key={cat._id} value={cat._id}>
                     {cat.name}
@@ -279,7 +286,7 @@ const UpdateProductPage: React.FC = () => {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 disabled={!category}
               >
-                <option value="">Select a sub category</option>
+                <option value={subCategory ?  subCategory._id :""}>{subCategory ?  subCategory.name :"Select a sub category"}</option>
                 {subCategories.map((subCat) => (
                   <option key={subCat._id} value={subCat._id}>
                     {subCat.name}
@@ -287,18 +294,7 @@ const UpdateProductPage: React.FC = () => {
                 ))}
               </select>
             </div>
-            <div className="flex items-center">
-              <input
-                id="isListed"
-                type="checkbox"
-                checked={isListed}
-                onChange={(e) => setIsListed(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-              />
-              <label htmlFor="isListed" className="ml-2 block text-sm text-gray-700">
-                Listed
-              </label>
-            </div>
+           
           </div>
         </div>
 
@@ -362,7 +358,7 @@ const UpdateProductPage: React.FC = () => {
                         setVariants(
                           variants.map((v, i) =>
                             i === index
-                              ? { ...v, price: Number(e.target.value) }
+                              ? { ...v, inPrice: Number(e.target.value) }
                               : v
                           )
                         )
@@ -377,7 +373,7 @@ const UpdateProductPage: React.FC = () => {
                         setVariants(
                           variants.map((v, i) =>
                             i === index
-                              ? { ...v, price: Number(e.target.value) }
+                              ? { ...v, outPrice: Number(e.target.value) }
                               : v
                           )
                         )
