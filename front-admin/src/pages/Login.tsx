@@ -1,6 +1,6 @@
 // src/pages/Login.jsx
 import React from 'react';
-import Navbar from '../layouts/Navbar';
+import Navbar from '../components/Header';
 import LoginContainer from '../components/LoginContainer';
 
 const LoginPage = () => {

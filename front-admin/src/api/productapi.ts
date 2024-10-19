@@ -59,6 +59,15 @@ class ProductApi{
           return error;
         }
       }
+      async listingProduct(id:string,action:string): Promise<any> {
+        try {
+    
+          return await this.axiosInstance.patch(`/api/products/product/${id}?action=${action}`);
+        } catch (error: unknown) {
+         
+          return error;
+        }
+      }
     }
 
   export default new ProductApi()
