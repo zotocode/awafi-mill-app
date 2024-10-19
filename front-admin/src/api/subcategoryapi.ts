@@ -21,7 +21,7 @@ class SubCategoryApi{
       }
     async fetchAllListedCategories(id:string): Promise<any> {
         try {
-          return await this.axiosInstance.get(`/api/categories/listedCategory/sub?mainCategory=${id}`);
+          return await this.axiosInstance.get(`/api/categories/listedCategory/sub/${id}`);
         } catch (error: unknown) {
          
           return error;

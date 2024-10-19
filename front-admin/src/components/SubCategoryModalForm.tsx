@@ -93,7 +93,6 @@ const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
       }
 
       if (response.data) {
-        console.log("response of update sub category",response.data)
         onSuccess(response.data);
         toast.success(
           `Category ${category ? "updated" : "created"} successfully`
@@ -116,7 +115,7 @@ const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-99 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black bg-opacity-50">
       <div className="relative w-full max-w-md p-4 mx-auto">
         <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
           <div className="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">

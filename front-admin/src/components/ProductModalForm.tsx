@@ -40,6 +40,7 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
+        toast.error("Failed to fetch categories");
       }
     }
     fetchCategories();
@@ -52,12 +53,16 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
           const response = await subcategoryapi.fetchAllListedCategories(category._id);
           if (response.status === 200) {
             setSubCategories(response.data);
+            // Reset subcategory selection when main category changes
+            setSubCategory(null);
           }
         } catch (error) {
           console.error("Error fetching subcategories:", error);
+          toast.error("Failed to fetch subcategories");
         }
       } else {
         setSubCategories([]);
+        setSubCategory(null);
       }
     }
     fetchSubCategories();
@@ -158,7 +163,6 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
       (cat) => cat._id === selectedCategoryId
     );
     setCategory(selectedCategory || null);
-    setSubCategory(null); // Reset subcategory when main category changes
   };
 
   const handleSubCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

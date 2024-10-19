@@ -36,14 +36,14 @@ export class SubCategoryController {
 
   async getListedCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { mainCategoryId } = req.query;
+      const { Id } = req.params;
   
       // Check if mainCategoryId is provided, and convert it to ObjectId
-      if (!mainCategoryId) {
+      if (!Id) {
          res.status(400).json({ message: "mainCategoryId is required" });
       }
   
-      const categoryId = new mongoose.Types.ObjectId(mainCategoryId as string);
+      const categoryId = new mongoose.Types.ObjectId(Id as string);
   
       const products = await this.categoryInteractor.getListedCategories(categoryId);
       res.status(200).json(products);

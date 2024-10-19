@@ -26,6 +26,7 @@ const UpdateProductPage: React.FC = () => {
     { weight: "", inPrice: 0, outPrice: 0, stockQuantity: 0 },
   ]);
   const [isLoading, setIsLoading] = useState(true);
+  const [imageLoading, setImageLoading] = useState<boolean[]>(Array(MAX_IMAGES).fill(false)); // New state
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,6 +102,12 @@ const UpdateProductPage: React.FC = () => {
   };
 
   const handleImageUpload = async (index: number) => {
+    setImageLoading((prevLoading) => {
+      const newLoading = [...prevLoading];
+      newLoading[index] = true;
+      return newLoading;
+    });
+
     const image = images[index];
     if (image instanceof File && id) {
       const formData = new FormData();
@@ -108,7 +115,6 @@ const UpdateProductPage: React.FC = () => {
       try {
         const response = await productapi.updateProductImage(id, formData, index);
         if (response.status === 200) {
-          console.log("response",response)
           const newImages = [...images];
           newImages[index] = response.data;
           setImages(newImages);
@@ -117,6 +123,12 @@ const UpdateProductPage: React.FC = () => {
       } catch (error) {
         console.error("Error updating image:", error);
         toast.error("Failed to update image");
+      }finally{
+        setImageLoading((prevLoading) => {
+          const newLoading = [...prevLoading];
+          newLoading[index] = false;
+          return newLoading;
+        });
       }
     }
   };
@@ -173,8 +185,8 @@ const UpdateProductPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-indigo-500"></div>
-      </div>
+  <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-gray-500"></div>
+</div>
     );
   }
 
@@ -192,12 +204,14 @@ const UpdateProductPage: React.FC = () => {
                    typeof image === "string" ? (
                      <img
                        src={image}
+                       id={`image-${index}`}
                        alt={`Product ${index + 1}`}
                        className="w-full h-full object-cover"
                      />
                    ) : (
                      <img
                        src={URL.createObjectURL(image)}
+                       id={`image-${index}`}
                        alt={`Product ${index + 1}`}
                        className="w-full h-full object-cover"
                      />
@@ -220,14 +234,43 @@ const UpdateProductPage: React.FC = () => {
                  {image ? 'Change' : 'Add Image'}
                </label>
                {image instanceof File && (
-                 <button
-                   type="button"
-                   onClick={() => handleImageUpload(index)}
-                   className="mt-2 text-xs font-medium text-green-600 hover:text-green-800"
-                 >
-                   Upload
-                 </button>
-               )}
+                  <div className="mt-2">
+                    <button
+                      type="button"
+                      onClick={() => handleImageUpload(index)}
+                      className="text-xs font-medium text-green-600 hover:text-green-800"
+                      disabled={imageLoading[index]} // Disable if loading
+                    >
+                      {imageLoading[index] ? (
+                        <span className="flex items-center">
+                          <svg
+                            className="animate-spin h-4 w-4 text-green-600"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                            ></path>
+                          </svg>
+                          <span className="ml-2">Uploading...</span>
+                        </span>
+                      ) : (
+                        'Upload'
+                      )}
+                    </button>
+                  </div>
+                )}
              </div>
             ))}
           </div>
