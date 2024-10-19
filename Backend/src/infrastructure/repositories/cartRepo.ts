@@ -19,7 +19,7 @@ export class CartRepository extends BaseRepository<IUserCart> implements ICartRe
   async findCartByUser(userId: string): Promise<IUserCart | null> {
     return await this.model.findOne({ user: userId }).exec();
   }
-
+ 
   async addItemToCart(userId: string, productId: string, quantity: number): Promise<IUserCart | null> {
     return await this.model.findOneAndUpdate(
       { user: userId },
