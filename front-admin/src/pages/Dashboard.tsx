@@ -20,7 +20,7 @@ const Dashboard = () => {
     { header: 'Price', accessor: 'price' },
   ];
   return (
-    <div>
+    <div className="flex flex-col gap-10 w-full">
       <div className="p-4 sm:ml-64 mt-16">  
           <Table data={productData} columns={columns} />   
       </div>

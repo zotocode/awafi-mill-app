@@ -27,7 +27,7 @@ const categoryRoutes = express.Router();
 
 categoryRoutes.post("/category/sub",subcategoryController.addCategory.bind(subcategoryController));
 categoryRoutes.get("/category/sub", subcategoryController.getAllCategories.bind(subcategoryController));
-categoryRoutes.get("/listedCategory/sub", subcategoryController.getListedCategories.bind(subcategoryController));
+categoryRoutes.get("/listedCategory/sub/:Id", subcategoryController.getListedCategories.bind(subcategoryController));
 categoryRoutes.get("/category/sub/:id", subcategoryController.getCategoryById.bind(subcategoryController));
 categoryRoutes.put("/category/sub/:id", subcategoryController.updateCategory.bind(subcategoryController));
 categoryRoutes.patch("/category/sub/:id", subcategoryController.toggleListStatus.bind(subcategoryController));
