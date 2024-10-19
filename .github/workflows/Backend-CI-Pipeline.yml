@@ -26,14 +26,21 @@ jobs:
           exit 1
         fi
 
-
-    - name: Check for .env files
+    # Step to ensure .env, node_modules, and dist folders are not committed
+    - name: Check for restricted files/folders
       run: |
         if find Backend -name ".env" -print -quit | grep -q .; then
           echo "Error: .env file(s) found in the Backend directory or its subdirectories."
           exit 1
         fi
-
+        if find Backend -name "node_modules" -type d -print -quit | grep -q .; then
+          echo "Error: node_modules directory found in the Backend directory or its subdirectories."
+          exit 1
+        fi
+        if find Backend -name "dist" -type d -print -quit | grep -q .; then
+          echo "Error: dist directory found in the Backend directory or its subdirectories."
+          exit 1
+        fi
 
     - name: Install dependencies
       run: |
