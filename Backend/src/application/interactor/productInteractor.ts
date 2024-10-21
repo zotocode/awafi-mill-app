@@ -45,7 +45,7 @@ export class ProductInteractor implements IProductInteractor {
   // Retrieve all products
   async getAllProducts(): Promise<ProductDTO[]> {
     const products = await this.productRepo.findAllProducts();
-    return products.map((p) => this.mapEntityToDto(p));
+        return products.map((p) => this.mapEntityToDto(p));
   }
 
   // Retrieve all listed products
@@ -77,7 +77,6 @@ export class ProductInteractor implements IProductInteractor {
  
 
     const updatedProduct = await this.productRepo.updateProduct(id, data);
-    console.log("updation",updatedProduct)
     return updatedProduct ? this.mapEntityToDto(updatedProduct) : null;
   }
 

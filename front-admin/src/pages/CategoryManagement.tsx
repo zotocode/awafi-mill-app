@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from "react";
 import Table from "../components/Table";
 import CategoryModalForm from "../components/CategoryModalForm";
+import ConfirmationDialog from "../components/ConfirmationDialog"; // Add this import
 import categoryapi from "../api/categoryapi";
 import { toast } from "react-toastify";
 import { ListMinus, ListPlus, Pencil, Trash2 } from "lucide-react";
-import {Category} from '../types/categoryType'
-
-
+import { Category } from '../types/categoryType';
 
 const MainCategoryManagementPage = () => {
   const [isModal, setModal] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null
-  );
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [showDialog, setShowDialog] = useState(false); // Modal state for confirmation
+  const [actionType, setActionType] = useState<"delete" | "list">(); // Action type (list/unlist or delete)
 
   useEffect(() => {
     fetchCategories();
@@ -57,8 +56,6 @@ const MainCategoryManagementPage = () => {
   const handleSuccess = (newCategory: Category) => {
     setCategories(prev => {
       const existingCategoryIndex = prev.findIndex(cat => cat._id === newCategory._id);
-      
-      // If category exists, update it. Otherwise, add the new category
       if (existingCategoryIndex !== -1) {
         const updatedCategories = [...prev];
         updatedCategories[existingCategoryIndex] = newCategory;
@@ -67,17 +64,14 @@ const MainCategoryManagementPage = () => {
         return [...prev, newCategory];
       }
     });
-  
     setModal(false);
     setSelectedCategory(null);
-    // toast.success(`Category ${newCategory.id ? 'updated' : 'added'} successfully`);
   };
-  
 
   const categoryActions = (row: { [key: string]: any }) => (
     <div className="flex space-x-2">
       <button
-        onClick={() => handleList(row)}
+        onClick={() => openConfirmationDialog("list", row)}
         className={`p-1 rounded-full ${
           row.isListed
             ? "bg-yellow-100 text-yellow-600"
@@ -95,7 +89,7 @@ const MainCategoryManagementPage = () => {
         <Pencil size={16} />
       </button>
       <button
-        onClick={() => handleDelete(row)}
+        onClick={() => openConfirmationDialog("delete", row)}
         className="p-1 rounded-full bg-red-100 text-red-600 hover:bg-opacity-80"
         title="Delete"
       >
@@ -104,35 +98,41 @@ const MainCategoryManagementPage = () => {
     </div>
   );
 
+  const openConfirmationDialog = (type: "delete" | "list", category: any) => {
+    setActionType(type);
+    setSelectedCategory(category);
+    setShowDialog(true);
+  };
+
   const handleEdit = (category: any) => {
     setSelectedCategory(category);
     setModal(true);
   };
 
-  const handleDelete = async (category: any) => {
-    if (window.confirm(`Are you sure you want to delete ${category.name}?`)) {
+  const handleDeleteCategory = async () => {
+    if (selectedCategory) {
       try {
-        await categoryapi.deleteCategory(category._id);
-        setCategories((prev) => prev.filter((cat) => cat._id !== category._id));
+        await categoryapi.deleteCategory(selectedCategory._id);
+        setCategories((prev) => prev.filter((cat) => cat._id !== selectedCategory._id));
         toast.success("Category deleted successfully");
       } catch (error) {
         toast.error("Failed to delete category");
         console.error("Error deleting category:", error);
+      } finally {
+        setShowDialog(false);
       }
     }
   };
 
-  const handleList = async (category: any) => {
-    const action = category.isListed ? "unlist" : "list";
-    if (
-      window.confirm(`Are you sure you want to ${action} ${category.name}?`)
-    ) {
+  const handleProductListing = async () => {
+    if (selectedCategory) {
+      const action = selectedCategory.isListed ? "unlist" : "list";
       try {
-        const response = await categoryapi.blockCategory(category._id, action);
+        const response = await categoryapi.blockCategory(selectedCategory._id, action);
         if (response.status === 200) {
           setCategories((prev) =>
             prev.map((cat) =>
-              cat._id === category._id ? { ...cat, isListed: !cat.isListed } : cat
+              cat._id === selectedCategory._id ? { ...cat, isListed: !cat.isListed } : cat
             )
           );
           toast.success(`Category ${action}ed successfully`);
@@ -140,16 +140,16 @@ const MainCategoryManagementPage = () => {
       } catch (error) {
         toast.error(`Failed to ${action} category`);
         console.error(`Error ${action}ing category:`, error);
+      } finally {
+        setShowDialog(false);
       }
     }
   };
 
   return (
     <>
-   
-   <div className="flex flex-col gap-10 w-full">
+      <div className="flex flex-col gap-10 w-full">
         <div className="flex w-full p-5 justify-between items-center">
-          {/* <h1 className="text-2xl font-semibold">Category Management</h1> */}
           <button
             onClick={() => setModal(true)}
             type="button"
@@ -170,6 +170,20 @@ const MainCategoryManagementPage = () => {
         onSuccess={handleSuccess}
         category={selectedCategory}
       />
+      {/* Confirmation Dialog for list/unlist or delete actions */}
+      {showDialog && selectedCategory && (
+        <ConfirmationDialog
+          message={
+            actionType === "delete"
+              ? `Are you sure you want to delete ${selectedCategory.name}?`
+              : `Are you sure you want to ${selectedCategory.isListed ? "unlist" : "list"} ${selectedCategory.name}?`
+          }
+          confirmButtonLabel={actionType === "delete" ? "Delete" : "Confirm"}
+          cancelButtonLabel="Cancel"
+          onConfirm={actionType === "delete" ? handleDeleteCategory : handleProductListing}
+          onCancel={() => setShowDialog(false)}
+        />
+      )}
     </>
   );
 };

@@ -19,7 +19,7 @@ export class ProductController {
       if (photos.length > 0 && !productData.images) {
         productData.images = photos.map((photo: any[0]) => photo.path.toString());
       }
-
+      console.log("product daa",productData)
       const result: any = await this.productInteractor.addProduct(productData);
       if (result?.status) {
         res.status(result.status).json({ message: result.message });
