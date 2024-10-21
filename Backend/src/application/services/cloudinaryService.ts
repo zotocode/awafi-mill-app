@@ -40,5 +40,4 @@ class CloudinaryService implements ICloudinaryService{
     }
   
 }
-
 export default CloudinaryService;
