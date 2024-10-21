@@ -5,28 +5,28 @@ import { InewUserData } from "../../types/userTypes";
 import { BaseRepository } from "./baseRepository";
 
 export class UserRepo extends BaseRepository<IuserDocument> implements IUserRepo {
-    constructor() {
-        super(userModel); 
+  constructor() {
+    super(userModel);
+  }
+
+  async findUserEmail(email: string): Promise<IuserDocument | null> {
+    try {
+      return await this.model.findOne({ email });
+    } catch (error) {
+      console.error("Error finding user:", error);
+      throw error;
     }
+  }
 
-    async findUserEmail(email: string): Promise<IuserDocument | null> {
-      try {
-        return await this.model.findOne({email}); 
-      } catch (error) {
-        console.error("Error finding user:", error);
-        throw error;
-      }
+
+  async findUser(id: string): Promise<IuserDocument | null> {
+    try {
+      return await this.model.findById(id);
+    } catch (error) {
+      console.error("Error finding user:", error);
+      throw error;
     }
-
-
-    async findUser(id: string): Promise<IuserDocument | null> {
-        try {
-          return await this.model.findById(id); 
-        } catch (error) {
-          console.error("Error finding user:", error);
-          throw error;
-        }
-      }
+  }
 
 
     async registerUser(userData: InewUserData): Promise<string> {

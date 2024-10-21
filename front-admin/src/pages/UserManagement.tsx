@@ -25,8 +25,9 @@ const UserManagementPage = () => {
     setError(null);
     try {
       const response = await userApi.fetchAllUserData();
+      console.log(response);
+
       if (response.status === 200 && response.data) {
-        console.log('Fetched Users:', response.data.data);
         setUsers(response.data.data);
       } else {
         throw new Error("Invalid response from API");
@@ -34,6 +35,7 @@ const UserManagementPage = () => {
     } catch (error) {
       console.error("Error fetching user data:", error);
       setError("Failed to fetch users");
+      // toast.error(error.message || 'An unknown error occurred');
     }
   };
 
@@ -88,7 +90,7 @@ const UserManagementPage = () => {
 
   return (
     <>
-      <div className="p-4 sm:ml-64 mt-16">
+      <div className="flex flex-col gap-10 w-full">
         <div className="flex w-full p-5 justify-between items-center">
           <h1 className="text-2xl font-semibold">User Management</h1>
         </div>

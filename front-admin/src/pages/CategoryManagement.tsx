@@ -147,9 +147,9 @@ const MainCategoryManagementPage = () => {
   return (
     <>
    
-      <div className="p-4 sm:ml-64 mt-16">
+   <div className="flex flex-col gap-10 w-full">
         <div className="flex w-full p-5 justify-between items-center">
-          <h1 className="text-2xl font-semibold">Category Management</h1>
+          {/* <h1 className="text-2xl font-semibold">Category Management</h1> */}
           <button
             onClick={() => setModal(true)}
             type="button"
