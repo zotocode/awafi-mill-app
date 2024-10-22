@@ -4,14 +4,14 @@ export interface creatingCategory{
 }
 
 export interface Category {
-    _id?: string;
+    _id: string;
     name: string;
     description: string;
     isListed: boolean;
   }
   
   export interface subCategory {
-    _id?: string;
+    _id: string;
     name: string;
     mainCategory: string;
     description: string;

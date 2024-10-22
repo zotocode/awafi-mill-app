@@ -1,5 +1,5 @@
 import ICategoryInteractor from "../../interface/subCategoryInterface/IsubCategoryInteractory";
-import { responseHandler } from "../../types/commonTypes";
+import { LargeDataFetch, responseHandler } from "../../types/commonTypes";
 import IsubCategoryRepo from "../../interface/subCategoryInterface/IsubCategoryRepo"; // Import your category repository interface
 import {subCategoryCreationDTo,subCategoryDTo} from '../../domain/dtos/SubCategoryDTO'
 import IsubCategoryInteractor from "../../interface/subCategoryInterface/IsubCategoryInteractory";
@@ -29,15 +29,17 @@ export class SubCategoryInteractor implements IsubCategoryInteractor {
   }
 
   // Get all categories
-  async getAllCategories(): Promise<subCategoryDTo[]> {
-    const categories = await this.categoryRepo.getAllCategories(); // Use repository method
-    return categories.map(this.mapToDTO);
+  async getAllCategories(page:number,limit:number): Promise<LargeDataFetch> {
+    const categoryResponse = await this.categoryRepo.getAllCategories(page,limit); // Use repository method
+    const categories=categoryResponse.data.map(this.mapToDTO);
+    return {data:categories,totalPages:categoryResponse.totalPages}
 }
 
   // Get all listed categories
-  async getListedCategories(mainCategoryId:mongoose.Types.ObjectId): Promise<subCategoryDTo[]> {
-    const categories = await this.categoryRepo.getListedCategories(mainCategoryId); // Use repository method
-    return categories.map(this.mapToDTO);
+  async getListedCategories(mainCategoryId:mongoose.Types.ObjectId,page:number,limit:number): Promise<LargeDataFetch> {
+    const categoryResponse = await this.categoryRepo.getListedCategories(mainCategoryId,page,limit); // Use repository method
+    const categories= categoryResponse.data.map(this.mapToDTO);
+    return {data:categories,totalPages:categoryResponse.totalPages}
   }
 
   // Get a category by ID

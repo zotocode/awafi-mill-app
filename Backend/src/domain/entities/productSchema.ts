@@ -1,5 +1,4 @@
-import mongoose, { Document } from "mongoose";
-
+import mongoose, { Document } from 'mongoose';
 
 interface Description {
   header: string;
@@ -13,18 +12,18 @@ interface Variant {
   stockQuantity: number;
 }
 
-// Define the Product interface
 export default interface Product extends Document {
-  _id:mongoose.Types.ObjectId
+  ID?: string;
+  sku?: string;
+  ean?: string;
   name: string;
   descriptions: Description[];
   isListed: boolean;
   isDelete: boolean;
-  subCategory: mongoose.Schema.Types.ObjectId | null;
-  category: mongoose.Schema.Types.ObjectId | null;
+  category: mongoose.Types.ObjectId | null;
+  subCategory: mongoose.Types.ObjectId | null;
   images: string[];
   variants: Variant[];
+  createdAt?: Date;
+  updatedAt?: Date;
 }
-
-
-

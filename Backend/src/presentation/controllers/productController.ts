@@ -19,8 +19,21 @@ export class ProductController {
       if (photos.length > 0 && !productData.images) {
         productData.images = photos.map((photo: any[0]) => photo.path.toString());
       }
-
+      console.log("product daa",productData)
       const result: any = await this.productInteractor.addProduct(productData);
+      if (result?.status) {
+        res.status(result.status).json({ message: result.message });
+      } else {
+        res.status(200).json({ message: "Product created successfully", product: result });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+  async bulkAdding(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const productData: any = req.file || [];
+      const result: any = await this.productInteractor.addBulkProduct(productData);
       if (result?.status) {
         res.status(result.status).json({ message: result.message });
       } else {
@@ -63,7 +76,9 @@ export class ProductController {
   // Get all products (HTTP GET)
   async getAllProducts(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const products = await this.productInteractor.getAllProducts();
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const products = await this.productInteractor.getAllProducts(page,limit);
       res.status(200).json(products);
     } catch (error) {
       next(error);
@@ -73,7 +88,10 @@ export class ProductController {
   // Get all listed products (HTTP GET)
   async getAllListedProducts(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const products = await this.productInteractor.getAllListedProducts();
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+
+      const products = await this.productInteractor.getAllListedProducts(page,limit);
       res.status(200).json(products);
     } catch (error) {
       next(error);

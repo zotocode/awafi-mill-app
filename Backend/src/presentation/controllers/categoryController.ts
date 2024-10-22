@@ -29,7 +29,9 @@ export class CategoryController {
   // Get all categories (HTTP GET)
   async getAllCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const products = await this.categoryInteractor.getAllCategories();
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const products = await this.categoryInteractor.getAllCategories(page,limit);
       res.status(200).json(products);
     } catch (error) {
       next(error);

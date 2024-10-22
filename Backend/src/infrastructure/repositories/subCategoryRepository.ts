@@ -3,6 +3,7 @@ import { BaseRepository } from './baseRepository';
 import IsubCategoryRepo from '../../interface/subCategoryInterface/IsubCategoryRepo';
 import IsubCategory from '../../domain/entities/subCategorySchema';
 import { categoryCreationDTo } from '../../domain/dtos/CategoryDTO'; // Correct import for category DTO
+import { LargeDataFetch } from '../../types/commonTypes';
 
 export class SubCategoryRepository extends BaseRepository<IsubCategory> implements IsubCategoryRepo {
   constructor(model: Model<IsubCategory>) {
@@ -14,12 +15,24 @@ export class SubCategoryRepository extends BaseRepository<IsubCategory> implemen
     return await super.create(data);
   }
 
-  async getAllCategories(): Promise<IsubCategory[]> {
-    return await this.model.find({ isDeleted: false });
+  async getAllCategories(page:number,limit:number): Promise<LargeDataFetch> {
+    const skip=(page-1)*limit
+    const totalCategories = await this.model.countDocuments();
+    const category= await this.model.find().skip(skip).limit(limit);
+    return{
+      data:category,
+      totalPages:totalCategories
+    }
 }
 
-  async getListedCategories(mainCategoryId:mongoose.Types.ObjectId): Promise<IsubCategory[]> {
-    return await this.model.find({isListed:true,isDeleted:false,mainCategory:mainCategoryId});
+  async getListedCategories(mainCategoryId:mongoose.Types.ObjectId,page:number,limit:number): Promise<LargeDataFetch> {
+    const skip=(page-1)*limit
+    const totalCategories = await this.model.countDocuments();
+    const category= await this.model.find({isListed:true,isDeleted:false,mainCategory:mainCategoryId}).skip(skip).limit(limit);
+    return{
+      data:category,
+      totalPages:totalCategories
+    }
   }
 
   async findByName(name: string): Promise<IsubCategory | null> {
