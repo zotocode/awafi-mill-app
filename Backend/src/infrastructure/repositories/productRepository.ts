@@ -1,19 +1,20 @@
 // src/infrastructure/repositories/productRepository.ts
-import { ProductDTO, ProductCreationDTO } from "../../domain/dtos/ProductDTO";
+import { ProductCreationDTO } from "../../domain/dtos/ProductDTO";
 import mongoose, { Model } from "mongoose";
-import Product from "../../domain/entities/productSchema";
+import IProductSchema from "../../domain/entities/productSchema";
 import { BaseRepository } from "./baseRepository";
 import { IproductRepo } from '../../interface/productInterface/IproductRepo'
+import {ProductResponse} from '../../types/productTypes'
 
 type listing = {
   isListed: boolean
 }
-export class ProductRepository extends BaseRepository<Product> implements IproductRepo {
-  constructor(model: Model<Product>) {
+export class ProductRepository extends BaseRepository<IProductSchema> implements IproductRepo {
+  constructor(model: Model<IProductSchema>) {
     super(model);
   }
 
-  async addProduct(productDTO: ProductCreationDTO): Promise<Product> {
+  async addProduct(productDTO: ProductCreationDTO): Promise<IProductSchema> {
     const productEntity = {
       name: productDTO.name,
       subCategory: productDTO.subCategory,
@@ -28,18 +29,41 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
     return await super.create(productEntity);
 
   }
+  async addBulkProduct(productData: any): Promise<any> {
+    const productEntity = {
+      ID:productData.ID,
+      sku:productData.SKU,
+      ean:productData.EAN,
+      name: productData.Name,
+      subCategory: productData.SubCategory,
+      category: productData.MainCategory,
+      descriptions: productData.Descriptions,
+      images: productData.images,
+      variants: productData.variants,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
 
-  async findAllProducts(): Promise<Product[]> {
+    return await super.create(productEntity);
 
-    return await this.model.find().populate('category').exec();
+  }
+  
+  async findAllProducts(page:number,limit:number): Promise<ProductResponse> {
+    const totalProducts = await this.model.countDocuments();
+     const skip = (page - 1) * limit;
+     const products =await this.model.find().skip(skip).limit(limit).populate('category').exec();
+    return {products:products,totalPages: Math.ceil(totalProducts / limit)}
 
   }
 
-  async findListedAllProducts(): Promise<Product[]> {
-    return await this.model.find({ isListed: true, isDelete: false }).populate('category').exec();
+  async findListedAllProducts(page:number,limit:number): Promise<ProductResponse> {
+    const totalProducts = await this.model.countDocuments();
+     const skip = (page - 1) * limit;
+    const products= await this.model.find({ isListed: true, isDelete: false }).skip(skip).limit(limit).populate('category').exec();
+    return {products:products,totalPages: Math.ceil(totalProducts / limit)}
   }
 
-  async fetchByCategory(mainCategoryId?: mongoose.Types.ObjectId | null, subCategoryId?: mongoose.Types.ObjectId | null): Promise<Product[]> {
+  async fetchByCategory(mainCategoryId?: mongoose.Types.ObjectId | null, subCategoryId?: mongoose.Types.ObjectId | null): Promise<IProductSchema[]> {
     const filter: any = {};
 
     if (mainCategoryId) {
@@ -54,11 +78,11 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
     return await this.model.find(filter).exec();
   }
 
-  async findByName(name: string): Promise<Product | null> {
+  async findByName(name: string): Promise<IProductSchema | null> {
     const regex = new RegExp(`^${name}$`, 'i');
     return await super.findOne({ name: regex });
   }
-  async findByNameAndNotCurrentId(id: mongoose.Types.ObjectId, name: string): Promise<Product | null> {
+  async findByNameAndNotCurrentId(id: mongoose.Types.ObjectId, name: string): Promise<IProductSchema | null> {
     const regex = new RegExp(`^${name}$`, 'i');
     return await super.findOne({
       _id: { $ne: id },
@@ -67,12 +91,12 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
 
   }
 
-  async productFindById(id: mongoose.Types.ObjectId): Promise<Product | null> {
+  async productFindById(id: mongoose.Types.ObjectId): Promise<IProductSchema | null> {
 
     return await this.model.findById(id).populate('category').populate('subCategory').exec();
   }
 
-  async isListedProduct(id: mongoose.Types.ObjectId): Promise<Product | null> {
+  async isListedProduct(id: mongoose.Types.ObjectId): Promise<IProductSchema | null> {
     return await this.model.findOne({ _id: id, isListed: true }).exec();
   }
 
@@ -84,7 +108,7 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
     return await this.model.updateOne({ _id: id }, { $set: { [`images.${index}`]: photo } });
   }
 
-  async updateVariantQuantity(productId: mongoose.Types.ObjectId, variantId: string, quantity: number): Promise<Product | null> {
+  async updateVariantQuantity(productId: mongoose.Types.ObjectId, variantId: string, quantity: number): Promise<IProductSchema | null> {
     return await this.model.findOneAndUpdate(
       { _id: productId, 'variants._id': variantId }, // Find the product and the specific variant
       { $inc: { 'variants.$.stockQuantity': quantity } }, // Increment or decrement the stock quantity
@@ -93,7 +117,7 @@ export class ProductRepository extends BaseRepository<Product> implements Iprodu
   }
   // Update in productRepository.ts
 
-async updateProduct(id: mongoose.Types.ObjectId, data: Partial<ProductCreationDTO>): Promise<Product | null> {
+async updateProduct(id: mongoose.Types.ObjectId, data: Partial<ProductCreationDTO>): Promise<IProductSchema | null> {
   return await this.model.findByIdAndUpdate(id, data, { new: true }).exec();
 }
 

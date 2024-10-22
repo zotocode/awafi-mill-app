@@ -11,9 +11,9 @@ class CategoryApi{
           return error;
         }
       }
-    async fetchAllCategories(): Promise<any> {
+    async fetchAllCategories(page:number,limit:number): Promise<any> {
         try {
-          return await this.axiosInstance.get('/api/categories/category');
+          return await this.axiosInstance.get(`/api/categories/category?page=${page}&limit=${limit}`);
         } catch (error: unknown) {
          
           return error;
