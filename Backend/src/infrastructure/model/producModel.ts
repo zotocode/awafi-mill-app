@@ -7,6 +7,9 @@ import { ref, required } from 'joi';
 
 // Create the product schema
 const productSchema = new Schema<Product>({
+  ID:{type:String,required:false},
+  sku:{type:String,required:false},
+  ean:{type:String,required:false},
   name: { type: String, required: true },
   descriptions: [{
     header: { type: String, required: true },
@@ -25,22 +28,22 @@ const productSchema = new Schema<Product>({
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'MainCategory',
-    required: true
+    required: false
   },
   subCategory: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'SubCategory',
-    required: true
+    required: false
   },
   images: [
     { type: String, required: true }
   ],
   variants: [
     {
-      weight: { type: String, required: true },
-      inPrice: { type: Number, required: true },
-      outPrice: { type: Number, required: true },
-      stockQuantity: { type: Number, required: true }
+      weight: { type: String, required: false },
+      inPrice: { type: Number, required: false },
+      outPrice: { type: Number, required: false },
+      stockQuantity: { type: Number, required: false }
     }
   ]
 }, { timestamps: true });

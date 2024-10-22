@@ -3,6 +3,7 @@ import { BaseRepository } from './baseRepository';
 import ICategoryRepo from '../../interface/categoryInterface/IcategoryRepo';
 import ICategory from '../../domain/entities/categorySchema';
 import { categoryCreationDTo } from '../../domain/dtos/CategoryDTO'; // Correct import for category DTO
+import { LargeDataFetch } from '../../types/commonTypes';
 
 export class CategoryRepository extends BaseRepository<ICategory> implements ICategoryRepo {
   constructor(model: Model<ICategory>) {
@@ -14,8 +15,14 @@ export class CategoryRepository extends BaseRepository<ICategory> implements ICa
     return await super.create(data);
   }
 
-  async getAllCategories(): Promise<ICategory[]> {
-    return await this.model.find({isDeleted:false});
+  async getAllCategories(page:number,limit:number): Promise<LargeDataFetch> {
+    const skip=(page-1)*limit
+    const totalCategories = await this.model.countDocuments();
+    const categories= await this.model.find({isDeleted:false}).skip(skip).limit(limit);
+    return{
+      data:categories,
+      totalPages:totalCategories
+    }
   }
   async getListedCategories(): Promise<ICategory[]> {
     return await this.model.find({isListed:true,isDeleted:false});

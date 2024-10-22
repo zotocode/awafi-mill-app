@@ -13,17 +13,22 @@ const SubCategoryManagementPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<subCategory | null>(null);
   const [showDialog, setShowDialog] = useState(false);
   const [actionType, setActionType] = useState<"list" | "delete" | null>(null);
+  
+  const [currentPage, setCurrentPage] = useState(1); // Current page state
+  const [totalPages, setTotalPages] = useState(1); // Total pages state
+  const [itemsPerPage] = useState(10); // Define how many items to show per page
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [currentPage]); // Fetch categories whenever currentPage changes
 
   async function fetchCategories() {
     try {
-      const response = await subcategoryapi.fetchAllCategories();
+      const response = await subcategoryapi.fetchAllCategories(currentPage, itemsPerPage);
       if (response.status === 200) {
-        console.log('all categories', response.data);
-        setCategories(response.data);
+        console.log("sub category",response.data)
+        setCategories(response.data.data);
+        setTotalPages(response.data.totalPages); // Set total pages from response
       }
     } catch (error) {
       console.error("Error fetching category data:", error);
@@ -149,6 +154,19 @@ const SubCategoryManagementPage = () => {
     }
   };
 
+  // Pagination handlers
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prevPage => prevPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prevPage => prevPage - 1);
+    }
+  };
+
   return (
     <>
       <div className="flex flex-col gap-10 w-full">
@@ -162,6 +180,27 @@ const SubCategoryManagementPage = () => {
           </button>
         </div>
         <Table data={categories} columns={categoryColumns} actions={categoryActions} />
+
+        {/* Pagination Controls */}
+        <div className="flex justify-center items-center space-x-4 mt-4">
+          <button
+            onClick={handlePreviousPage}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 text-sm ${currentPage === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-black text-white hover:bg-gray-800"} rounded`}
+          >
+            Previous
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 text-sm ${currentPage === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-black text-white hover:bg-gray-800"} rounded`}
+          >
+            Next
+          </button>
+        </div>
       </div>
 
       <SubCategoryModalForm
@@ -176,9 +215,7 @@ const SubCategoryManagementPage = () => {
           message={
             actionType === "delete"
               ? `Are you sure you want to delete ${selectedCategory.name}?`
-              : `Are you sure you want to ${
-                  selectedCategory.isListed ? "unlist" : "list"
-                } ${selectedCategory.name}?`
+              : `Are you sure you want to ${selectedCategory.isListed ? "unlist" : "list"} ${selectedCategory.name}?`
           }
           confirmButtonLabel={actionType === "delete" ? "Delete" : "Confirm"}
           cancelButtonLabel="Cancel"

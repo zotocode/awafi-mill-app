@@ -1,10 +1,12 @@
 import mongoose from 'mongoose';
 import { categoryCreationDTo } from '../../domain/dtos/CategoryDTO';
 import ICategory from '../../domain/entities/categorySchema';
+import { LargeDataFetch } from '../../types/commonTypes';
+
 
 export default interface ICategoryRepo {
   addCategory(data: categoryCreationDTo): Promise<ICategory>;
-  getAllCategories(): Promise<ICategory[]>;
+  getAllCategories(page:number,limit:number): Promise<LargeDataFetch>;
   getListedCategories(): Promise<ICategory[]>;
   getCategoryById(id: mongoose.Types.ObjectId): Promise<ICategory | null>;
   updateCategory(id: mongoose.Types.ObjectId, data: Partial<categoryCreationDTo>): Promise<ICategory | null>;

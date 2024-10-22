@@ -5,14 +5,18 @@ import { responseHandler } from '../../types/commonTypes'; // Corrected spelling
 import { ICloudinaryService } from "../../interface/serviceInterface/IcloudinaryInterface";
 import { IproductRepo } from "../../interface/productInterface/IproductRepo";
 import mongoose from "mongoose";
+import { IExcel } from "../../interface/serviceInterface/IexcelInterface";
+import {ProductResponseDTO} from "../../types/productTypes"
 
 export class ProductInteractor implements IProductInteractor {
   private productRepo: IproductRepo;
   private cloudinaryService: ICloudinaryService;
+  private excelService:IExcel
 
-  constructor(productRepo: IproductRepo, cloudinaryService: ICloudinaryService) {
+  constructor(productRepo: IproductRepo, cloudinaryService: ICloudinaryService,excelService:IExcel) {
     this.productRepo = productRepo;
     this.cloudinaryService = cloudinaryService;
+    this.excelService=excelService
   }
 
   // Adding a new product
@@ -36,6 +40,29 @@ export class ProductInteractor implements IProductInteractor {
     return this.mapEntityToDto(createdProduct);
   }
 
+  async addBulkProduct(productData: any): Promise<any> {
+    try {
+      const sheetData = await this.excelService.processExcel(productData.path); // Await the result of the promise
+  
+      if (sheetData && Array.isArray(sheetData)) {
+        // Use map if sheetData is an array
+        const addBulkProducts = sheetData.map((element) => {
+          return this.productRepo.addBulkProduct(element);
+        });
+  
+        // If you need to wait for all products to be added before proceeding
+        await Promise.allSettled(addBulkProducts);
+  
+        return { message: 'Bulk products added successfully' };
+      } else {
+        return { message: 'Invalid sheet data format' };
+      }
+    } catch (error) {
+      console.error('Error processing bulk products:', error);
+      throw new Error('Failed to add bulk products');
+    }
+  }
+  
   async updateImage(id: mongoose.Types.ObjectId, index: number, path: string): Promise<boolean | string> {
     const uploadResult = await this.cloudinaryService.uploadProductImage(path);
     const updatedProduct = await this.productRepo.updateImage(id, index, uploadResult.secure_url);
@@ -43,15 +70,17 @@ export class ProductInteractor implements IProductInteractor {
   }
 
   // Retrieve all products
-  async getAllProducts(): Promise<ProductDTO[]> {
-    const products = await this.productRepo.findAllProducts();
-        return products.map((p) => this.mapEntityToDto(p));
+  async getAllProducts(page:number,limit:number): Promise<ProductResponseDTO> {
+    const ProductResponse = await this.productRepo.findAllProducts(page,limit);
+         const products=ProductResponse.products.map((p) => this.mapEntityToDto(p));
+         return  {products:products,totalPages:ProductResponse.totalPages}
   }
 
   // Retrieve all listed products
-  async getAllListedProducts(): Promise<ProductDTO[]> {
-    const products = await this.productRepo.findListedAllProducts();
-    return products.map((p) => this.mapEntityToDto(p));
+  async getAllListedProducts(page:number,limit:number): Promise<ProductResponseDTO> {
+    const ProductResponse = await this.productRepo.findListedAllProducts(page,limit);
+    const products= ProductResponse.products.map((p) => this.mapEntityToDto(p));
+      return  {products:products,totalPages:ProductResponse.totalPages}
   }
 
   // Filter by category

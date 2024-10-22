@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-
-interface FileItem {
-  name: string;
-  type: string;
-}
+import productapi from '../api/productapi';
+import { toast } from 'react-toastify';
 
 const BulkProducAddingPage = () => {
-  const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
-  const [files, setFiles] = useState<FileItem[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Handle click-based file upload
   const handleUpload = () => {
@@ -19,7 +16,7 @@ const BulkProducAddingPage = () => {
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files![0];
       if (file) {
-        handleFile(file);
+        handleFileSelection(file);
       }
     };
     input.click();
@@ -38,31 +35,44 @@ const BulkProducAddingPage = () => {
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
-   
+
     const file = e.dataTransfer.files[0];
     if (file) {
-      handleFile(file);
-      console.log('fileis here',file)
+      handleFileSelection(file);
     }
   };
 
-  // Common function to handle file processing
-  const handleFile = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const content = e.target!.result;
-      if (content instanceof ArrayBuffer) {
-        const arrayBufferView = new Uint8Array(content);
-        const decoder = new TextDecoder();
-        const decodedContent = decoder.decode(arrayBufferView);
-        console.log(decodedContent); // Here you can parse and process the Excel content
-      }
-    };
-    reader.readAsArrayBuffer(file);
+  // Handle file selection
+  const handleFileSelection = (file: File) => {
+    setSelectedFile(file);
+  };
 
-    // Simulate adding the file
-    setFiles(prevFiles => [...prevFiles, { name: file.name, type: file.type }]);
-    setSelectedFile(null);
+  // Handle file submission to API
+  const handleSubmit = async () => {
+    if (!selectedFile) {
+      toast.error("Please select a file before submitting");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
+      const response = await productapi.bulkAddProduct(formData);
+       console.log('resp',response)
+      if (response.status === 200) {
+        toast.success("File uploaded successfully");
+        setSelectedFile(null);
+      } else {
+        toast.error("Failed to upload file");
+      }
+    } catch (error) {
+      toast.error("Error uploading file");
+      console.error("Error:", error);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -77,13 +87,36 @@ const BulkProducAddingPage = () => {
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          <button
-            className="w-full py-2 text-blue-600 font-semibold rounded-lg transition-colors duration-300"
-          >
+          <button className="w-full py-2 text-blue-600 font-semibold rounded-lg transition-colors duration-300">
             {isDragging ? 'Drop the file here...' : 'Upload or Drag & Drop Excel'}
           </button>
         </div>
       </div>
+
+      {selectedFile && (
+        <div className="flex flex-col items-center mt-4">
+          <p className="font-semibold">Selected File:</p>
+          <p className="text-gray-700">{selectedFile.name}</p>
+          <button
+            className="mt-2 px-4 py-2 bg-red-500 text-white rounded-lg"
+            onClick={() => setSelectedFile(null)}
+          >
+            Remove File
+          </button>
+        </div>
+      )}
+
+      {selectedFile && (
+        <div className="flex justify-center mt-4">
+          <button
+            className={`px-6 py-2 bg-green-500 text-white rounded-lg ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={handleSubmit}
+            disabled={isUploading}
+          >
+            {isUploading ? 'Uploading...' : 'Submit'}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

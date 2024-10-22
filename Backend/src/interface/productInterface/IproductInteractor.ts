@@ -1,17 +1,19 @@
 import mongoose from "mongoose";
 import { ProductDTO, ProductCreationDTO } from "../../domain/dtos/ProductDTO"; 
 import { responseHandler } from '../../types/commonTypes'; // Corrected spelling
+import {ProductResponseDTO} from '../../types/productTypes'
 
 export default interface IProductInteractor {
   addProduct(data: ProductCreationDTO): Promise<ProductDTO | responseHandler>; // Ensure responseHandler is correctly spelled
+  addBulkProduct(data: any): Promise<any>; // Ensure responseHandler is correctly spelled
   fetchByCategory(
     mainCategoryId: mongoose.Types.ObjectId | null, 
     subCategoryId: mongoose.Types.ObjectId | null
   ): Promise<ProductDTO[] | null>;
   
-  getAllProducts(): Promise<ProductDTO[]>;
+  getAllProducts(page:number,limit:number): Promise<ProductResponseDTO>;
   
-  getAllListedProducts(): Promise<ProductDTO[]>;
+  getAllListedProducts(page:number,limit:number): Promise<ProductResponseDTO>;
   
   getProductById(id: mongoose.Types.ObjectId): Promise<ProductDTO | null>;
   
