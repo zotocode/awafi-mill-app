@@ -18,6 +18,7 @@
     "lucide-react": "^0.447.0",
     "mogoose": "^0.0.1-security",
     "react": "^18.3.1",
+    "react-dnd": "^16.0.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.53.0",
     "react-redux": "^9.1.2",

@@ -8,9 +8,9 @@ export interface Description {
   
  export interface Variant {
     weight: string;
-    inPrice: number;
-    outPrice:number;
-    stockQuantity: number;
+    inPrice: string;
+    outPrice:string;
+    stockQuantity: string;
   }
   
   // Define the Product interface

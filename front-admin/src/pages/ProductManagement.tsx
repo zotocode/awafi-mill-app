@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Table from "../components/Table";
 import ProductModalForm from "../components/ProductModalForm";
-import ConfirmationDialog from "../components/ConfirmationDialog"; // Import dialog
+import ConfirmationDialog from "../components/ConfirmationDialog";
 import productapi from "../api/productapi";
 import { Product } from "../types/productTypes";
 import { useNavigate } from "react-router-dom";
@@ -12,15 +12,19 @@ const ProductManagement: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [actionType, setActionType] = useState<"delete" | "list" | null>(null);
-  const [showDialog, setShowDialog] = useState(false); // Manage confirmation dialog
+  const [showDialog, setShowDialog] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1); // Pagination state
+  const [itemsPerPage] = useState(5); // Items per page
+  const [totalPages, setTotalPages] = useState(1); // Total pages returned from backend
   const navigate = useNavigate();
 
-  // Fetch products from API
-  const fetchProducts = useCallback(async () => {
+  // Fetch products from API with pagination
+  const fetchProducts = useCallback(async (page: number, limit: number) => {
     try {
-      const response = await productapi.fetchAllProducts();
+      const response = await productapi.fetchAllProducts(page, limit);
       if (response.status === 200) {
-        setProducts(response.data);
+        setProducts(response.data.products);
+        setTotalPages(response.data.totalPages); // Update total pages
       }
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -28,8 +32,8 @@ const ProductManagement: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    fetchProducts(currentPage, itemsPerPage); // Fetch products for current page
+  }, [fetchProducts, currentPage, itemsPerPage]);
 
   // Handle delete with confirmation
   const confirmDeleteProduct = (product: Product) => {
@@ -42,9 +46,7 @@ const ProductManagement: React.FC = () => {
     try {
       if (selectedProduct) {
         await productapi.deleteProduct(selectedProduct._id);
-        setProducts((prevProducts) =>
-          prevProducts.filter((product) => product._id !== selectedProduct._id)
-        );
+        fetchProducts(currentPage, itemsPerPage); // Re-fetch products for the current page after delete
       }
     } catch (error) {
       console.error("Failed to delete product:", error);
@@ -60,6 +62,7 @@ const ProductManagement: React.FC = () => {
     setActionType("list");
     setShowDialog(true);
   };
+
   const handleEditProduct = (product: Product) => {
     navigate(`/update-product/${product._id}`);
     setSelectedProduct(product);
@@ -72,11 +75,7 @@ const ProductManagement: React.FC = () => {
     try {
       const response = await productapi.listingProduct(_id, action);
       if (response.status === 200) {
-        setProducts((prevProducts) =>
-          prevProducts.map((product) =>
-            product._id === _id ? { ...product, isListed: !isListed } : product
-          )
-        );
+        fetchProducts(currentPage, itemsPerPage); // Re-fetch products after listing/unlisting
       }
     } catch (error) {
       console.error("Error updating product listing:", error);
@@ -120,6 +119,19 @@ const ProductManagement: React.FC = () => {
     );
   }, []);
 
+  // Pagination handlers
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  };
+
   const productColumns = [
     { header: "Product Name", accessor: "name" },
     {
@@ -144,17 +156,51 @@ const ProductManagement: React.FC = () => {
 
   return (
     <>
-       <div className="flex flex-col gap-10 w-full">
-        <div className="flex w-full justify-end mb-4">
+      <div className="flex flex-col gap-10 w-full">
+        <div className="flex w-full justify-between mb-4">
+          <button
+            onClick={() => navigate("/bulk-adding")}
+            type="button"
+            className="text-white bg-black hover:bg-[#8e8f91] hover:text-black-2 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+            Bulk Add
+          </button>
           <button
             onClick={() => setModal(true)}
             type="button"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            className="text-white bg-black hover:bg-[#8e8f91] hover:text-black-2 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
             Add Product
           </button>
         </div>
         <Table data={products} columns={productColumns} actions={productActions} />
+        <div className="flex justify-center items-center space-x-4 mt-4">
+          <button
+            onClick={handlePreviousPage}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 text-sm ${
+              currentPage === 1
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-black text-white hover:bg-gray-800"
+            } rounded`}
+          >
+            Previous
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 text-sm ${
+              currentPage === totalPages
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-black text-white hover:bg-gray-800"
+            } rounded`}
+          >
+            Next
+          </button>
+        </div>
         <ProductModalForm
           isOpen={isModal}
           onClose={() => setModal(false)}
@@ -167,11 +213,15 @@ const ProductManagement: React.FC = () => {
             message={
               actionType === "delete"
                 ? `Are you sure you want to delete ${selectedProduct.name}?`
-                : `Are you sure you want to ${selectedProduct.isListed ? "unlist" : "list"} ${selectedProduct.name}?`
+                : `Are you sure you want to ${
+                    selectedProduct.isListed ? "unlist" : "list"
+                  } ${selectedProduct.name}?`
             }
             confirmButtonLabel={actionType === "delete" ? "Delete" : "Confirm"}
             cancelButtonLabel="Cancel"
-            onConfirm={actionType === "delete" ? handleDeleteProduct : handleProductListing}
+            onConfirm={
+              actionType === "delete" ? handleDeleteProduct : handleProductListing
+            }
             onCancel={() => setShowDialog(false)}
           />
         )}

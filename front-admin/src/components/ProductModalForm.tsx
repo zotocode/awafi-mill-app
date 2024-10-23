@@ -28,7 +28,7 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
   const [images, setImages] = useState<File[]>([]);
   const [subCategory, setSubCategory] = useState<Category | null>(null);
   const [variants, setVariants] = useState<Variant[]>([
-    { weight: "", inPrice: 0,outPrice:0, stockQuantity: 0 },
+    { weight: "", inPrice: "",outPrice:"", stockQuantity: "" },
   ]);
 
   useEffect(() => {
@@ -74,7 +74,7 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
     setIsListed(true);
     setCategory(null);
     setSubCategory(null);
-    setVariants([{ weight: "", inPrice: 0,outPrice:0, stockQuantity: 0 }]);
+    setVariants([{ weight: "", inPrice: "",outPrice:"", stockQuantity: ""}]);
   };
 
   const handleAddDescription = () => {
@@ -103,7 +103,7 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
   };
 
   const handleAddVariant = () =>
-    setVariants([...variants, { weight: "", inPrice: 0,outPrice:0, stockQuantity: 0 }]);
+    setVariants([...variants, { weight: "", inPrice: "",outPrice:"", stockQuantity: "" }]);
 
   const handleRemoveVariant = (index: number) =>
     setVariants(variants.filter((_, i) => i !== index));
@@ -217,6 +217,7 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
                 <input
                   id="productName"
                   type="text"
+                  placeholder="Product Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
@@ -331,90 +332,124 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
                 className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
               />
 
-              <div className="flex flex-col">
-                <label className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                  Variants
-                </label>
-                {variants.map((variant, index) => (
-                  <div
-                    key={index}
-                    className="grid grid-cols-3 gap-4 mb-2 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg"
-                  >
-                    <input
-                      type="text"
-                      placeholder="Weight"
-                      value={variant.weight}
-                      onChange={(e) =>
-                        setVariants(
-                          variants.map((v, i) =>
-                            i === index ? { ...v, weight: e.target.value } : v
-                          )
-                        )
-                      }
-                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Price"
-                      value={variant.inPrice}
-                      onChange={(e) =>
-                        setVariants(
-                          variants.map((v, i) =>
-                            i === index
-                              ? { ...v, inPrice: Number(e.target.value) }
-                              : v
-                          )
-                        )
-                      }
-                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Price"
-                      value={variant.outPrice}
-                      onChange={(e) =>
-                        setVariants(
-                          variants.map((v, i) =>
-                            i === index
-                              ? { ...v, outPrice: Number(e.target.value) }
-                              : v
-                          )
-                        )
-                      }
-                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Stock"
-                      value={variant.stockQuantity}
-                      onChange={(e) =>
-                        setVariants(
-                          variants.map((v, i) =>
-                            i === index
-                              ? { ...v, stockQuantity: Number(e.target.value) }
-                              : v
-                          )
-                        )
-                      }
-                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveVariant(index)}
-                      className="col-span-3 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                    >
-                      Remove Variant
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={handleAddVariant}
-                  className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                >
-                  + Add Variant
-                </button>
-              </div>
+<div className="flex flex-col space-y-6">
+  <label className="text-sm font-medium text-gray-900 dark:text-white">
+    Variants
+  </label>
+
+  {variants.map((variant, index) => (
+    <div
+      key={index}
+      className="grid grid-cols-1 gap-y-6 md:grid-cols-3 md:gap-x-6 p-6 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md"
+    >
+      {/* Weight Input */}
+      <div className="flex flex-col">
+        <label htmlFor={`weight-${index}`} className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          Weight
+        </label>
+        <input
+          id={`weight-${index}`}
+          type="number"
+          placeholder="Enter weight"
+          value={variant.weight}
+          onChange={(e) =>
+            setVariants(
+              variants.map((v, i) =>
+                i === index ? { ...v, weight: e.target.value } : v
+              )
+            )
+          }
+          className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-2 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          aria-label="Weight"
+        />
+      </div>
+
+      {/* In Price Input */}
+      <div className="flex flex-col">
+        <label htmlFor={`in-price-${index}`} className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          In Price
+        </label>
+        <input
+          id={`in-price-${index}`}
+          type="number"
+          placeholder="Enter in price"
+          value={variant.inPrice}
+          onChange={(e) =>
+            setVariants(
+              variants.map((v, i) =>
+                i === index ? { ...v, inPrice: e.target.value } : v
+              )
+            )
+          }
+          className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-2 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          aria-label="In Price"
+        />
+      </div>
+
+      {/* Out Price Input */}
+      <div className="flex flex-col">
+        <label htmlFor={`out-price-${index}`} className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          Out Price
+        </label>
+        <input
+          id={`out-price-${index}`}
+          type="number"
+          placeholder="Enter out price"
+          value={variant.outPrice}
+          onChange={(e) =>
+            setVariants(
+              variants.map((v, i) =>
+                i === index ? { ...v, outPrice: e.target.value } : v
+              )
+            )
+          }
+          className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-2 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          aria-label="Out Price"
+        />
+      </div>
+
+      {/* Stock Quantity Input */}
+      <div className="flex flex-col">
+        <label htmlFor={`stock-quantity-${index}`} className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          Stock Quantity
+        </label>
+        <input
+          id={`stock-quantity-${index}`}
+          type="number"
+          placeholder="Enter stock quantity"
+          value={variant.stockQuantity}
+          onChange={(e) =>
+            setVariants(
+              variants.map((v, i) =>
+                i === index ? { ...v, stockQuantity: e.target.value } : v
+              )
+            )
+          }
+          className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-2 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          aria-label="Stock Quantity"
+        />
+      </div>
+
+      <button
+        type="button"
+        onClick={() => handleRemoveVariant(index)}
+        className="col-span-1 md:col-span-3 text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 mt-2"
+      >
+        Remove Variant
+      </button>
+    </div>
+  ))}
+
+  <button
+    type="button"
+    onClick={handleAddVariant}
+    className="text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mt-4"
+  >
+    + Add Variant
+  </button>
+</div>
+
+
               <button
                 type="submit"
                 className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"

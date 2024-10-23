@@ -27,8 +27,10 @@ export class SubCategoryController {
   // Get all categories (HTTP GET)
   async getAllCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const products = await this.categoryInteractor.getAllCategories();
-      res.status(200).json(products);
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const categories = await this.categoryInteractor.getAllCategories(page,limit);
+      res.status(200).json(categories);
     } catch (error) {
       next(error);
     }
@@ -37,7 +39,9 @@ export class SubCategoryController {
   async getListedCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { Id } = req.params;
-  
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      
       // Check if mainCategoryId is provided, and convert it to ObjectId
       if (!Id) {
          res.status(400).json({ message: "mainCategoryId is required" });
@@ -45,7 +49,7 @@ export class SubCategoryController {
   
       const categoryId = new mongoose.Types.ObjectId(Id as string);
   
-      const products = await this.categoryInteractor.getListedCategories(categoryId);
+      const products = await this.categoryInteractor.getListedCategories(categoryId,page,limit);
       res.status(200).json(products);
     } catch (error) {
       next(error);

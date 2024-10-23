@@ -3,6 +3,8 @@ import { responseHandler } from "../../types/commonTypes";
 import ICategoryRepo from "../../interface/categoryInterface/IcategoryRepo"; // Import your category repository interface
 import {categoryCreationDTo,categoryDTo} from '../../domain/dtos/CategoryDTO'
 import mongoose from "mongoose";
+import { LargeDataFetch } from '../../types/commonTypes';
+
 
 
 export class CategoryInteractor implements IsubCategoryInteractory {
@@ -28,9 +30,10 @@ export class CategoryInteractor implements IsubCategoryInteractory {
   }
 
   // Get all categories
-  async getAllCategories(): Promise<categoryDTo[]> {
-    const categories = await this.categoryRepo.getAllCategories(); // Use repository method
-    return categories.map(this.mapToDTO);
+  async getAllCategories(page:number,limit:number): Promise<LargeDataFetch> {
+    const categoriesResponse = await this.categoryRepo.getAllCategories(page,limit); // Use repository method
+     const categories=categoriesResponse.data.map(this.mapToDTO);
+    return {data:categories,totalPages:categoriesResponse.totalPages}
   }
 
   // Get all listed categories

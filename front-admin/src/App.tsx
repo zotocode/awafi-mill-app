@@ -13,6 +13,7 @@ import Banner from "./pages/BannerManagement";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import DefaultLayout from "./layouts/DefaultLayout";
+import BulkProducAddingPage from "./pages/BulkProducAddingPage";
 
 function App() {
   return (
@@ -32,10 +33,15 @@ function App() {
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
             <Route element={<DefaultLayout />}>
+
               <Route path="/dashboard" element={<DashboardPage />} />
+
               <Route path="/users" element={<UserManagementPage />} />
+
               <Route path="/products" element={<ProductManagementPage />} />
               <Route path="/update-product/:id" element={<UpdateProductPage />} />
+              <Route path="/bulk-adding" element={<BulkProducAddingPage />} />
+
               <Route path="/categories/main" element={<MainCategoryManagementPage />} />
               <Route path="/categories/sub" element={<SubCategoryManagementPage />} />
               <Route path="/banner" element={<Banner />} />
