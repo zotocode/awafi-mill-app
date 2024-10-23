@@ -35,7 +35,7 @@ const Table: React.FC<TableProps> = ({ data, columns, actions }) => {
               {columns.map((column) => (
                 <td key={column.accessor} className="px-6 py-4">
                   {column.render
-                    ? column.render(row) 
+                    ? column.render(row) // Pass the entire row to the render function
                     : row[column.accessor]} 
                 </td>
               ))}

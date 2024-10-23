@@ -16,5 +16,11 @@ const bannerRoutes = express.Router();
 
 // Define routes
 bannerRoutes.post("/offerBanner",upload.single('image'),bannerController.addOfferBanner.bind(bannerController))
+bannerRoutes.get("/allBanners",bannerController.allBanners.bind(bannerController))
+bannerRoutes.post("/unlistBanner",bannerController.unlistBanner.bind(bannerController))
+bannerRoutes.get("/viewWelcomeBanner",bannerController.welcomeBanners.bind(bannerController))
+bannerRoutes.get("/viewOfferBanner",bannerController.offerBanners.bind(bannerController))
+bannerRoutes.get("/viewCollectionBanner",bannerController.collectionBanners.bind(bannerController))
+
 
 export default bannerRoutes;
