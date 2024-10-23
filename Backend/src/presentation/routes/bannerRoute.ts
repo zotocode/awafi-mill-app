@@ -2,7 +2,7 @@
 import express from "express";
 import { BannerController } from "../controllers/bannerController"; 
 import { BannerInteractor } from "../../application/interactor/bannerInteractor";
-import { upload } from "../../config/multerConfig";
+import { uploadImages } from "../../config/multerConfig";
 import CloudinaryService from "../../application/services/cloudinary";
 
 
@@ -15,7 +15,7 @@ const bannerController = new BannerController(bannerInteractor)
 const bannerRoutes = express.Router();
 
 // Define routes
-bannerRoutes.post("/offerBanner",upload.single('image'),bannerController.addOfferBanner.bind(bannerController))
+bannerRoutes.post("/offerBanner",uploadImages.single('image'),bannerController.addOfferBanner.bind(bannerController))
 bannerRoutes.get("/allBanners",bannerController.allBanners.bind(bannerController))
 bannerRoutes.post("/unlistBanner",bannerController.unlistBanner.bind(bannerController))
 bannerRoutes.get("/viewWelcomeBanner",bannerController.welcomeBanners.bind(bannerController))
