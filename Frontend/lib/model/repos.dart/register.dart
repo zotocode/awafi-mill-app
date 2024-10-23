@@ -41,7 +41,7 @@ Future<void> registerUser(
         phoneNumber: phoneNumberController.text,
         password: passwordController.text));
   } else {
-    Get.snackbar('Error', 'User already exists with this name',
+    Get.snackbar('Error', 'User Crdential not added!',
         backgroundColor: Colors.red);
   }
 }

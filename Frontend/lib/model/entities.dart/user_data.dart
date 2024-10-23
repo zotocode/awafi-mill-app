@@ -5,7 +5,7 @@ part 'user_data.g.dart';
 @HiveType(typeId: 0)
 class UserData extends HiveObject {
   @HiveField(0)
-  final String name;
+  final String? name;
 
   @HiveField(1)
   final String phoneNumber;
@@ -14,13 +14,13 @@ class UserData extends HiveObject {
   final String email;
 
   @HiveField(3)
-  final String password;
+  final String? password;
 
   UserData({
-    required this.name,
+    this.name,
     required this.phoneNumber,
     required this.email,
-    required this.password,
+    this.password,
   });
 
   Map<String, dynamic> toJson() {

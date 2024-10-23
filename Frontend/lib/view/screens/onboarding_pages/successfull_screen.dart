@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frondend/common/assigns.dart';
+import 'package:frondend/model/repos.dart/loading.dart';
 import 'package:frondend/view/components/widgets/auth_button.dart';
 import 'package:frondend/view/screens/onboarding_pages/sucess.dart';
 import 'package:get/get.dart';
@@ -45,6 +46,7 @@ class SuccessfullScreen extends StatelessWidget {
             child: AuthenticateSaveButton(
               buttonText: 'START SHOPPING',
               onpressed: () {
+                handleLoading(context);
                 Get.to(() => SucessLastScreen());
               },
             ),

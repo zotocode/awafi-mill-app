@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frondend/common/assigns.dart';
+import 'package:frondend/model/repos.dart/loading.dart';
 import 'package:frondend/model/repos.dart/otp_verify.dart';
 import 'package:frondend/view/components/widgets/auth_button.dart';
 import 'package:frondend/view/components/widgets/back_arrow.dart';
@@ -85,6 +86,7 @@ class VerificationScreen extends StatelessWidget {
                             colorText: Colors.white,
                           );
                         }
+                        handleLoading(context);
                       },
                     ),
                     SizedBox(height: 10),

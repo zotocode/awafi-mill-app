@@ -57,7 +57,7 @@ class _AnimationExampleState extends State<AnimationExample>
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        Future.delayed(Duration(milliseconds: 600), () {
+        Future.delayed(Duration(seconds: 1), () {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => BottomScreen()),
           );
@@ -146,7 +146,7 @@ class _AnimationExampleState extends State<AnimationExample>
                         child: AnimatedTextKit(
                           animatedTexts: [
                             TypewriterAnimatedText(
-                              'AWAFI MILLL',
+                              'AWAFI MILL',
                               textStyle: GoogleFonts.sixtyfour(
                                   letterSpacing: 1, fontSize: 24),
                               speed: const Duration(

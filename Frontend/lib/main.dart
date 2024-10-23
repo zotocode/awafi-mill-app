@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frondend/model/entities.dart/user_data.dart';
 import 'package:frondend/view/screens/onboarding_pages/splash_screen.dart';
 import 'package:frondend/view_model/provider.dart/bottom_bar.dart';
+import 'package:frondend/view_model/provider.dart/category.dart';
 import 'package:frondend/view_model/provider.dart/field_provider.dart';
 import 'package:frondend/view_model/provider.dart/loading.dart';
 import 'package:frondend/view_model/provider.dart/quantity.dart';
@@ -21,6 +22,7 @@ void main() async {
       ChangeNotifierProvider(create: (_) => FieldProvider()),
       ChangeNotifierProvider(create: (_) => ProductQuantity()),
       ChangeNotifierProvider(create: (_) => LoadingProvider()),
+      ChangeNotifierProvider(create: (_) => CategoryProvider()),
     ],
     child: AwafiMill(),
   ));

@@ -9,9 +9,11 @@ import 'package:frondend/view/screens/internal_pages/collections.dart';
 import 'package:frondend/view/screens/internal_pages/home_search.dart';
 import 'package:frondend/view/screens/internal_pages/notifications.dart';
 import 'package:frondend/view/screens/onboarding_pages/login.dart';
+import 'package:frondend/view_model/provider.dart/category.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconly/iconly.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,6 +23,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<CategoryProvider>(context, listen: false).fetchCategories();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -119,70 +129,72 @@ class _HomeScreenState extends State<HomeScreen> {
                       letterSpacing: 1),
                 ),
                 SizedBox(height: 20),
-                SizedBox(
-                  height: 250,
-                  child: GridView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: Assigns.categories.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8),
-                      itemBuilder: (context, index) {
-                        var data = Assigns.categories[index];
-                        return InkWell(
-                          onTap: () {
-                            Get.to(() => TopCategoriesScreen(
-                                  appBarText: data['text'],
-                                ));
-                          },
-                          child: Container(
-                            height: 40,
-                            width: 40,
-                            decoration: BoxDecoration(
-                                border: Border.all(width: 2),
-                                borderRadius: BorderRadius.circular(20)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Image.asset(
-                                    data['image'],
+                Consumer<CategoryProvider>(
+                  builder: (context, categoryProvider, child) {
+                    if (categoryProvider.isLoading) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    if (categoryProvider.categories.isEmpty) {
+                      return Center(
+                        child: Text('No categories found.'),
+                      );
+                    }
+                    return SizedBox(
+                      height: 250,
+                      child: GridView.builder(
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: categoryProvider.categories.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 8,
+                                  mainAxisSpacing: 8),
+                          itemBuilder: (context, index) {
+                            var data = categoryProvider.categories[index];
+                            return InkWell(
+                              onTap: () {
+                                Get.to(() => TopCategoriesScreen(
+                                      appBarText: data.name,
+                                    ));
+                              },
+                              child: Container(
+                                height: 40,
+                                width: 40,
+                                decoration: BoxDecoration(
+                                    border: Border.all(width: 2),
+                                    borderRadius: BorderRadius.circular(20)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      // Image.asset(
+                                      //   data['image'],
+                                      // ),
+                                      SizedBox(height: 10),
+                                      Flexible(
+                                        child: Text(
+                                          data.name,
+                                          style: GoogleFonts.mulish(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      )
+                                    ],
                                   ),
-                                  SizedBox(height: 10),
-                                  Flexible(
-                                    child: Text(
-                                      data['text'],
-                                      style: GoogleFonts.mulish(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  )
-                                ],
+                                ),
                               ),
-                            ),
-                          ),
-                        );
-                      }),
+                            );
+                          }),
+                    );
+                  },
                 ),
                 SizedBox(height: 20),
                 OfferCarousalWidget(
                     height: 140, image: 'assets/images/offer.png'),
-                // Card(
-                //   elevation: 0,
-                //   child: Container(
-                //     width: double.infinity,
-                //     height: 140,
-                //     decoration: BoxDecoration(
-                //         color: Style.themeColor,
-                //         borderRadius: BorderRadius.circular(25),
-                //         image: DecorationImage(
-                //             image: AssetImage('assets/images/offer.png'),
-                //             fit: BoxFit.cover)),
-                //   ),
-                // ),
                 SizedBox(height: 20),
                 OfferCarousalWidget(
                   image: 'assets/images/Rectangle 34.png',
