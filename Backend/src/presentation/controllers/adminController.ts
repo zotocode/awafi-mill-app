@@ -10,7 +10,6 @@ export class AdminController {
   }
 
   async adminLogin(req: Request, res: Response, next: NextFunction) {
-    console.log("admin login","adfasdfasdfsadfasd")
     const result = await this.adminInteractor.logIn(req.body)
     if (result.success) {
         return res
