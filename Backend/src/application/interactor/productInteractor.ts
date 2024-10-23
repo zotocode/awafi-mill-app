@@ -1,100 +1,150 @@
 import { ProductCreationDTO, ProductDTO } from "../../domain/dtos/ProductDTO";
-import { ProductRepository } from "../../infrastructure/repositories/productRepository";
 import IProductInteractor from "../../interface/productInterface/IproductInteractor";
-import { Product } from "../../domain/entities/productSchema";
-import { error } from "console";
-import IDHandler from "../services/hashIdServices";
-
-
+import Product from "../../domain/entities/productSchema";
+import { responseHandler } from '../../types/commonTypes'; // Corrected spelling
+import { ICloudinaryService } from "../../interface/serviceInterface/IcloudinaryInterface";
+import { IproductRepo } from "../../interface/productInterface/IproductRepo";
+import mongoose from "mongoose";
+import { IExcel } from "../../interface/serviceInterface/IexcelInterface";
+import {ProductResponseDTO} from "../../types/productTypes"
 
 export class ProductInteractor implements IProductInteractor {
-  private productRepo: ProductRepository;
-  private hashIdHandler:IDHandler
+  private productRepo: IproductRepo;
+  private cloudinaryService: ICloudinaryService;
+  private excelService:IExcel
 
-  constructor(productRepo: ProductRepository, hashIdHandler:IDHandler) {
+  constructor(productRepo: IproductRepo, cloudinaryService: ICloudinaryService,excelService:IExcel) {
     this.productRepo = productRepo;
-    this.hashIdHandler=hashIdHandler;
+    this.cloudinaryService = cloudinaryService;
+    this.excelService=excelService
   }
 
   // Adding a new product
-  async addProduct(productData: ProductCreationDTO): Promise<ProductDTO> {
-    
-    if (productData.price <= 0) {
-      throw  error('Price must be greater than zero');
+  async addProduct(productData: ProductCreationDTO): Promise<ProductDTO | responseHandler> {
+    const uploadedImages = await Promise.all(
+      productData.images.map(async (path) => {
+        const uploadResult = await this.cloudinaryService.uploadProductImage(path);
+        return uploadResult.secure_url; // Return the Cloudinary URL
+      })
+    );
+
+    productData.images = uploadedImages;
+
+    const { name } = productData;
+    const isAvailable = await this.productRepo.findByName(name);
+    if (isAvailable) {
+      return { message: "Product is already in your bucket", status: 409 };
     }
 
-    const createdProduct = await this.productRepo.create(productData);
+    const createdProduct = await this.productRepo.addProduct(productData);
     return this.mapEntityToDto(createdProduct);
   }
 
+  async addBulkProduct(productData: any): Promise<any> {
+    try {
+      const sheetData = await this.excelService.processExcel(productData.path); // Await the result of the promise
+  
+      if (sheetData && Array.isArray(sheetData)) {
+        // Use map if sheetData is an array
+        const addBulkProducts = sheetData.map((element) => {
+          return this.productRepo.addBulkProduct(element);
+        });
+  
+        // If you need to wait for all products to be added before proceeding
+        await Promise.allSettled(addBulkProducts);
+  
+        return { message: 'Bulk products added successfully' };
+      } else {
+        return { message: 'Invalid sheet data format' };
+      }
+    } catch (error) {
+      console.error('Error processing bulk products:', error);
+      throw new Error('Failed to add bulk products');
+    }
+  }
+  
+  async updateImage(id: mongoose.Types.ObjectId, index: number, path: string): Promise<boolean | string> {
+    const uploadResult = await this.cloudinaryService.uploadProductImage(path);
+    const updatedProduct = await this.productRepo.updateImage(id, index, uploadResult.secure_url);
+    return updatedProduct.modifiedCount > 0 ? uploadResult.secure_url : false;
+  }
+
   // Retrieve all products
-  async getAllProducts(): Promise<ProductDTO[]> {
-    const products = await this.productRepo.findAll();
-    return products.map((p) => this.mapEntityToDto(p as any));
+  async getAllProducts(page:number,limit:number): Promise<ProductResponseDTO> {
+    const ProductResponse = await this.productRepo.findAllProducts(page,limit);
+         const products=ProductResponse.products.map((p) => this.mapEntityToDto(p));
+         return  {products:products,totalPages:ProductResponse.totalPages}
+  }
+
+  // Retrieve all listed products
+  async getAllListedProducts(page:number,limit:number): Promise<ProductResponseDTO> {
+    const ProductResponse = await this.productRepo.findListedAllProducts(page,limit);
+    const products= ProductResponse.products.map((p) => this.mapEntityToDto(p));
+      return  {products:products,totalPages:ProductResponse.totalPages}
+  }
+
+  // Filter by category
+  async fetchByCategory(mainCategoryId: mongoose.Types.ObjectId | null, subCategoryId: mongoose.Types.ObjectId | null): Promise<ProductDTO[] | null> {
+    const products = await this.productRepo.fetchByCategory(mainCategoryId, subCategoryId);
+    return products ? products.map((p) => this.mapEntityToDto(p as any)) : null;
   }
 
   // Retrieve a product by ID
-  async getProductById(id: string): Promise<ProductDTO | null> {
-    const productId=this.hashIdHandler.dehashID(id)
-   console.log("id",productId)
-    const product = await this.productRepo.pFindById(productId);
+  async getProductById(id: mongoose.Types.ObjectId): Promise<ProductDTO | null> {
+    const product = await this.productRepo.productFindById(id);
     return product ? this.mapEntityToDto(product) : null;
   }
 
   // Update a product by ID
-  // async updateProduct(id: string, data: Partial<ProductDTO>): Promise<ProductDTO | null> {
-  //   const productUpdateData = this.mapDtoToEntity(data as ProductDTO);
-  //   const updatedProduct = await this.productRepo.update(id, productUpdateData);
-  //   return updatedProduct ? this.mapEntityToDto(updatedProduct) : null;
-  // }
+  async updateProduct(id: mongoose.Types.ObjectId, data: Partial<ProductCreationDTO>): Promise<ProductDTO | null | responseHandler> {
+    if (data?.name) {
+      const isAvailable = await this.productRepo.findByNameAndNotCurrentId(id, data.name);
+      if (isAvailable) {
+        return { message: "Product name is already in your bucket", status: 409 };
+      }
+    }
+ 
+
+    const updatedProduct = await this.productRepo.updateProduct(id, data);
+    return updatedProduct ? this.mapEntityToDto(updatedProduct) : null;
+  }
+
+  // List and unlist product
+  async listById(id: mongoose.Types.ObjectId): Promise<responseHandler | null> {
+    const isListed = await this.productRepo.isListedProduct(id);
+    if (isListed) {
+      throw new Error("Product is already listed");
+    }
+    const listProduct = await this.productRepo.updateListing(id, { isListed: true });
+    return listProduct.modifiedCount > 0 ? { message: "Product listed" } : null;
+  }
+
+  async unListById(id: mongoose.Types.ObjectId): Promise<responseHandler | null> {
+    const isListed = await this.productRepo.isListedProduct(id);
+    if (!isListed) {
+      throw new Error("Product is already unlisted");
+    }
+    const unlistProduct = await this.productRepo.updateListing(id, { isListed: false });
+    return unlistProduct.modifiedCount > 0 ? { message: "Product is unlisted" } : null;
+  }
 
   // Delete a product by ID
-  // async deleteProduct(id: string): Promise<boolean> {
-  //   const deletedProduct = await this.productRepo.delete(id);
-  //   return !!deletedProduct;
-  // }
-
-  private mapDtoToEntity(productData: ProductDTO): Product {
-    if (!productData.name || !productData.description || !productData.price) {
-      throw error('Required fields are missing in ProductDTO');
-    }
-  
-    const stockStatus = {
-      quantity: productData.stockStatus.quantity,
-      status: productData.stockStatus.status,
-    };
-  
-    return {
-      name: productData.name,
-      description: productData.description,
-      price: productData.price,
-      originalPrice: productData.originalPrice,
-      weight: productData.weight,
-      stockStatus: stockStatus,
-      categories: productData.categories,
-      images: productData.images,
-      variants: productData.variants,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } as Product;
+  async deleteProduct(id: mongoose.Types.ObjectId): Promise<boolean> {
+    const deletedProduct = await this.productRepo.deleteProduct(id);
+    return !!deletedProduct;
   }
-  
 
   // Mapping Product entity to DTO
   private mapEntityToDto(product: Product): ProductDTO {
-    const hashedId = this.hashIdHandler.hashID(product._id);
     return {
-      _id: hashedId, // Use the hashed ID here
+      _id: product._id, // Use the hashed ID here
       name: product.name,
-      description: product.description,
-      price: product.price,
-      originalPrice: product.originalPrice,
-      weight: product.weight,
-      stockStatus: product.stockStatus,
-      categories: product.categories,
+      descriptions: product.descriptions,
+      category: product.category,
+      subCategory: product.subCategory,
       images: product.images,
       variants: product.variants,
+      isListed: product.isListed,
     };
   }
-  
 }

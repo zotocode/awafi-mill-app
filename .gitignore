@@ -52,3 +52,12 @@ app.*.map.json
 # Backend
 node_modules/
 dist/
+Backend/.env
+# Environment Files
+.env
+*.env
+**/.env
+
+dist/
+
+uploads/

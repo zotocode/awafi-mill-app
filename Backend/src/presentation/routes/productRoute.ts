@@ -4,24 +4,41 @@ import { ProductRepository } from "../../infrastructure/repositories/productRepo
 import { ProductController } from "../controllers/productController";
 import { ProductInteractor } from "../../application/interactor/productInteractor";
 import { ProductModel } from "../../infrastructure/model/producModel";
-import { upload } from "../../config/multerConfig";
-import IDHandler from "../../application/services/hashIdServices";
+import { uploadImages,uploadExcel } from "../../config/multerConfig";
+import { validateProductInput } from "../middleware/produtValidation";
+import CloudinaryService from "../../application/services/cloudinaryService";
+import { ExcelService } from "../../application/services/excelService";
 
 
 
-// Set up dependencies
-const hashIdHandler= new IDHandler()
+
+
 const productRepo = new ProductRepository(ProductModel);
-const productInteractor = new ProductInteractor(productRepo,hashIdHandler);
+const cloudinaryService=new CloudinaryService()
+const excelService=new ExcelService()
+const productInteractor = new ProductInteractor(productRepo,cloudinaryService,excelService);
 const productController = new ProductController(productInteractor);
 
 const productRoutes = express.Router();
 
+// fuctional routes-----------
+productRoutes.get("/product/filter", productController.FilterProducts.bind(productController));
 // Define routes
-productRoutes.post("/",upload.array('images', 5),productController.addProduct.bind(productController));
-productRoutes.get("/", productController.getAllProducts.bind(productController));
-productRoutes.get("/:id", productController.getProductById.bind(productController));
-// productRoutes.put("/products/:id", productController.updateProduct.bind(productController));
-// productRoutes.delete("/products/:id", productController.deleteProduct.bind(productController));
+productRoutes.post("/product",uploadImages.array('images', 5),productController.addProduct.bind(productController));
+productRoutes.post("/product/bulk",uploadExcel.single('file'),productController.bulkAdding.bind(productController));
+productRoutes.patch("/product/update-img",uploadImages.single('image'),productController.updateImage.bind(productController));
+productRoutes.get("/product", productController.getAllProducts.bind(productController));
+productRoutes.get("/product/listed", productController.getAllListedProducts.bind(productController));
+productRoutes.get("/product/:id", productController.getProductById.bind(productController));
+productRoutes.put("/product/:id", productController.updateProduct.bind(productController));
+productRoutes.patch("/product/:id", productController.toggleListStatus.bind(productController));
+productRoutes.patch("/product/delete/:id", productController.deleteProduct.bind(productController));
+
+
+
+
+
+
+
 
 export default productRoutes;

@@ -1,36 +1,29 @@
-import { Document } from "mongoose";
+import mongoose, { Document } from 'mongoose';
 
-// Define interfaces for nested types
-interface Image {
-  url: string;
-  altText?: string;
+interface Description {
+  header: string;
+  content: string;
 }
 
 interface Variant {
-  size: string;
-  price: number;
+  weight: string;
+  inPrice: number;
+  outPrice: number;
   stockQuantity: number;
 }
 
-interface StockStatus {
-  quantity: number;
-  status: 'In Stock' | 'Out of Stock';
-}
-
-
-// Define the Product interface that extends Document
-export interface Product extends Document {
-  _id:string
+export default interface Product extends Document {
+  ID?: string;
+  sku?: string;
+  ean?: string;
   name: string;
-  description: string;
-  price: number;
-  originalPrice?: number; // Optional
-  weight: string;
-  stockStatus: StockStatus;
-  categories?: string[]; // Optional
-  images?: string[]; // Optional
-  variants?: Variant[]; // Optional
-  createdAt?: Date; // Automatically handled by mongoose
-  updatedAt?: Date; // Automatically handled by mongoose
+  descriptions: Description[];
+  isListed: boolean;
+  isDelete: boolean;
+  category: mongoose.Types.ObjectId | null;
+  subCategory: mongoose.Types.ObjectId | null;
+  images: string[];
+  variants: Variant[];
+  createdAt?: Date;
+  updatedAt?: Date;
 }
-Document

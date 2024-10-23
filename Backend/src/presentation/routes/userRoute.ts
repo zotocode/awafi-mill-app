@@ -4,7 +4,8 @@ import { UserController } from "../controllers/userController";
 import { UserInteractor } from "../../application/interactor/userInteractor";
 import { UserRepo } from "../../infrastructure/repositories/userRepo";
 import { HashPassword } from "../../application/services/bcryptService";
-import { validateUserInput } from "../middleware/validationMiddleware";
+import { validateUserInput } from "../middleware/userValidation";
+import { verifyToken } from "../middleware/userAuthMiddleware";
 import { JWT } from "../../application/services/jwtService";
 import EmailService from "../../application/services/emailService";
 
@@ -19,9 +20,12 @@ const userController = new UserController(userInteractor);
 
 
 // Routes
-userRoute.post('/', validateUserInput, userController.userLogin.bind(userController));
+userRoute.post('/',userController.userLogin.bind(userController));
 userRoute.post('/register', validateUserInput, userController.userRegister.bind(userController));
 userRoute.post('/otpVerify', userController.otpVerify.bind(userController));
-userRoute.patch('/profile', userController.editProfile.bind(userController));
+userRoute.get('/profile',verifyToken,userController.userProfile.bind(userController))
+userRoute.patch('/edit',verifyToken, userController.editProfile.bind(userController));
+userRoute.patch('/change-password',verifyToken, userController.changePassword.bind(userController));
+
 
 export default userRoute;

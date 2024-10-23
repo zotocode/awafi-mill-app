@@ -1,31 +1,42 @@
-import mongoose  from "mongoose";
-import { Schema,Document } from "mongoose";
-import { Model } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
-export interface IuserDocument extends Document{
-    email: string;
-    userName: string;
-    password: string;
+// Define the user document interface
+export interface IuserDocument extends Document {
+  _id: string;  // We can cast the ObjectId to a string later
+  name: string;
+  email: string;
+  phone:number;
+  isBlocked:boolean;
+  password: string;
 }
 
-
-
-const userSchema:Schema = new Schema<IuserDocument>(
-    {
-        email: {
-            type: String,
-            required: true,
-            unique: true
-        },
-        userName: {
-            type: String,
-            required: true
-        },
-        password: {
-            type: String,
-            default: null
-        }
+// Define the user schema
+const userSchema: Schema<IuserDocument> = new Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
     },
-    { timestamps: true })
+    name: { 
+      type: String,
+      required: true,
+    },
+    phone:{
+        type: Number,
+        required: false,
+    },
+    isBlocked: {
+      type: Boolean,
+      default: false, 
+    },
 
-export  const userModel:Model<IuserDocument> =mongoose.model<IuserDocument>("users1",userSchema)
+    password: {
+      type: String,
+      default: null,
+    }
+  },
+
+);
+
+export  const userModel:Model<IuserDocument> =mongoose.model<IuserDocument>("user",userSchema)
