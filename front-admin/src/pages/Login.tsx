@@ -10,8 +10,7 @@ const LoginPage = () => {
       };
 
   return (
-    <>
-      <Navbar showLogoutButton={false} />
+    <>   
       <LoginContainer onLogin={handleLogin} />
     </>
   );

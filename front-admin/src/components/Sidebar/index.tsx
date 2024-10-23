@@ -8,7 +8,8 @@ import {
   faBoxOpen,
   faLayerGroup,    // New: for main Categories
   faFolderTree,    // New: for Category section
-  faTree       // New: for Sub Categories
+  faTree ,      // New: for Sub Categories
+  faCertificate,
 } from '@fortawesome/free-solid-svg-icons';
 
 interface SidebarProps {
@@ -221,6 +222,18 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   );
                 }}
               </SidebarLinkGroup>
+
+              <li>
+                <NavLink
+                  to="/banner"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                    pathname.includes('banner') && 'bg-graydark dark:bg-meta-4'
+                  }`}
+                >
+                  <FontAwesomeIcon icon={faCertificate} />
+                  Banners
+                </NavLink>
+              </li>
             </ul>
           </div>
         </nav>

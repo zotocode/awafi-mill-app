@@ -15,6 +15,8 @@ const adminController = new AdminController(adminInteractor)
 const adminRoute = express.Router();
 adminRoute.post('/login',adminController.adminLogin.bind(adminController))
 adminRoute.get('/allUser',adminController.allUsers.bind(adminController))
+adminRoute.post('/blockUser',adminController.blockUser.bind(adminController))
+adminRoute.post('/unblockUser',adminController.unblockUser.bind(adminController))
 
 
 

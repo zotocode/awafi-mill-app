@@ -2,8 +2,8 @@ import React from 'react';
 
 interface TableColumn {
   header: string;
-  accessor: string;
-  render?: (value: any) => React.ReactNode;
+  accessor: string; // This should ideally be more descriptive, maybe "key" or "field" for clarity
+  render?: (row: { [key: string]: any }) => React.ReactNode; // Pass the entire row for rendering
 }
 
 interface TableProps {
@@ -35,8 +35,8 @@ const Table: React.FC<TableProps> = ({ data, columns, actions }) => {
               {columns.map((column) => (
                 <td key={column.accessor} className="px-6 py-4">
                   {column.render
-                    ? column.render(row[column.accessor])
-                    : row[column.accessor]}
+                    ? column.render(row) // Pass the entire row to the render function
+                    : row[column.accessor]} 
                 </td>
               ))}
               {actions && (

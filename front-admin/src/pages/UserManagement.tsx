@@ -2,24 +2,26 @@ import React, { useEffect, useState } from "react";
 import Table from "../components/Table";
 import userApi from "../api/userApi";
 import { toast } from "react-toastify";
-import { Pencil, Trash2 } from "lucide-react";
 
 interface User {
   id?: number;
   name?: string;
   email?: string;
   role?: string;
+  isBlocked?: boolean;
 }
 
 const UserManagementPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
-
+  
+  // Fetch users data when the component mounts
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  async function fetchUsers() {
+  // Function to fetch user data
+  const fetchUsers = async () => {
     setError(null);
     try {
       const response = await userApi.fetchAllUserData();
@@ -35,47 +37,53 @@ const UserManagementPage = () => {
       setError("Failed to fetch users");
       // toast.error(error.message || 'An unknown error occurred');
     }
-  }
+  };
 
   const userColumns = [
     { header: "Name", accessor: "name" },
     { header: "Email", accessor: "email" },
-    { header: "Status", accessor: "role" },
+    { header: "Phone No", accessor: "phone" },
+    {
+      header: "Status",
+      accessor: "isBlocked",
+      render: (row: User) => {
+        return row.isBlocked ? "Blocked" : "Active";
+      },
+    },
   ];
 
   const userActions = (row: User) => (
     <div className="flex space-x-2">
       <button
-        onClick={() => handleEdit(row)}
-        className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-opacity-80"
-        title="Edit"
+        onClick={() => handleBlockUnblock(row)}
+        className={`px-3 py-1 rounded-full ${
+          row.isBlocked ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
+        } hover:bg-opacity-80`}
       >
-        <Pencil size={16} />
-      </button>
-      <button
-        onClick={() => handleDelete(row)}
-        className="p-1 rounded-full bg-red-100 text-red-600 hover:bg-opacity-80"
-        title="Delete"
-      >
-        <Trash2 size={16} />
+        {row.isBlocked ? "Unblock" : "Block"}
       </button>
     </div>
   );
 
-  const handleEdit = (user: User) => {
-    // setSelectedUser(user);
-    // edit function is here
-    // Open your modal here
-  };
+  const handleBlockUnblock = async (user: User) => {
+    const action = user.isBlocked ? "unblock" : "block";
+    const confirmMessage = `Are you sure you want to ${action} ${user.name}?`;
 
-  const handleDelete = async (user: User) => {
-    if (window.confirm(`Are you sure you want to delete ${user.name}?`)) {
+    if (window.confirm(confirmMessage)) {
       try {
-        setUsers((prev) => prev.filter((u) => u.id !== user.id));
-        toast.success("User deleted successfully");
+        const response = user.isBlocked 
+          ? await userApi.unblockUser(user.email) 
+          : await userApi.blockUser(user.email);
+
+        if (response.status === 200) {
+          toast.success(`User ${action}ed successfully`);
+          fetchUsers(); // Re-fetch users after successful action
+        } else {
+          throw new Error(`Failed to ${action} user`);
+        }
       } catch (error) {
-        // toast.error(error.message || 'An unknown error occurred');
-        console.error("Error deleting user:", error);
+        console.error(`Error ${action}ing user:`, error);
+        toast.error(`Failed to ${action} user`);
       }
     }
   };
@@ -85,13 +93,6 @@ const UserManagementPage = () => {
       <div className="flex flex-col gap-10 w-full">
         <div className="flex w-full p-5 justify-between items-center">
           <h1 className="text-2xl font-semibold">User Management</h1>
-          <button
-            // onClick={() => setSelectedUser(null)}
-            type="button"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >
-            Add User
-          </button>
         </div>
         {error ? (
           <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">

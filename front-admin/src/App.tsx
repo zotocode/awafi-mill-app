@@ -9,6 +9,7 @@ import ProductManagementPage from "./pages/ProductManagement";
 import MainCategoryManagementPage from "./pages/CategoryManagement";
 import UpdateProductPage from "./pages/UpdateProductPage";
 import SubCategoryManagementPage from "./pages/SubCategoryManagementPage";
+import Banner from "./pages/BannerManagement";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import DefaultLayout from "./layouts/DefaultLayout";
@@ -43,6 +44,7 @@ function App() {
 
               <Route path="/categories/main" element={<MainCategoryManagementPage />} />
               <Route path="/categories/sub" element={<SubCategoryManagementPage />} />
+              <Route path="/banner" element={<Banner />} />
             </Route>
           </Route>
         </Routes>

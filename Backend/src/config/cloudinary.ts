@@ -6,4 +6,7 @@ export const cloudinaryConfig = cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+console.log('====================================');
+console.log("key fgvngjmyhjkyjky" ,process.env.CLOUDINARY_CLOUD_NAME);
+console.log('====================================');
 export const uploader = cloudinary.uploader;
