@@ -25,7 +25,7 @@ const MainCategoryManagementPage = () => {
     try {
       const response = await categoryapi.fetchAllCategories(currentPage, itemsPerPage);
       if (response.status === 200) {
-        console.log("categor re",response.data)
+        
         setCategories(response.data.data);
         setTotalPages(response.data.totalPages); // Update total pages
       }

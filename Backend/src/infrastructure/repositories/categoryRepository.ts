@@ -9,6 +9,7 @@ export class CategoryRepository extends BaseRepository<ICategory> implements ICa
   constructor(model: Model<ICategory>) {
     super(model);
   }
+  
 
   // Correct the DTO used in addCategory
   async addCategory(data: categoryCreationDTo): Promise<ICategory> {

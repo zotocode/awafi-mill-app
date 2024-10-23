@@ -1,11 +1,12 @@
 import { useApi } from './axiosConfig'
-import { creatingCategory } from '../types/categoryType';
 
 class CategoryApi{
     axiosInstance :any=useApi()
-    async addCategory(data:creatingCategory): Promise<any> {
+    async addCategory(data:FormData): Promise<any> {
         try {
-          return await this.axiosInstance.post('/api/categories/category',data);
+          return await this.axiosInstance.post('/api/categories/category',data,
+            {headers: { 'Content-Type': 'multipart/form-data' }}
+          );
         } catch (error: unknown) {
          
           return error;
@@ -35,10 +36,11 @@ class CategoryApi{
           return error;
         }
       }
-    async updateCategory(id:string,data:Partial<creatingCategory>): Promise<any> {
+    async updateCategory(id:string,data:FormData): Promise<any> {
         try {
-    
-          return await this.axiosInstance.put(`/api/categories/category/${id}`,data);
+          return await this.axiosInstance.put(`/api/categories/category/${id}`,data,
+            {headers: { 'Content-Type': 'multipart/form-data' }}
+          );
         } catch (error: unknown) {
          
           return error;

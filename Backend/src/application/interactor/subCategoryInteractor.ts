@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 
 export class SubCategoryInteractor implements IsubCategoryInteractor {
   private categoryRepo: IsubCategoryRepo; // Use the category repository
+  
 
   constructor(categoryRepo: IsubCategoryRepo) {
     this.categoryRepo = categoryRepo;

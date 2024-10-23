@@ -4,14 +4,18 @@ import ICategoryRepo from "../../interface/categoryInterface/IcategoryRepo"; // 
 import {categoryCreationDTo,categoryDTo} from '../../domain/dtos/CategoryDTO'
 import mongoose from "mongoose";
 import { LargeDataFetch } from '../../types/commonTypes';
+import ICategory from "../../domain/entities/categorySchema";
+import { ICloudinaryService } from "../../interface/serviceInterface/IcloudinaryInterface";
 
 
 
 export class CategoryInteractor implements IsubCategoryInteractory {
   private categoryRepo: ICategoryRepo; // Use the category repository
+  private cloudinaryService:ICloudinaryService
 
-  constructor(categoryRepo: ICategoryRepo) {
+  constructor(categoryRepo: ICategoryRepo,cloudinaryService: ICloudinaryService) {
     this.categoryRepo = categoryRepo;
+    this.cloudinaryService = cloudinaryService;
   }
 
   // Add a new category
@@ -22,6 +26,12 @@ export class CategoryInteractor implements IsubCategoryInteractory {
     if(isAvailable)
     {
       return { message: "Category always in your bucket", status: 409 };
+
+    }
+    if(data && data.photo)
+    {
+      const uploadImage=await this.cloudinaryService.uploadCategoryImage(data.photo)
+      data.photo=uploadImage.secure_url
 
     }
     const category = await this.categoryRepo.addCategory(data); // Use repository method
@@ -50,9 +60,10 @@ export class CategoryInteractor implements IsubCategoryInteractory {
 
   // Update a category
   async updateCategory(id: mongoose.Types.ObjectId, data: Partial<categoryCreationDTo>): Promise<categoryDTo | responseHandler | null> {
-    if(data.name)
+    const {name,photo}=data
+    if(name)
     {
-      const isAvailable=await this.categoryRepo.findByNameNotId(id,data.name)
+      const isAvailable=await this.categoryRepo.findByNameNotId(id,name)
       if(isAvailable)
       {
         return { message: "Category always in your bucket", status: 409 };
@@ -60,6 +71,12 @@ export class CategoryInteractor implements IsubCategoryInteractory {
       }
 
     }
+    if(photo)
+      {
+        const uploadImage=await this.cloudinaryService.uploadCategoryImage(photo)
+        data.photo=uploadImage.secure_url
+  
+      }
    
     const updatedCategory = await this.categoryRepo.updateCategory(id, data); // Use repository method
     return updatedCategory && !updatedCategory.isDeleted ? this.mapToDTO(updatedCategory) : null;
@@ -99,10 +116,11 @@ export class CategoryInteractor implements IsubCategoryInteractory {
   }
 
   // Map Category to ProductDTO
-  private mapToDTO(category: any): categoryDTo {
+  private mapToDTO(category: ICategory): categoryDTo {
     return {
-      _id: category._id.toString(),
+      _id: category._id,
       name: category.name,
+      photo:category.photo,
       description: category.description,
       isListed: category.isListed,
       isDeleted: category.isDeleted,

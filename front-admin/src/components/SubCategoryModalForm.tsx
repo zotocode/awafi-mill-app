@@ -7,7 +7,7 @@ interface CategoryModalFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (newCategory: any) => any;
-  category?: any; // category is optional because it's null when adding new categories
+  category?: any;
 }
 
 const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
@@ -19,30 +19,27 @@ const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [mainCategory, setMainCategory] = useState("");
-  const [mainCategories, setMainCategories] = useState<any[]>([]); // to store the fetched main categories
-  const [errors, setErrors] = useState({ name: "", description: "" });
+  const [mainCategories, setMainCategories] = useState<any[]>([]);
+  const [errors, setErrors] = useState({ name: "", description: "", mainCategory: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Prepopulate the form with selected category data (if editing)
   useEffect(() => {
     if (category) {
       setName(category.name || "");
       setDescription(category.description || "");
       setMainCategory(category.mainCategory || "");
     } else {
-      // Reset fields when adding a new category
       setName("");
       setDescription("");
       setMainCategory("");
     }
   }, [category]);
 
-  // Fetch
   useEffect(() => {
     const fetchMainCategories = async () => {
       try {
         const response = await CategoryApi.fetchAllListedCategories();
-        setMainCategories(response.data); // Assuming the response contains the list of categories
+        setMainCategories(response.data);
       } catch (error) {
         console.error("Error fetching main categories:", error);
       }
@@ -52,7 +49,7 @@ const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
 
   const validateForm = () => {
     let isValid = true;
-    const newErrors = { name: "", description: "" };
+    const newErrors = { name: "", description: "", mainCategory: "" };
 
     if (!name.trim()) {
       newErrors.name = "Category name is required";
@@ -61,6 +58,11 @@ const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
 
     if (!description.trim()) {
       newErrors.description = "Description is required";
+      isValid = false;
+    }
+
+    if (!mainCategory) {
+      newErrors.mainCategory = "Main category is required";
       isValid = false;
     }
 
@@ -77,14 +79,12 @@ const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
     try {
       let response;
       if (category) {
-        // Edit existing category
         response = await subcategoryapi.updateCategory(category._id, {
           name,
           description,
           mainCategory,
         });
       } else {
-        // Add new category
         response = await subcategoryapi.addCategory({
           name,
           description,
@@ -94,19 +94,13 @@ const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
 
       if (response.data) {
         onSuccess(response.data);
-        toast.success(
-          `Category ${category ? "updated" : "created"} successfully`
-        );
+        toast.success(`Category ${category ? "updated" : "created"} successfully`);
       }
 
-      onClose(); // Close the modal after successful operation
+      onClose();
     } catch (error) {
       console.error("Error submitting category:", error);
-      toast.error(
-        `Failed to ${
-          category ? "update" : "create"
-        } category. Please try again.`
-      );
+      toast.error(`Failed to ${category ? "update" : "create"} category. Please try again.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -155,7 +149,7 @@ const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
                 onChange={(e) => setName(e.target.value)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                 placeholder="Enter category name"
-                required
+                
               />
               {errors.name && (
                 <p className="mt-2 text-sm text-red-600 dark:text-red-500">
@@ -176,7 +170,7 @@ const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
                 onChange={(e) => setDescription(e.target.value)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                 placeholder="Enter category description"
-                required
+                
               />
               {errors.description && (
                 <p className="mt-2 text-sm text-red-600 dark:text-red-500">
@@ -197,7 +191,7 @@ const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
                 value={mainCategory}
                 onChange={(e) => setMainCategory(e.target.value)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                required
+                
               >
                 <option value="">Select a main category</option>
                 {mainCategories.map((cat) => (
@@ -206,6 +200,11 @@ const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
                   </option>
                 ))}
               </select>
+              {errors.mainCategory && (
+                <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+                  {errors.mainCategory}
+                </p>
+              )}
             </div>
 
             <button

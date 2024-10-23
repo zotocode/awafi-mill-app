@@ -14,12 +14,18 @@ export class CategoryController {
   async addCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const category: categoryCreationDTo = req.body;
+      const photo=req.file
+      
+      if(photo && typeof photo.path=="string")
+      {
+        category.photo=photo.path
+      }
       const result: any = await this.categoryInteractor.addCategory(category);
 
       if (result?.status) {
         res.status(result.status).json({ message: result.message });
       } else {
-        res.status(201).json(result);
+        res.status(200).json(result);
       }
     } catch (error) {
       next(error);
@@ -69,6 +75,13 @@ export class CategoryController {
     try {
       const categoryId = new mongoose.Types.ObjectId(req.params.id); // Convert string to ObjectId
       const updatedData: Partial<categoryCreationDTo> = req.body;
+      const photo=req.file
+      
+      if(photo && typeof photo.path=="string")
+      {
+        updatedData.photo=photo.path
+      }
+      
       const updatedCategory = await this.categoryInteractor.updateCategory(categoryId, updatedData);
 
       if (updatedCategory) {

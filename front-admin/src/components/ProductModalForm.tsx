@@ -12,7 +12,7 @@ interface ModalFormProps {
   onProductAdd: (newProduct: Product) => void;
 }
 
-const ProductModalForm: React.FC<ModalFormProps> = ({
+const AddProductModal: React.FC<ModalFormProps> = ({
   isOpen,
   onClose,
   onProductAdd,
@@ -21,15 +21,16 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
   const [descriptions, setDescriptions] = useState<Description[]>([
     { header: "", content: "" },
   ]);
-  const [isListed, setIsListed] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
   const [subCategories, setSubCategories] = useState<Category[]>([]);
   const [images, setImages] = useState<File[]>([]);
   const [subCategory, setSubCategory] = useState<Category | null>(null);
   const [variants, setVariants] = useState<Variant[]>([
-    { weight: "", inPrice: "",outPrice:"", stockQuantity: "" },
+    { weight: "", inPrice: "", outPrice: "", stockQuantity: "" },
   ]);
+  const [errors, setErrors] = useState<any>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     async function fetchCategories() {
@@ -45,36 +46,44 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
     }
     fetchCategories();
   }, []);
-
   useEffect(() => {
     async function fetchSubCategories() {
       if (category?._id) {
         try {
-          const response = await subcategoryapi.fetchAllListedCategories(category._id);
+          const response = await subcategoryapi.fetchAllListedCategories(
+            category._id
+          );
+
           if (response.status === 200) {
-            setSubCategories(response.data);
-            // Reset subcategory selection when main category changes
+            // Check if the response.data is an array
+            if (Array.isArray(response.data.data)) {
+              setSubCategories(response.data.data);
+            } else {
+              setSubCategories([]); // Set to empty array if not an array
+            }
             setSubCategory(null);
           }
         } catch (error) {
-          console.error("Error fetching subcategories:", error);
           toast.error("Failed to fetch subcategories");
+          setSubCategories([]); // Ensure to reset if there's an error
         }
       } else {
         setSubCategories([]);
         setSubCategory(null);
       }
     }
+
     fetchSubCategories();
   }, [category]);
 
   const resetForm = () => {
     setName("");
     setDescriptions([{ header: "", content: "" }]);
-    setIsListed(true);
     setCategory(null);
     setSubCategory(null);
-    setVariants([{ weight: "", inPrice: "",outPrice:"", stockQuantity: ""}]);
+    setVariants([{ weight: "", inPrice: "", outPrice: "", stockQuantity: "" }]);
+    setImages([]);
+    setErrors({});
   };
 
   const handleAddDescription = () => {
@@ -84,11 +93,19 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
   const handleRemoveDescription = (index: number) => {
     setDescriptions(descriptions.filter((_, i) => i !== index));
   };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files;
     if (selectedFiles) {
-      // Convert FileList to an array of File objects
-      setImages(Array.from(selectedFiles));
+      const validImages = Array.from(selectedFiles).filter(
+        (file) => file.type.startsWith("image/") && file.size <= 5 * 1024 * 1024
+      );
+
+      if (validImages.length !== selectedFiles.length) {
+        toast.error("Invalid file(s): Only images under 2MB are allowed.");
+      }
+
+      setImages(validImages);
     }
   };
 
@@ -103,17 +120,97 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
   };
 
   const handleAddVariant = () =>
-    setVariants([...variants, { weight: "", inPrice: "",outPrice:"", stockQuantity: "" }]);
+    setVariants([
+      ...variants,
+      { weight: "", inPrice: "", outPrice: "", stockQuantity: "" },
+    ]);
 
   const handleRemoveVariant = (index: number) =>
     setVariants(variants.filter((_, i) => i !== index));
 
+  const validateForm = () => {
+    const errors: any = {};
+
+    // Validate product name
+    if (!name.trim()) {
+      errors.name = "Product name is required.";
+    }
+
+    // Validate category selection
+    if (!category) {
+      errors.category = "Category is required.";
+    }
+
+    // Validate descriptions
+    if (descriptions.some((desc) => !desc.header || !desc.content)) {
+      errors.descriptions = "Each description must have a header and content.";
+    }
+
+    // Validate variants
+    const variantErrors = variants.map((variant, index) => {
+      const variantError: any = {};
+
+      // Check weight
+      if (
+        !variant.weight ||
+        isNaN(Number(variant.weight)) ||
+        Number(variant.weight) <= 0
+      ) {
+        variantError.weight = "Weight must be a positive number.";
+      }
+
+      // Check inPrice
+      if (
+        !variant.inPrice ||
+        isNaN(Number(variant.inPrice)) ||
+        Number(variant.inPrice) <= 0
+      ) {
+        variantError.inPrice = "In Price must be a positive number.";
+      }
+
+      // Check outPrice
+      if (
+        !variant.outPrice ||
+        isNaN(Number(variant.outPrice)) ||
+        Number(variant.outPrice) <= 0
+      ) {
+        variantError.outPrice = "Out Price must be a positive number.";
+      }
+
+      // Check stock quantity
+      if (
+        !variant.stockQuantity ||
+        isNaN(Number(variant.stockQuantity)) ||
+        Number(variant.stockQuantity) < 0
+      ) {
+        variantError.stockQuantity =
+          "Stock Quantity must be 0 or a positive number.";
+      }
+
+      return Object.keys(variantError).length ? variantError : null;
+    });
+
+    // Check for any variant errors
+    if (variantErrors.some((error) => error !== null)) {
+      errors.variants = variantErrors;
+    }
+
+    setErrors(errors);
+    return Object.keys(errors).length === 0; // Return true if no errors
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true); // Start submitting
+
+    if (!validateForm()) {
+      toast.error("Please correct the errors before submitting.");
+      setIsSubmitting(false); // Stop submitting
+      return;
+    }
 
     const formData = new FormData();
     formData.append("name", name);
-    formData.append("isListed", isListed.toString());
 
     if (category?._id) {
       formData.append("category", category._id);
@@ -130,22 +227,28 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
 
     variants.forEach((variant, index) => {
       formData.append(`variants[${index}][weight]`, variant.weight || "");
-      formData.append(`variants[${index}][inPrice]`, variant.inPrice.toString());
-      formData.append(`variants[${index}][outPrice]`, variant.inPrice.toString());
+      formData.append(
+        `variants[${index}][inPrice]`,
+        variant.inPrice.toString()
+      );
+      formData.append(
+        `variants[${index}][outPrice]`,
+        variant.outPrice.toString()
+      );
       formData.append(
         `variants[${index}][stockQuantity]`,
         variant.stockQuantity.toString()
       );
     });
-    images.forEach((image, index) => {
-      formData.append(`images`, image);
+
+    images.forEach((image) => {
+      formData.append("images", image);
     });
-  
 
     try {
       const addProduct = await productapi.addProduct(formData);
 
-      if (addProduct.status === 200) {
+      if (addProduct.status == 200) {
         onProductAdd(addProduct.data.product);
         toast.success("Product added successfully");
         resetForm();
@@ -154,6 +257,8 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
     } catch (error) {
       toast.error("Failed to add product");
       console.error("Product save error:", error);
+    } finally {
+      setIsSubmitting(false); // Stop submitting in both success and error cases
     }
   };
 
@@ -176,286 +281,331 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black bg-opacity-50">
-      <div className="relative p-4 w-full max-w-4xl max-h-full">
+    <div className="fixed inset-0 z-9999 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black bg-opacity-50">
+      <div className="relative p-4 w-full max-w-6xl max-h-full">
         <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
           <div className="flex items-center justify-between p-5 border-b rounded-t dark:border-gray-600">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Add Product
+              Add New Product
             </h3>
             <button
               type="button"
+              className="text-gray-400 hover:bg-gray-200 rounded-lg p-1.5 ml-auto inline-flex items-center justify-center"
               onClick={onClose}
-              className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
             >
               <svg
+                aria-hidden="true"
                 className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+                fill="currentColor"
+                viewBox="0 0 16 16"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
+                  fillRule="evenodd"
+                  d="M1.5 1.5a.5.5 0 0 1 .707 0L8 7.293l5.793-5.793a.5.5 0 0 1 .707.707L8.707 8l5.793 5.793a.5.5 0 0 1-.707.707L8 8.707l-5.793 5.793a.5.5 0 0 1-.707-.707L7.293 8 1.5 2.207a.5.5 0 0 1 0-.707z"
                 />
               </svg>
+              <span className="sr-only">Close modal</span>
             </button>
           </div>
-
-          <div className="p-6 space-y-6 overflow-y-auto max-h-[70vh]">
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div className="flex flex-col">
-                <label
-                  htmlFor="productName"
-                  className="text-sm font-medium text-gray-900 dark:text-white mb-1"
-                >
-                  Product Name
-                </label>
-                <input
-                  id="productName"
-                  type="text"
-                  placeholder="Product Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                  required
-                />
-              </div>
-
-              <div className="flex flex-col">
-                <label className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                  Descriptions
-                </label>
-                {descriptions.map((desc, index) => (
-                  <div
-                    key={index}
-                    className="mb-2 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg"
-                  >
+          <div className="p-6 space-y-6">
+            <form onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 gap-4">
+                <div className="flex flex-row space-x-4">
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Product Name
+                    </label>
                     <input
                       type="text"
-                      placeholder="Header"
-                      value={desc.header}
-                      onChange={(e) =>
-                        handleDescriptionChange(index, "header", e.target.value)
-                      }
-                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mb-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                      className={`mt-1 block w-full border ${
+                        errors.name ? "border-red-500" : "border-gray-300"
+                      } rounded-md shadow-sm p-2`}
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
                     />
-                    <textarea
-                      placeholder="Content"
-                      value={desc.content}
-                      onChange={(e) =>
-                        handleDescriptionChange(
-                          index,
-                          "content",
-                          e.target.value
-                        )
-                      }
-                      className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                      rows={3}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveDescription(index)}
-                      className="mt-2 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                    >
-                      Remove Description
-                    </button>
+                    {errors.name && (
+                      <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                    )}
                   </div>
-                ))}
+
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Images (Max 2MB)
+                    </label>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-row space-x-4">
+                  <div className="md:flex-1 flex-none">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Category
+                    </label>
+                    <select
+                      className={`mt-1 block w-full border ${
+                        errors.category ? "border-red-500" : "border-gray-300"
+                      } rounded-md shadow-sm p-2`}
+                      value={category?._id || ""}
+                      onChange={handleCategoryChange}
+                    >
+                      <option value="">Select Category</option>
+                      {categories.map((cat) => (
+                        <option key={cat._id} value={cat._id}>
+                          {cat.name}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.category && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.category}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Sub-Category
+                    </label>
+                    <select
+                      className={`mt-1 block w-full border ${
+                        errors.subCategory
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      } rounded-md shadow-sm p-2`}
+                      value={subCategory?._id || ""}
+                      onChange={handleSubCategoryChange}
+                    >
+                      <option value="">Select Sub-Category</option>
+                      {subCategories.map((sub) => (
+                        <option key={sub._id} value={sub._id}>
+                          {sub.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Descriptions
+                  </label>
+                  {descriptions.map((desc, index) => (
+                    <div key={index} className="flex space-x-2">
+                      <input
+                        type="text"
+                        placeholder="Header"
+                        className={`mt-1 block w-1/2 border ${
+                          errors.descriptions
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } rounded-md shadow-sm p-2`}
+                        value={desc.header}
+                        onChange={(e) =>
+                          handleDescriptionChange(
+                            index,
+                            "header",
+                            e.target.value
+                          )
+                        }
+                      />
+
+                      <input
+                        type="text"
+                        placeholder="Content"
+                        className={`mt-1 block w-1/2 border ${
+                          errors.descriptions
+                            ? "border-red-500"
+                            : "border-gray-300"
+                        } rounded-md shadow-sm p-2`}
+                        value={desc.content}
+                        onChange={(e) =>
+                          handleDescriptionChange(
+                            index,
+                            "content",
+                            e.target.value
+                          )
+                        }
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveDescription(index)}
+                        className="mt-1 text-red-600"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={handleAddDescription}
+                    className="mt-2 bg-blue-500 text-white rounded-md p-2"
+                  >
+                    Add Description
+                  </button>
+                  {errors.descriptions && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.descriptions}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Variants
+                  </label>
+                  {variants.map((variant, index) => (
+                    <div key={index} className="mb-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex flex-col">
+                          <input
+                            type="text"
+                            placeholder="Weight"
+                            className={`mt-1 block border ${
+                              errors.variants && errors.variants[index]?.weight
+                                ? "border-red-500"
+                                : "border-gray-300"
+                            } rounded-md shadow-sm p-2`}
+                            value={variant.weight}
+                            onChange={(e) =>
+                              setVariants((prev) =>
+                                prev.map((v, i) =>
+                                  i === index
+                                    ? { ...v, weight: e.target.value }
+                                    : v
+                                )
+                              )
+                            }
+                          />
+                          {errors.variants &&
+                            errors.variants[index]?.weight && (
+                              <p className="mt-1 text-sm text-red-600">
+                                {errors.variants[index].weight}
+                              </p>
+                            )}
+                        </div>
+
+                        <div className="flex flex-col">
+                          <input
+                            type="text"
+                            placeholder="In Price"
+                            className={`mt-1 block border ${
+                              errors.variants && errors.variants[index]?.inPrice
+                                ? "border-red-500"
+                                : "border-gray-300"
+                            } rounded-md shadow-sm p-2`}
+                            value={variant.inPrice}
+                            onChange={(e) =>
+                              setVariants((prev) =>
+                                prev.map((v, i) =>
+                                  i === index
+                                    ? { ...v, inPrice: e.target.value }
+                                    : v
+                                )
+                              )
+                            }
+                          />
+                          {errors.variants &&
+                            errors.variants[index]?.inPrice && (
+                              <p className="mt-1 text-sm text-red-600">
+                                {errors.variants[index].inPrice}
+                              </p>
+                            )}
+                        </div>
+
+                        <div className="flex flex-col">
+                          <input
+                            type="text"
+                            placeholder="Out Price"
+                            className={`mt-1 block border ${
+                              errors.variants &&
+                              errors.variants[index]?.outPrice
+                                ? "border-red-500"
+                                : "border-gray-300"
+                            } rounded-md shadow-sm p-2`}
+                            value={variant.outPrice}
+                            onChange={(e) =>
+                              setVariants((prev) =>
+                                prev.map((v, i) =>
+                                  i === index
+                                    ? { ...v, outPrice: e.target.value }
+                                    : v
+                                )
+                              )
+                            }
+                          />
+                          {errors.variants &&
+                            errors.variants[index]?.outPrice && (
+                              <p className="mt-1 text-sm text-red-600">
+                                {errors.variants[index].outPrice}
+                              </p>
+                            )}
+                        </div>
+
+                        <div className="flex flex-col">
+                          <input
+                            type="text"
+                            placeholder="Stock Quantity"
+                            className={`mt-1 block border ${
+                              errors.variants &&
+                              errors.variants[index]?.stockQuantity
+                                ? "border-red-500"
+                                : "border-gray-300"
+                            } rounded-md shadow-sm p-2`}
+                            value={variant.stockQuantity}
+                            onChange={(e) =>
+                              setVariants((prev) =>
+                                prev.map((v, i) =>
+                                  i === index
+                                    ? { ...v, stockQuantity: e.target.value }
+                                    : v
+                                )
+                              )
+                            }
+                          />
+                          {errors.variants &&
+                            errors.variants[index]?.stockQuantity && (
+                              <p className="mt-1 text-sm text-red-600">
+                                {errors.variants[index].stockQuantity}
+                              </p>
+                            )}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveVariant(index)}
+                        className="mt-2 text-red-600"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={handleAddVariant}
+                    className="mt-2 bg-blue-500 text-white rounded-md p-2"
+                  >
+                    Add Variant
+                  </button>
+                </div>
+
+
                 <button
-                  type="button"
-                  onClick={handleAddDescription}
-                  className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                  type="submit"
+                  className={`mt-4 w-full bg-blue-500 text-white rounded-md p-2 ${
+                    isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  disabled={isSubmitting}
                 >
-                  + Add Description
+                  {isSubmitting ? "Adding..." : "Add Product"}
                 </button>
               </div>
-
-              <div className="flex flex-col">
-                <label
-                  htmlFor="category"
-                  className="text-sm font-medium text-gray-900 dark:text-white mb-1"
-                >
-                  Main Category
-                </label>
-                <select
-                  id="category"
-                  value={category?._id || ""}
-                  onChange={handleCategoryChange}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  required
-                >
-                  <option value="" disabled>
-                    Select a main category
-                  </option>
-                  {categories.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex flex-col">
-                <label
-                  htmlFor="subCategory"
-                  className="text-sm font-medium text-gray-900 dark:text-white mb-1"
-                >
-                  Sub Category
-                </label>
-                <select
-                  id="subCategory"
-                  value={subCategory?._id || ""}
-                  onChange={handleSubCategoryChange}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  disabled={!category}
-                >
-                  <option value="" disabled>
-                    Select a sub category
-                  </option>
-                  {subCategories.map((subCat) => (
-                    <option key={subCat._id} value={subCat._id}>
-                      {subCat.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageChange}
-                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-              />
-
-<div className="flex flex-col space-y-6">
-  <label className="text-sm font-medium text-gray-900 dark:text-white">
-    Variants
-  </label>
-
-  {variants.map((variant, index) => (
-    <div
-      key={index}
-      className="grid grid-cols-1 gap-y-6 md:grid-cols-3 md:gap-x-6 p-6 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md"
-    >
-      {/* Weight Input */}
-      <div className="flex flex-col">
-        <label htmlFor={`weight-${index}`} className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-          Weight
-        </label>
-        <input
-          id={`weight-${index}`}
-          type="number"
-          placeholder="Enter weight"
-          value={variant.weight}
-          onChange={(e) =>
-            setVariants(
-              variants.map((v, i) =>
-                i === index ? { ...v, weight: e.target.value } : v
-              )
-            )
-          }
-          className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-2 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          aria-label="Weight"
-        />
-      </div>
-
-      {/* In Price Input */}
-      <div className="flex flex-col">
-        <label htmlFor={`in-price-${index}`} className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-          In Price
-        </label>
-        <input
-          id={`in-price-${index}`}
-          type="number"
-          placeholder="Enter in price"
-          value={variant.inPrice}
-          onChange={(e) =>
-            setVariants(
-              variants.map((v, i) =>
-                i === index ? { ...v, inPrice: e.target.value } : v
-              )
-            )
-          }
-          className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-2 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          aria-label="In Price"
-        />
-      </div>
-
-      {/* Out Price Input */}
-      <div className="flex flex-col">
-        <label htmlFor={`out-price-${index}`} className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-          Out Price
-        </label>
-        <input
-          id={`out-price-${index}`}
-          type="number"
-          placeholder="Enter out price"
-          value={variant.outPrice}
-          onChange={(e) =>
-            setVariants(
-              variants.map((v, i) =>
-                i === index ? { ...v, outPrice: e.target.value } : v
-              )
-            )
-          }
-          className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-2 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          aria-label="Out Price"
-        />
-      </div>
-
-      {/* Stock Quantity Input */}
-      <div className="flex flex-col">
-        <label htmlFor={`stock-quantity-${index}`} className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
-          Stock Quantity
-        </label>
-        <input
-          id={`stock-quantity-${index}`}
-          type="number"
-          placeholder="Enter stock quantity"
-          value={variant.stockQuantity}
-          onChange={(e) =>
-            setVariants(
-              variants.map((v, i) =>
-                i === index ? { ...v, stockQuantity: e.target.value } : v
-              )
-            )
-          }
-          className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-2 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          aria-label="Stock Quantity"
-        />
-      </div>
-
-      <button
-        type="button"
-        onClick={() => handleRemoveVariant(index)}
-        className="col-span-1 md:col-span-3 text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 mt-2"
-      >
-        Remove Variant
-      </button>
-    </div>
-  ))}
-
-  <button
-    type="button"
-    onClick={handleAddVariant}
-    className="text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mt-4"
-  >
-    + Add Variant
-  </button>
-</div>
-
-
-              <button
-                type="submit"
-                className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              >
-                Add Product
-              </button>
             </form>
           </div>
         </div>
@@ -464,4 +614,4 @@ const ProductModalForm: React.FC<ModalFormProps> = ({
   );
 };
 
-export default ProductModalForm;
+export default AddProductModal;
