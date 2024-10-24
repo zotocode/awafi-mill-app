@@ -11,6 +11,7 @@ export interface IproductRepo {
   findByNameAndNotCurrentId(id: mongoose.Types.ObjectId, name: string): Promise<Product | null>;
   findAllProducts(page:number,limit:number): Promise<ProductResponse>;
   findListedAllProducts(page:number,limit:number): Promise<ProductResponse>;
+  findProductsBySpelling(page:number,limit:number,name:string): Promise<ProductResponse>;
   productFindById(id: mongoose.Types.ObjectId): Promise<Product | null>;
   fetchByCategory(mainCategoryId: mongoose.Types.ObjectId | null, subCategoryId: mongoose.Types.ObjectId | null): Promise<ProductDTO[] | null>;
   updateImage(id: mongoose.Types.ObjectId, index: number, imageUrl: string): Promise<{ modifiedCount: number }>;

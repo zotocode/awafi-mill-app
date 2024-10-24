@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Table from "../components/Table";
+import Table from "../components/Tables/Table";
 import userApi from "../api/userApi";
 import { toast } from "react-toastify";
 

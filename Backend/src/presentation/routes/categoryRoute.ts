@@ -8,11 +8,14 @@ import { SubCategoryRepository } from "../../infrastructure/repositories/subCate
 import SubCategory from "../../infrastructure/model/subCategoryModel";
 import { SubCategoryInteractor } from "../../application/interactor/subCategoryInteractor";
 import { SubCategoryController } from "../controllers/subCategoryController";
+import {uploadCategoryImage} from '../../config/multerConfig'
+import CloudinaryService from "../../application/services/cloudinaryService";
 
 // Set up dependencies
 // main Category------
 const categoryRepo = new CategoryRepository(CategoryModel);
-const categoryInteractor = new CategoryInteractor(categoryRepo);
+const cloudinaryService=new CloudinaryService()
+const categoryInteractor = new CategoryInteractor(categoryRepo,cloudinaryService);
 const categoryController = new CategoryController(categoryInteractor);
 // subCategory-----
 const subCategoryRepo = new SubCategoryRepository(SubCategory);
@@ -26,19 +29,26 @@ const categoryRoutes = express.Router();
 // Sub - Category Routes--------------------------------------------
 
 categoryRoutes.post("/category/sub",subcategoryController.addCategory.bind(subcategoryController));
+
 categoryRoutes.get("/category/sub", subcategoryController.getAllCategories.bind(subcategoryController));
+categoryRoutes.get("/category/search/sub", subcategoryController.searchBySubCategoryName.bind(subcategoryController));
 categoryRoutes.get("/listedCategory/sub/:Id", subcategoryController.getListedCategories.bind(subcategoryController));
 categoryRoutes.get("/category/sub/:id", subcategoryController.getCategoryById.bind(subcategoryController));
+
 categoryRoutes.put("/category/sub/:id", subcategoryController.updateCategory.bind(subcategoryController));
 categoryRoutes.patch("/category/sub/:id", subcategoryController.toggleListStatus.bind(subcategoryController));
 categoryRoutes.patch("/category/sub/delete/:id", subcategoryController.deleteCategory.bind(subcategoryController));
 
+
 // Define routes
-categoryRoutes.post("/category",categoryController.addCategory.bind(categoryController));
+categoryRoutes.post("/category",uploadCategoryImage.single('photo'),categoryController.addCategory.bind(categoryController));
+
 categoryRoutes.get("/category", categoryController.getAllCategories.bind(categoryController));
+categoryRoutes.get("/category/search", categoryController.searchByCategoryName.bind(categoryController));
 categoryRoutes.get("/listedCategory", categoryController.getListedCategories.bind(categoryController));
 categoryRoutes.get("/category/:id", categoryController.getCategoryById.bind(categoryController));
-categoryRoutes.put("/category/:id", categoryController.updateCategory.bind(categoryController));
+
+categoryRoutes.put("/category/:id",uploadCategoryImage.single('photo'), categoryController.updateCategory.bind(categoryController));
 categoryRoutes.patch("/category/:id", categoryController.toggleListStatus.bind(categoryController));
 categoryRoutes.patch("/category/delete/:id", categoryController.deleteCategory.bind(categoryController));
 

@@ -12,7 +12,7 @@ export class AdminInteractor implements IadminInteractor {
   }
  
  async logIn(data: any): Promise<any> {
-     console.log("reached interactor..",data);
+   
      let email = "admin@gmail.com"
      let password = "12345"
      if(data.email === email && password === data.password){

@@ -12,7 +12,7 @@ const createUploadDir = (dir:any) => {
 // Set storage engine for images
 const imageStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = 'src/uploads/';
+    const dir = 'src/uploads/products';
     createUploadDir(dir);
     cb(null, dir); // Set the upload destination
   },
@@ -80,4 +80,35 @@ export const uploadExcel = multer({
       return cb(new Error("Invalid file type. Only Excel files are allowed."));
     }
   },
+});
+
+// Set storage engine for category images
+const categoryImageStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = 'src/uploads/categories'; // Directory for category images
+    createUploadDir(dir); // Ensure the directory exists
+    cb(null, dir); // Set the upload destination
+  },
+  filename: (req, file, cb) => {
+    // Create a unique filename using the current timestamp and original file name
+    cb(null, `${Date.now()}-${file.originalname}`);
+  }
+});
+
+// Initialize multer upload for category images
+export const uploadCategoryImage = multer({
+  storage: categoryImageStorage,
+  limits: { fileSize: 5000000 }, // Limit file size to 5 MB for category images
+  fileFilter: (req, file, cb) => {
+    // Accept only image file types (jpeg, jpg, png, gif)
+    const filetypes = /jpeg|jpg|png|gif/;
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = filetypes.test(file.mimetype);
+
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      return cb(new Error('Invalid file type. Only images are allowed.'));
+    }
+  }
 });
