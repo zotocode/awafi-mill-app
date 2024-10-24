@@ -33,6 +33,8 @@ export class AdminController {
     }
   }
 
+
+  
   async blockUser(req: Request, res: Response, next: NextFunction){
     const result = await this.adminInteractor.blockUser(req.body.email)
     if (result.success) {
