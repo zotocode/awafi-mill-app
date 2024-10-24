@@ -15,6 +15,7 @@ const adminController = new AdminController(adminInteractor)
 
 const adminRoute = express.Router();
 adminRoute.post('/login',adminController.adminLogin.bind(adminController))
+//auth routes
 adminRoute.use(verifyAdminToken); 
 adminRoute.get('/allUser',adminController.allUsers.bind(adminController))
 adminRoute.post('/blockUser',adminController.blockUser.bind(adminController))
