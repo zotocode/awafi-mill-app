@@ -1,7 +1,6 @@
 import { IBannerInteractor } from "../../interface/bannerInterface/ibannerInteractor";
 import { ICloudinaryService } from "../../interface/serviceInterface/IcloudinaryInterface";
 import { BannerModel } from "../../infrastructure/model/bannerModel"; // Import Banner Model
-import { log } from "winston";
 
 export class BannerInteractor implements IBannerInteractor {
   private cloudinaryService: ICloudinaryService;

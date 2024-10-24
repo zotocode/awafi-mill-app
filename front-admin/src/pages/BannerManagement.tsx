@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import BannerApi from '../api/bannerapi';
-import Table from '../components/Table';
+import Table from '../components/Tables/Table';
 
 const Banner = () => {
   const [banners, setBanners] = useState<any[]>([]); // State for all banners

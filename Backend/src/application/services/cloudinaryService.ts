@@ -25,7 +25,6 @@ class CloudinaryService implements ICloudinaryService{
       throw new Error(`Failed to upload image: ${error.message}`);
     }
   }
-<<<<<<< HEAD
     //uploadofferBanner
     async uploadOfferBaner(filePath: string): Promise<any> {
       try {
@@ -41,7 +40,6 @@ class CloudinaryService implements ICloudinaryService{
       }
     }
   
-=======
   async uploadCategoryImage(filePath: string): Promise<any> {
     try {
      
@@ -56,6 +54,5 @@ class CloudinaryService implements ICloudinaryService{
       throw new Error(`Failed to upload image: ${error.message}`);
     }
   }
->>>>>>> bulkUpload
 }
 export default CloudinaryService;
