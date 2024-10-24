@@ -16,6 +16,10 @@ const CategorySchema: Schema = new Schema(
       required: false, // Optional: make this field required or not
       trim: true,
     },
+    photo: {
+      type: String,
+      default: true, // Default value is true
+    },
     isListed: {
       type: Boolean,
       default: true, // Default value is true

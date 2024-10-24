@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 
 export class SubCategoryInteractor implements IsubCategoryInteractor {
   private categoryRepo: IsubCategoryRepo; // Use the category repository
+  
 
   constructor(categoryRepo: IsubCategoryRepo) {
     this.categoryRepo = categoryRepo;
@@ -31,6 +32,11 @@ export class SubCategoryInteractor implements IsubCategoryInteractor {
   // Get all categories
   async getAllCategories(page:number,limit:number): Promise<LargeDataFetch> {
     const categoryResponse = await this.categoryRepo.getAllCategories(page,limit); // Use repository method
+    const categories=categoryResponse.data.map(this.mapToDTO);
+    return {data:categories,totalPages:categoryResponse.totalPages}
+}
+  async searchByname(page:number,limit:number,name:string): Promise<LargeDataFetch> {
+    const categoryResponse = await this.categoryRepo.findCategoryName(page,limit,name); // Use repository method
     const categories=categoryResponse.data.map(this.mapToDTO);
     return {data:categories,totalPages:categoryResponse.totalPages}
 }

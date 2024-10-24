@@ -25,6 +25,7 @@ class CloudinaryService implements ICloudinaryService{
       throw new Error(`Failed to upload image: ${error.message}`);
     }
   }
+<<<<<<< HEAD
     //uploadofferBanner
     async uploadOfferBaner(filePath: string): Promise<any> {
       try {
@@ -40,5 +41,21 @@ class CloudinaryService implements ICloudinaryService{
       }
     }
   
+=======
+  async uploadCategoryImage(filePath: string): Promise<any> {
+    try {
+     
+      const result = await this.uploader.upload(filePath, {
+        folder: 'CategoryImages',
+        resource_type: 'auto', // Automatically detects the file type
+      });
+        // Remove the image from local storage after successful upload
+        await fs.unlink(filePath);
+      return result;
+    } catch (error:any) {
+      throw new Error(`Failed to upload image: ${error.message}`);
+    }
+  }
+>>>>>>> bulkUpload
 }
 export default CloudinaryService;

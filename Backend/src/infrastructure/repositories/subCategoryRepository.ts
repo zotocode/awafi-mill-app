@@ -24,6 +24,27 @@ export class SubCategoryRepository extends BaseRepository<IsubCategory> implemen
       totalPages:totalCategories
     }
 }
+async findCategoryName(page: number, limit: number, name: string): Promise<LargeDataFetch> {
+  const skip = (page - 1) * limit;
+  // Count total categories that match the regex search
+  const totalCategories = await this.model.countDocuments({
+    name: { $regex: `^${name}`, $options: 'i' } 
+  });
+
+  // Fetch categories with prefix matching prioritized
+  const categories = await this.model.find({
+      name: { $regex: `^${name}`, $options: 'i' } 
+    })
+    .skip(skip) // Pagination
+    .limit(limit) // Limit the number of results
+    .exec();
+  
+  return {
+    data: categories,
+    totalPages: Math.ceil(totalCategories / limit) 
+  };
+}
+
 
   async getListedCategories(mainCategoryId:mongoose.Types.ObjectId,page:number,limit:number): Promise<LargeDataFetch> {
     const skip=(page-1)*limit

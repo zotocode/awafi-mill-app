@@ -14,6 +14,8 @@ export default interface IProductInteractor {
   getAllProducts(page:number,limit:number): Promise<ProductResponseDTO>;
   
   getAllListedProducts(page:number,limit:number): Promise<ProductResponseDTO>;
+
+  SearchByName(page:number,limit:number,name:string): Promise<ProductResponseDTO>;
   
   getProductById(id: mongoose.Types.ObjectId): Promise<ProductDTO | null>;
   

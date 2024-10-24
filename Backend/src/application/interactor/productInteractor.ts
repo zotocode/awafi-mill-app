@@ -83,6 +83,12 @@ export class ProductInteractor implements IProductInteractor {
       return  {products:products,totalPages:ProductResponse.totalPages}
   }
 
+  async SearchByName(page:number,limit:number,productName:string): Promise<ProductResponseDTO> {
+    const ProductResponse = await this.productRepo.findProductsBySpelling(page,limit,productName);
+    const products= ProductResponse.products.map((p) => this.mapEntityToDto(p));
+      return  {products:products,totalPages:ProductResponse.totalPages}
+  }
+
   // Filter by category
   async fetchByCategory(mainCategoryId: mongoose.Types.ObjectId | null, subCategoryId: mongoose.Types.ObjectId | null): Promise<ProductDTO[] | null> {
     const products = await this.productRepo.fetchByCategory(mainCategoryId, subCategoryId);
