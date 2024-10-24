@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
-import Table from "../components/Table";
-import ProductModalForm from "../components/ProductModalForm";
-import ConfirmationDialog from "../components/ConfirmationDialog";
-import productapi from "../api/productapi";
-import { Product } from "../types/productTypes";
+import Table from "../../components/Tables/Table";
+import ProductModalForm from "../../components/Product/ProductModalForm";
+import ConfirmationDialog from "../../components/ConfirmationDialog";
+import productapi from "../../api/productapi";
+import { Product } from "../../types/productTypes";
 import { useNavigate } from "react-router-dom";
 import { ListMinus, ListPlus, Pencil, Trash2 } from "lucide-react";
 

@@ -23,6 +23,7 @@ const productRoutes = express.Router();
 
 // fuctional routes-----------
 productRoutes.get("/product/filter", productController.FilterProducts.bind(productController));
+productRoutes.get("/product/search", productController.SearchByName.bind(productController));
 // Define routes
 productRoutes.post("/product",uploadImages.array('images', 5),productController.addProduct.bind(productController));
 productRoutes.post("/product/bulk",uploadExcel.single('file'),productController.bulkAdding.bind(productController));

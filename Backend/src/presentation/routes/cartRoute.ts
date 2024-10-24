@@ -12,6 +12,8 @@ const cartController = new CartController(cartInteractor);
 
 const cartRoutes = express.Router();
 
+
+
 // Define routes
 cartRoutes.post("/", cartController.createCart.bind(cartController));
 cartRoutes.get("/:userId", cartController.getCartByUserId.bind(cartController));
