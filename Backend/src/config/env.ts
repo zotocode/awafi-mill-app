@@ -18,8 +18,12 @@ const envConfig: EnvConfig = {
     EMAIL_PASS: process.env.EMAIL_PASS as string
 };
 
+// Log loaded environment variables for debugging
+console.log("Environment Variables Loaded:", envConfig);
+
 // Ensure that all necessary environment variables are set
-if ( !envConfig.EMAIL_USER || !envConfig.EMAIL_PASS) {
+if (!envConfig.EMAIL_USER || !envConfig.EMAIL_PASS) {
+    console.error("Missing required environment variables");
     throw new Error("Missing required environment variables");
 }
 

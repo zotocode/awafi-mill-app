@@ -35,6 +35,17 @@ export class SubCategoryController {
       next(error);
     }
   }
+  async searchBySubCategoryName(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const {name}=req.body
+      const categories = await this.categoryInteractor.searchByname(page,limit,name);
+      res.status(200).json(categories);
+    } catch (error) {
+      next(error);
+    }
+  }
 
   async getListedCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {

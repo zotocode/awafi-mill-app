@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface TableColumn {
+export interface TableColumn {
   header: string;
   accessor: string; // This should ideally be more descriptive, maybe "key" or "field" for clarity
   render?: (row: { [key: string]: any }) => React.ReactNode; // Pass the entire row for rendering

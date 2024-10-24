@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux'; // Import useDispatch
-import { loginSuccess } from '../state/adminSlice';
-import AuthApi from '../api/adminLogin'; // Correct import
+import { loginSuccess } from '../../state/adminSlice';
+import AuthApi from '../../api/adminLogin'; // Correct import
 import { toast } from "react-toastify";
 
 interface LoginFormProps {

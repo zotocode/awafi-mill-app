@@ -1,13 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Description, Variant } from "../types/productTypes";
-import { Category, subCategory } from "../types/categoryType";
-import categoryapi from "../api/categoryapi";
-import subcategoryapi from "../api/subcategoryapi";
-import productapi from "../api/productapi";
+import { Description, Variant } from "../../types/productTypes";
+import { Category, subCategory } from "../../types/categoryType";
+import categoryapi from "../../api/categoryapi";
+import subcategoryapi from "../../api/subcategoryapi";
+import productapi from "../../api/productapi";
 import { toast } from "react-toastify";
+import { z } from "zod"; // Add this import for validation
 
 const MAX_IMAGES = 5;
+
+// Add validation schemas
+const descriptionSchema = z.object({
+  header: z.string().min(1, "Header is required"),
+  content: z.string().min(1, "Content is required"),
+});
+
+const variantSchema = z.object({
+  weight: z.string().min(1, "Weight is required"),
+  inPrice: z.string().regex(/^\d+(\.\d{1,2})?$/, "Invalid price format"),
+  outPrice: z.string().regex(/^\d+(\.\d{1,2})?$/, "Invalid price format"),
+  stockQuantity: z.string().regex(/^\d+$/, "Stock quantity must be a positive integer"),
+});
+
+const productSchema = z.object({
+  name: z.string().min(1, "Product name is required"),
+  category: z.string().min(1, "Category is required"),
+  subCategory: z.string().optional(),
+  descriptions: z.array(descriptionSchema).min(1, "At least one description is required"),
+  variants: z.array(variantSchema).min(1, "At least one variant is required"),
+});
 
 const UpdateProductPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +49,7 @@ const UpdateProductPage: React.FC = () => {
   ]);
   const [isLoading, setIsLoading] = useState(true);
   const [imageLoading, setImageLoading] = useState<boolean[]>(Array(MAX_IMAGES).fill(false)); // New state
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,7 +81,7 @@ const UpdateProductPage: React.FC = () => {
           if (product.category) {
             const subCategoriesResponse = await subcategoryapi.fetchAllListedCategories(product.category._id);
             if (subCategoriesResponse.status === 200) {
-              setSubCategories(subCategoriesResponse.data);
+              setSubCategories(subCategoriesResponse.data.data);
             }
           }
         }
@@ -160,8 +183,36 @@ const UpdateProductPage: React.FC = () => {
   const handleRemoveVariant = (index: number) =>
     setVariants(variants.filter((_, i) => i !== index));
 
+  const validateForm = () => {
+    try {
+      productSchema.parse({
+        name,
+        category: category?._id,
+        subCategory: subCategory?._id,
+        descriptions,
+        variants,
+      });
+      setErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          newErrors[err.path.join('.')] = err.message;
+        });
+        setErrors(newErrors);
+      }
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) {
+      toast.error("Please correct the errors before submitting");
+      return;
+    }
+
     const productData = {
       name,
       category: category?._id,
@@ -294,7 +345,7 @@ const UpdateProductPage: React.FC = () => {
           value={name}
           placeholder="Product Name"
           onChange={(e) => setName(e.target.value)}
-          className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+          className={`bg-white border ${errors['name'] ? 'border-red-500' : 'border-gray-300'} text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
           required
         />
     
@@ -366,8 +417,9 @@ const UpdateProductPage: React.FC = () => {
           placeholder="Header"
           value={desc.header}
           onChange={(e) => handleDescriptionChange(index, "header", e.target.value)}
-          className="peer outline-none px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 text-sm"
+          className={`peer outline-none px-4 py-2 border ${errors[`descriptions.${index}.header`] ? 'border-red-500' : 'border-gray-300'} rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 text-sm`}
         />
+        {errors[`descriptions.${index}.header`] && <p className="mt-1 text-sm text-red-500">{errors[`descriptions.${index}.header`]}</p>}
       </div>
       <div className="flex flex-col mb-4">
         <label className="text-gray-600 mb-2 text-sm" htmlFor={`content-${index}`}>
@@ -378,9 +430,10 @@ const UpdateProductPage: React.FC = () => {
           placeholder="Content"
           value={desc.content}
           onChange={(e) => handleDescriptionChange(index, "content", e.target.value)}
-          className="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 text-sm"
+          className={`block w-full px-4 py-2 border ${errors[`descriptions.${index}.content`] ? 'border-red-500' : 'border-gray-300'} rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 text-sm`}
           rows={4}
         />
+        {errors[`descriptions.${index}.content`] && <p className="mt-1 text-sm text-red-500">{errors[`descriptions.${index}.content`]}</p>}
       </div>
       <button
         type="button"
@@ -419,8 +472,9 @@ const UpdateProductPage: React.FC = () => {
                 i === index ? { ...v, weight: e.target.value } : v
               ))
             }
-            className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            className={`bg-white border ${errors[`variants.${index}.weight`] ? 'border-red-500' : 'border-gray-300'} text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
           />
+          {errors[`variants.${index}.weight`] && <p className="mt-1 text-sm text-red-500">{errors[`variants.${index}.weight`]}</p>}
         </div>
         
         <div className="flex flex-col">
@@ -439,8 +493,9 @@ const UpdateProductPage: React.FC = () => {
                 )
               )
             }
-            className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            className={`bg-white border ${errors[`variants.${index}.inPrice`] ? 'border-red-500' : 'border-gray-300'} text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
           />
+          {errors[`variants.${index}.inPrice`] && <p className="mt-1 text-sm text-red-500">{errors[`variants.${index}.inPrice`]}</p>}
         </div>
 
         <div className="flex flex-col">
@@ -459,8 +514,9 @@ const UpdateProductPage: React.FC = () => {
                 )
               )
             }
-            className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            className={`bg-white border ${errors[`variants.${index}.outPrice`] ? 'border-red-500' : 'border-gray-300'} text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
           />
+          {errors[`variants.${index}.outPrice`] && <p className="mt-1 text-sm text-red-500">{errors[`variants.${index}.outPrice`]}</p>}
         </div>
 
         <div className="flex flex-col">
@@ -477,8 +533,9 @@ const UpdateProductPage: React.FC = () => {
                 i === index ? { ...v, stockQuantity: e.target.value } : v
               ))
             }
-            className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            className={`bg-white border ${errors[`variants.${index}.stockQuantity`] ? 'border-red-500' : 'border-gray-300'} text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
           />
+          {errors[`variants.${index}.stockQuantity`] && <p className="mt-1 text-sm text-red-500">{errors[`variants.${index}.stockQuantity`]}</p>}
         </div>
       </div>
       <button

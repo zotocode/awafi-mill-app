@@ -14,12 +14,18 @@ export class CategoryController {
   async addCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const category: categoryCreationDTo = req.body;
+      const photo=req.file
+      
+      if(photo && typeof photo.path=="string")
+      {
+        category.photo=photo.path
+      }
       const result: any = await this.categoryInteractor.addCategory(category);
 
       if (result?.status) {
         res.status(result.status).json({ message: result.message });
       } else {
-        res.status(201).json(result);
+        res.status(200).json(result);
       }
     } catch (error) {
       next(error);
@@ -32,6 +38,17 @@ export class CategoryController {
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
       const products = await this.categoryInteractor.getAllCategories(page,limit);
+      res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async searchByCategoryName(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const{name}=req.body
+      const products = await this.categoryInteractor.getByName(page,limit,name);
       res.status(200).json(products);
     } catch (error) {
       next(error);
@@ -69,6 +86,13 @@ export class CategoryController {
     try {
       const categoryId = new mongoose.Types.ObjectId(req.params.id); // Convert string to ObjectId
       const updatedData: Partial<categoryCreationDTo> = req.body;
+      const photo=req.file
+      
+      if(photo && typeof photo.path=="string")
+      {
+        updatedData.photo=photo.path
+      }
+      
       const updatedCategory = await this.categoryInteractor.updateCategory(categoryId, updatedData);
 
       if (updatedCategory) {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import productapi from '../api/productapi';
+import productapi from '../../api/productapi';
 import { toast } from 'react-toastify';
 
 const BulkProducAddingPage = () => {
