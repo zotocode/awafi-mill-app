@@ -37,7 +37,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
         }));
         
         onLogin(email, password);
-        console.log('Login successful:', response.data);
+      
         toast.success("Admin Login Successfully");
         
         // Navigate to dashboard after successful login
