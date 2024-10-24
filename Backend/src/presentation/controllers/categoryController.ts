@@ -43,6 +43,17 @@ export class CategoryController {
       next(error);
     }
   }
+  async searchByCategoryName(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const{name}=req.body
+      const products = await this.categoryInteractor.getByName(page,limit,name);
+      res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  }
 
   // Get listed categories (HTTP GET)
   async getListedCategories(req: Request, res: Response, next: NextFunction): Promise<void> {

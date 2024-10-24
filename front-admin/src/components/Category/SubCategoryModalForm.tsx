@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import CategoryApi from "../api/categoryapi";
-import subcategoryapi from "../api/subcategoryapi";
+import CategoryApi from "../../api/categoryapi";
+import subcategoryapi from "../../api/subcategoryapi";
+import { z } from "zod";
 
 interface CategoryModalFormProps {
   isOpen: boolean;
@@ -9,6 +10,14 @@ interface CategoryModalFormProps {
   onSuccess: (newCategory: any) => any;
   category?: any;
 }
+
+const subCategorySchema = z.object({
+  name: z.string().min(1, "Category name is required"),
+  description: z.string().min(1, "Description is required"),
+  mainCategory: z.string().min(1, "Main category is required"),
+});
+
+type SubCategoryFormData = z.infer<typeof subCategorySchema>;
 
 const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
   isOpen,

@@ -63,6 +63,48 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
     return {products:products,totalPages: Math.ceil(totalProducts / limit)}
   }
 
+  async findProductsBySpelling(page: number, limit: number, name: string): Promise<ProductResponse> {
+    const totalProducts = await this.model.countDocuments({
+      isListed: true,
+      isDelete: false,
+      name: { $regex: name, $options: 'i' } // Case-insensitive search
+    });
+  
+    const skip = (page - 1) * limit;
+  
+    // Use aggregate pipeline to prioritize prefix matches first
+    const products = await this.model.aggregate([
+      {
+        $match: {
+          isListed: true,
+          isDelete: false,
+          name: { $regex: name, $options: 'i' } // Case-insensitive search
+        }
+      },
+      {
+        $addFields: {
+          prefixMatch: { $regexMatch: { input: "$name", regex: new RegExp(`^${name}`, 'i') } } // Prioritize prefix match
+        }
+      },
+      {
+        $sort: { prefixMatch: -1, name: 1 } // Sort by prefix match (true/false) and then alphabetically by name
+      },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $lookup: { 
+          from: 'MainCategory', 
+          localField: 'category',
+          foreignField: '_id',
+          as: 'category'
+        }
+      }
+    ]).exec();
+  
+    return { products: products, totalPages: Math.ceil(totalProducts / limit) };
+  }
+  
+
   async fetchByCategory(mainCategoryId?: mongoose.Types.ObjectId | null, subCategoryId?: mongoose.Types.ObjectId | null): Promise<IProductSchema[]> {
     const filter: any = {};
 

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Product, Description, Variant } from "../types/productTypes";
-import { Category } from "../types/categoryType";
-import categoryapi from "../api/categoryapi";
-import subcategoryapi from "../api/subcategoryapi";
+import { Product, Description, Variant } from "../../types/productTypes";
+import { Category } from "../../types/categoryType";
+import categoryapi from "../../api/categoryapi";
+import subcategoryapi from "../../api/subcategoryapi";
 import { toast } from "react-toastify";
-import productapi from "../api/productapi";
+import productapi from "../../api/productapi";
 
 interface ModalFormProps {
   isOpen: boolean;
@@ -445,7 +445,7 @@ const AddProductModal: React.FC<ModalFormProps> = ({
                   <button
                     type="button"
                     onClick={handleAddDescription}
-                    className="mt-2 bg-blue-500 text-white rounded-md p-2"
+                    className="mt-2 bg-black text-white rounded-md p-2"
                   >
                     Add Description
                   </button>
@@ -589,7 +589,7 @@ const AddProductModal: React.FC<ModalFormProps> = ({
                   <button
                     type="button"
                     onClick={handleAddVariant}
-                    className="mt-2 bg-blue-500 text-white rounded-md p-2"
+                    className="mt-2 bg-black text-white rounded-md p-2"
                   >
                     Add Variant
                   </button>
@@ -598,7 +598,7 @@ const AddProductModal: React.FC<ModalFormProps> = ({
 
                 <button
                   type="submit"
-                  className={`mt-4 w-full bg-blue-500 text-white rounded-md p-2 ${
+                  className={`mt-4 w-full bg-black text-white rounded-md p-2 ${
                     isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                   disabled={isSubmitting}

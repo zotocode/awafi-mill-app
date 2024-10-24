@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import SidebarLinkGroup from './SidebarLinks';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import { 
   faTachometerAlt, 
   faUsers, 
@@ -72,9 +73,13 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     >
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
-        <NavLink to="/" className="text-white text-2xl font-bold">
-          awafiMill
-        </NavLink>
+        {/* <NavLink to="/" >
+        <div className='flex flex-row justify-between'>
+          <div className='w-1/3'><img src={logo} alt="" /></div>
+          <div className="text-white text-2xl font-bold">  awafiMill</div>
+        </div>
+        
+        </NavLink> */}
 
         <button
           ref={trigger}

@@ -25,6 +25,27 @@ export class CategoryRepository extends BaseRepository<ICategory> implements ICa
       totalPages:totalCategories
     }
   }
+  async findbyNameSpellings(page: number, limit: number, name: string): Promise<LargeDataFetch> {
+    const skip = (page - 1) * limit;
+
+    // Use regex to count total categories that match the spelling criteria
+    const totalCategories = await this.model.countDocuments({
+        isDeleted: false,
+        name: { $regex: `^${name}`, $options: 'i' } // Match categories starting with the given name (case-insensitive)
+    });
+
+    // Fetch categories that match the spelling criteria
+    const categories = await this.model.find({
+        isDeleted: false,
+        name: { $regex: `^${name}`, $options: 'i' } // Match categories starting with the given name (case-insensitive)
+    }).skip(skip).limit(limit);
+
+    return {
+        data: categories,
+        totalPages: Math.ceil(totalCategories / limit) // Calculate total pages
+    };
+}
+
   async getListedCategories(): Promise<ICategory[]> {
     return await this.model.find({isListed:true,isDeleted:false});
   }

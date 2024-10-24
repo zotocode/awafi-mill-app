@@ -35,6 +35,11 @@ export class SubCategoryInteractor implements IsubCategoryInteractor {
     const categories=categoryResponse.data.map(this.mapToDTO);
     return {data:categories,totalPages:categoryResponse.totalPages}
 }
+  async searchByname(page:number,limit:number,name:string): Promise<LargeDataFetch> {
+    const categoryResponse = await this.categoryRepo.findCategoryName(page,limit,name); // Use repository method
+    const categories=categoryResponse.data.map(this.mapToDTO);
+    return {data:categories,totalPages:categoryResponse.totalPages}
+}
 
   // Get all listed categories
   async getListedCategories(mainCategoryId:mongoose.Types.ObjectId,page:number,limit:number): Promise<LargeDataFetch> {

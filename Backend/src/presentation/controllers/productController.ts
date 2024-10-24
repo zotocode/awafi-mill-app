@@ -98,6 +98,19 @@ export class ProductController {
     }
   }
 
+  async SearchByName(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const {name}=req.body
+
+      const products = await this.productInteractor.SearchByName(page,limit,name);
+      res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   // Fetch products by category
   async FilterProducts(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {

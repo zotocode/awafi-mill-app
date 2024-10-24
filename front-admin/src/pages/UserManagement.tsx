@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Table from "../components/Table";
+import Table from "../components/Tables/Table";
 import userApi from "../api/userApi";
 import { toast } from "react-toastify";
 import { Pencil, Trash2 } from "lucide-react";
@@ -88,7 +88,7 @@ const UserManagementPage = () => {
           <button
             // onClick={() => setSelectedUser(null)}
             type="button"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            className="text-white bg-black hover:bg-[#363333]  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
             Add User
           </button>

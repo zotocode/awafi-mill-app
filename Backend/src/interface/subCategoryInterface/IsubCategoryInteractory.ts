@@ -4,6 +4,7 @@ import {LargeDataFetch, responseHandler} from '../../types/commonTypes'
 export default interface IsubCategoryInteractor {
   addCategory(data: subCategoryCreationDTo): Promise<subCategoryDTo | responseHandler>;
   getAllCategories(limit:number,page:number): Promise<LargeDataFetch>;
+  searchByname(limit:number,page:number,name:string): Promise<LargeDataFetch>;
   getListedCategories(mainCategoryId:mongoose.Types.ObjectId,page:number,limit:number ): Promise<LargeDataFetch>;
   getCategoryById(id: mongoose.Types.ObjectId): Promise<subCategoryDTo | null>;
   updateCategory(id: mongoose.Types.ObjectId, data: Partial<subCategoryCreationDTo>): Promise<subCategoryDTo | null |responseHandler>;

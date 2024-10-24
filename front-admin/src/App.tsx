@@ -3,16 +3,16 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./state/store";
 import LoginPage from "./pages/Login";
-import DashboardPage from "./pages/Dashboard";
+import DashboardPage from "./pages/dashboard/Dashboard";
 import UserManagementPage from "./pages/UserManagement";
-import ProductManagementPage from "./pages/ProductManagement";
-import MainCategoryManagementPage from "./pages/CategoryManagement";
-import UpdateProductPage from "./pages/UpdateProductPage";
-import SubCategoryManagementPage from "./pages/SubCategoryManagementPage";
+import ProductManagementPage from "./pages/product/ProductManagement";
+import MainCategoryManagementPage from "./pages/category/CategoryManagement";
+import UpdateProductPage from "./pages/product/UpdateProductPage";
+import SubCategoryManagementPage from "./pages/category/SubCategoryManagementPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import DefaultLayout from "./layouts/DefaultLayout";
-import BulkProducAddingPage from "./pages/BulkProducAddingPage";
+import BulkProducAddingPage from "./pages/product/BulkProducAddingPage";
 
 function App() {
   return (
