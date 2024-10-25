@@ -48,7 +48,7 @@ const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
     const fetchMainCategories = async () => {
       try {
         const response = await CategoryApi.fetchAllListedCategories();
-        setMainCategories(response.data);
+        setMainCategories(response.data.data);
       } catch (error) {
         console.error("Error fetching main categories:", error);
       }

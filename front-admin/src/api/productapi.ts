@@ -36,6 +36,15 @@ class ProductApi{
           return error;
         }
       }
+    async bulkDownload(): Promise<any> {
+        try {
+
+          return await this.axiosInstance.get(`/api/products/product/bulk/download`);
+        } catch (error: unknown) {
+         
+          return error;
+        }
+      }
     async updateProduct(data:any,ProductId:string): Promise<any> {
         try {
 

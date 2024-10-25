@@ -8,15 +8,21 @@ import { uploadImages,uploadExcel } from "../../config/multerConfig";
 import { validateProductInput } from "../middleware/produtValidation";
 import CloudinaryService from "../../application/services/cloudinaryService";
 import { ExcelService } from "../../application/services/excelService";
+import { CategoryRepository } from "../../infrastructure/repositories/categoryRepository";
+import CategoryModel from "../../infrastructure/model/categoryModel"; 
+import SubCategoryModel from "../../infrastructure/model/subCategoryModel"; 
+import { SubCategoryRepository } from "../../infrastructure/repositories/subCategoryRepository";
 
 
 
 
 
 const productRepo = new ProductRepository(ProductModel);
+const categoryRepo=new CategoryRepository(CategoryModel)
+const subCategoryRepo=new SubCategoryRepository(SubCategoryModel)
 const cloudinaryService=new CloudinaryService()
 const excelService=new ExcelService()
-const productInteractor = new ProductInteractor(productRepo,cloudinaryService,excelService);
+const productInteractor = new ProductInteractor(productRepo,cloudinaryService,excelService,categoryRepo,subCategoryRepo);
 const productController = new ProductController(productInteractor);
 
 const productRoutes = express.Router();
@@ -24,9 +30,10 @@ const productRoutes = express.Router();
 // fuctional routes-----------
 productRoutes.get("/product/filter", productController.FilterProducts.bind(productController));
 productRoutes.get("/product/search", productController.SearchByName.bind(productController));
+productRoutes.post("/product/bulk/upload",uploadExcel.single('file'),productController.bulkAdding.bind(productController));
+productRoutes.get("/product/bulk/download",productController.bulkDownload.bind(productController));
 // Define routes
 productRoutes.post("/product",uploadImages.array('images', 5),productController.addProduct.bind(productController));
-productRoutes.post("/product/bulk",uploadExcel.single('file'),productController.bulkAdding.bind(productController));
 productRoutes.patch("/product/update-img",uploadImages.single('image'),productController.updateImage.bind(productController));
 productRoutes.get("/product", productController.getAllProducts.bind(productController));
 productRoutes.get("/product/listed", productController.getAllListedProducts.bind(productController));

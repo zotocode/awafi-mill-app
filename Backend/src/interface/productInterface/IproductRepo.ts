@@ -13,7 +13,7 @@ export interface IproductRepo {
   findListedAllProducts(page:number,limit:number): Promise<ProductResponse>;
   findProductsBySpelling(page:number,limit:number,name:string): Promise<ProductResponse>;
   productFindById(id: mongoose.Types.ObjectId): Promise<Product | null>;
-  fetchByCategory(mainCategoryId: mongoose.Types.ObjectId | null, subCategoryId: mongoose.Types.ObjectId | null): Promise<ProductDTO[] | null>;
+  fetchByCategoryAndName(page:number,limit:number,filter:any): Promise<ProductDTO[] | null>;
   updateImage(id: mongoose.Types.ObjectId, index: number, imageUrl: string): Promise<{ modifiedCount: number }>;
   deleteProduct(id: mongoose.Types.ObjectId): Promise<boolean>;
   updateListing(id: mongoose.Types.ObjectId, data: { isListed: boolean }): Promise<{ modifiedCount: number }>;

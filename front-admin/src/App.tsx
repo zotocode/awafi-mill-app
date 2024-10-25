@@ -40,7 +40,7 @@ function App() {
 
               <Route path="/products" element={<ProductManagementPage />} />
               <Route path="/update-product/:id" element={<UpdateProductPage />} />
-              <Route path="/bulk-adding" element={<BulkProducAddingPage />} />
+              <Route path="/bulk-upload" element={<BulkProducAddingPage />} />
 
               <Route path="/categories/main" element={<MainCategoryManagementPage />} />
               <Route path="/categories/sub" element={<SubCategoryManagementPage />} />
