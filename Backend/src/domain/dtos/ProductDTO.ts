@@ -25,7 +25,9 @@ export interface ProductDTO {
   subCategory:mongoose.Types.ObjectId | null;
   images: string[];
   variants: Variant[];
-  isListed:boolean
+  isListed:boolean;
+  sku:string;
+  ean:string
 }
 export interface ProductCreationDTO {
   name: string;
@@ -35,4 +37,6 @@ export interface ProductCreationDTO {
   subCategory:mongoose.Types.ObjectId | null;
   images: string[];
   variants: Variant[];
+  sku:string;
+  ean:string
 }

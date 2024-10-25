@@ -46,8 +46,17 @@ export class CategoryRepository extends BaseRepository<ICategory> implements ICa
     };
 }
 
-  async getListedCategories(): Promise<ICategory[]> {
-    return await this.model.find({isListed:true,isDeleted:false});
+  async getListedCategories(page: number, limit: number): Promise<LargeDataFetch> {
+    const skip = (page - 1) * limit;
+    const totalCategories = await this.model.countDocuments({ isListed: true, isDeleted: false });
+    const categories = await this.model.find({ isListed: true, isDeleted: false })
+      .skip(skip)
+      .limit(limit);
+
+    return {
+      data: categories,
+      totalPages: Math.ceil(totalCategories / limit)
+    };
   }
 
   async findByName(name: string): Promise<ICategory | null> {
