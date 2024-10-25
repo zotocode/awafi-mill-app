@@ -21,20 +21,15 @@ export class AdminController {
   
   }
 
-
-  
-
   async allUsers(req: Request, res: Response, next: NextFunction) {
     try {
-        const result = await this.adminInteractor.usersData()
-        return res.status(200).json({status:true, data:result });  
+      const result = await this.adminInteractor.usersData();
+      return res.status(result.status ? 200 : 500).json(result);  
     } catch (error) {
       next(error);
     }
   }
 
-
-  
   async blockUser(req: Request, res: Response, next: NextFunction){
     const result = await this.adminInteractor.blockUser(req.body.email)
     if (result.success) {
@@ -56,4 +51,32 @@ export class AdminController {
       return res.status(401).json({ status: false, message: result.message });
     }
   }
+
+
+  async dashTotalOrders(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await this.adminInteractor.totalOrders()
+      return res.status(200).json({ status: true, data: result });
+    } catch (error) {
+      console.error('Error in dashTotalOrders:', error);
+      return res.status(500).json({ status: false, message: 'Internal server error' });
+    }
+  }
+
+  async dashTotalRevenue(req: Request, res: Response, next: NextFunction) {
+    try {
+        let period: string | undefined;
+        if (typeof req.query.period === 'string') {
+            period = req.query.period;
+        } else {
+            period = undefined; 
+        }     
+        const result = await this.adminInteractor.totalRevenue(period);
+        return res.json(result); 
+    } catch (error) {
+        console.log(error); 
+        next(error); 
+    }
+}
+  
 }

@@ -6,6 +6,8 @@ const email = process.env.ADMIN_EMAIL; // Get the admin email from the environme
 const jwtService = new JWT();
 
 export const verifyAdminToken = (req: Request, res: Response, next: NextFunction) => {
+    console.log("reached on authntication middle");
+    
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({ message: 'No token provided' });

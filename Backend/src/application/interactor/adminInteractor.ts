@@ -1,6 +1,10 @@
 import { IadminInteractor } from "../../interface/adminInterface/IadminInteractor";
 import { IUserRepo } from "../../interface/userInterface/IuserRepo";
 import { Ijwt } from "../../interface/serviceInterface/IjwtInterface";
+import ICheckoutRepo from "../../interface/checkoutInterface/IcheckoutRepo";
+import { UserResponse,UserDTO,UserActionResponse } from "../../domain/dtos/AdminDto";
+import { RevenueSummary,OrderSummary } from "../../domain/dtos/CheckoutDTO";
+import { log } from "winston";
 
 let email =  process.env.ADMIN_EMAIL
 let password = process.env.ADMIN_PASSWORD
@@ -8,9 +12,11 @@ let password = process.env.ADMIN_PASSWORD
 export class AdminInteractor implements IadminInteractor {
   private userRepository: IUserRepo;
   private jwt: Ijwt;
-  constructor(userRepository: IUserRepo ,jwt: Ijwt) {
+  private checkoutRepo: ICheckoutRepo;
+  constructor(userRepository: IUserRepo ,jwt: Ijwt,checkoutRepo: ICheckoutRepo) {
     this.userRepository = userRepository;
-    this.jwt = jwt
+    this.jwt = jwt;
+    this.checkoutRepo = checkoutRepo;
   }
  
  async logIn(data: any): Promise<any> {
@@ -25,17 +31,25 @@ export class AdminInteractor implements IadminInteractor {
      
  }
 
-  async usersData() {
-    try {
-      let userData = await this.userRepository.find();
-      return userData
-    } catch (error) {
-      console.log("false");
-      return { success: false, message: "Invalid credentials" };
-    }
+ async usersData(): Promise<UserResponse> {
+  try {
+    const userData: UserDTO[] = await this.userRepository.findAll(); // Fetch users as UserDTO[]
+    console.log("userData", userData); 
+    return {
+      status: true,
+      data: userData,
+    };
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    
+    return {
+      status: false,
+      data: [], // Handle no user data case
+      message: error instanceof Error ? error.message : "Unknown error occurred",
+    };
   }
-
-  async blockUser(email: string): Promise<any> { 
+}
+  async blockUser(email: string): Promise<UserActionResponse> { 
     try {
       const user = await this.userRepository.findUserEmail(email);
            if (!user) {
@@ -55,7 +69,7 @@ export class AdminInteractor implements IadminInteractor {
     }
   }
 
-  async unblockUser(email: string): Promise<any> { 
+  async unblockUser(email: string): Promise<UserActionResponse> { 
     try {
       const user = await this.userRepository.findUserEmail(email);
            if (!user) {
@@ -73,6 +87,23 @@ export class AdminInteractor implements IadminInteractor {
     }
   }
 
-  
+  async totalOrders(): Promise<OrderSummary[]> {
+    try {
+      const result = await this.checkoutRepo.viewAllorders();
+      return result; 
+    } catch (err) {
+      throw err; 
+    }
+  }
+
+  async totalRevenue(period:string | undefined):Promise<RevenueSummary[]>{
+       try{
+        const result = await this.checkoutRepo.viewRevenue(period);
+        return result
+       }catch(error){
+        console.log(error);
+        throw error
+       }
+  }
 
 }
