@@ -1,3 +1,4 @@
+// application/interactor/checkoutInteractor.ts
 import ICartRepo from "../../interface/cartInterface/IcartRepo";
 import ICheckoutRepo from "../../interface/checkoutInterface/IcheckoutRepo";
 import ICheckoutInteractor from "../../interface/checkoutInterface/IcheckoutInteractor";
@@ -25,7 +26,7 @@ export class CheckoutInteractor implements ICheckoutInteractor {
 
         if (!cart) throw new Error("Cart not found");
 
-        // Check inventory for each product in the cart
+        // Check inventory for each product in the cart 
         for (const item of cart.items) {
             const productId = new mongoose.Types.ObjectId(item.product);
             const product = await this.productRepo.productFindById(productId);
@@ -34,12 +35,43 @@ export class CheckoutInteractor implements ICheckoutInteractor {
             }
         }
 
-        // Create checkout (this could include payment amount and other details)
-        const checkoutData = { ...data }; // Add necessary checkout details here
+        const checkoutData = { ...data }; // add any details if want - abhishek 
         const checkoutResult = await this.checkoutRepo.createCheckout(checkoutData);
 
+
+        // Check payment method
+        switch (data.paymentMethod) {
+            case 'COD':
+                // Handle Cash on Delivery
+                // checkoutResult.status = 'Pending'; // Set status for COD
+                break;
+    
+            case 'Razorpay':
+                // For Razorpay payment
+                const razorpayOptions = {}; // Add any specific options for Razorpay if needed
+                const razorpayResponse = await this.paymentGateway.initiatePayment(checkoutResult.amount, checkoutResult.currency, razorpayOptions);
+                if (!razorpayResponse) {
+                    throw new Error('Razorpay payment initiation failed');
+                }
+                // checkoutResult.status = 'Paid'; // Update status to reflect payment success
+                break;
+    
+            case 'Stripe':
+                // For Stripe payment
+                const stripeOptions = {}; // Add any specific options for Stripe if needed
+                const stripeResponse = await this.paymentGateway.initiatePayment(checkoutResult.amount, checkoutResult.currency, stripeOptions);
+                if (!stripeResponse) {
+                    throw new Error('Stripe payment initiation failed');
+                }
+                // checkoutResult.status = 'Paid'; // Update status to reflect payment success
+                break;
+    
+            default:
+                throw new Error('Invalid payment method');
+        }
+
         // Initiate payment
-        const paymentResponse = await this.paymentGateway.initiatePayment(checkoutResult.amount, checkoutResult.currency);
+        // const paymentResponse = await this.paymentGateway.initiatePayment(checkoutResult.amount, checkoutResult.currency);
 
         // Store payment information in the checkout record if needed (not implemented here)
 

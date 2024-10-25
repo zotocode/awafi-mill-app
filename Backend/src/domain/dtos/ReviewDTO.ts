@@ -8,6 +8,7 @@ export interface ReviewDTO {
   export interface CreateReviewDTO {
     userId: string;
     productId: string;
+    orderId: string;
     rating: number;
     comment?: string;
   }

@@ -21,9 +21,16 @@ export class CartRepository extends BaseRepository<IUserCart> implements ICartRe
   }
  
   async addItemToCart(userId: string, productId: string, quantity: number): Promise<IUserCart | null> {
+  
+    let cart = await this.findCartByUser(userId);
+
+    if (!cart) {
+      cart = await this.createCart({ userId, items: [] });
+    }
+
     return await this.model.findOneAndUpdate(
       { user: userId },
-      { $addToSet: { items: { product: productId, quantity } } }, // Adds product with quantity, avoids duplicates
+      { $addToSet: { items: { product: productId, quantity } } },
       { new: true }
     ).exec();
   }
@@ -31,7 +38,7 @@ export class CartRepository extends BaseRepository<IUserCart> implements ICartRe
   async updateItemQuantity(userId: string, productId: string, quantity: number): Promise<IUserCart | null> {
     return await this.model.findOneAndUpdate(
       { user: userId, "items.product": productId },
-      { $set: { "items.$.quantity": quantity } }, // Update the quantity of the product
+      { $set: { "items.$.quantity": quantity } }, 
       { new: true }
     ).exec();
   }

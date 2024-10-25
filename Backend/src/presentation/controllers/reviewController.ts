@@ -12,7 +12,10 @@ export class ReviewController {
   // Create a new review (HTTP POST)
   async createReview(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      // @ts-ignore
+      const userId = req.user?.id;
       const reviewData: CreateReviewDTO = req.body;
+      reviewData.userId = userId;
       const review = await this.reviewInteractor.createReview(reviewData);
       res.status(201).json(review);
     } catch (error) {
