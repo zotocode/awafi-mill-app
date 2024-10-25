@@ -12,7 +12,7 @@ export class CheckoutRepository extends BaseRepository<ICheckout> implements ICh
   }
 
   async createCheckout(data: CheckoutDTO): Promise<ICheckout> {
-    const checkoutEntity = { user: data.userId, cart: data.cartId, paymentMethod: data.paymentMethod };
+    const checkoutEntity = { user: data.userId, paymentMethod: data.paymentMethod };
     return await super.create(checkoutEntity);
   }
 }
