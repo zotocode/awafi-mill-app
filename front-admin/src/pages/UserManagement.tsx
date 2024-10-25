@@ -48,7 +48,7 @@ const UserManagementPage = () => {
         return row.isBlocked ? "Blocked" : "Active";
       },
     },
-  ];
+  ]
 
   const userActions = (row: User) => (
     <div className="flex space-x-2">
