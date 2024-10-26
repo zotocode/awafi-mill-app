@@ -8,5 +8,5 @@ export interface IadminInteractor{
     unblockUser(data:string):Promise<UserActionResponse>
     totalOrders():Promise<OrderSummary[]>
     totalRevenue(period:string|undefined):Promise<RevenueSummary[]>
-   
+    salesReport(reportType:string|undefined,startDate:string|undefined,endDate:string|undefined):Promise<any>
 }

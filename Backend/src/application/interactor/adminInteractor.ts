@@ -4,7 +4,7 @@ import { Ijwt } from "../../interface/serviceInterface/IjwtInterface";
 import ICheckoutRepo from "../../interface/checkoutInterface/IcheckoutRepo";
 import { UserResponse,UserDTO,UserActionResponse } from "../../domain/dtos/AdminDto";
 import { RevenueSummary,OrderSummary } from "../../domain/dtos/CheckoutDTO";
-import { log } from "winston";
+
 
 let email =  process.env.ADMIN_EMAIL
 let password = process.env.ADMIN_PASSWORD
@@ -69,6 +69,8 @@ export class AdminInteractor implements IadminInteractor {
     }
   }
 
+
+
   async unblockUser(email: string): Promise<UserActionResponse> { 
     try {
       const user = await this.userRepository.findUserEmail(email);
@@ -87,6 +89,7 @@ export class AdminInteractor implements IadminInteractor {
     }
   }
 
+
   async totalOrders(): Promise<OrderSummary[]> {
     try {
       const result = await this.checkoutRepo.viewAllorders();
@@ -95,6 +98,7 @@ export class AdminInteractor implements IadminInteractor {
       throw err; 
     }
   }
+
 
   async totalRevenue(period:string | undefined):Promise<RevenueSummary[]>{
        try{
@@ -106,4 +110,32 @@ export class AdminInteractor implements IadminInteractor {
        }
   }
 
+  async salesReport(
+    reportType: 'day' | 'week' | 'month' | 'year' | undefined,
+    startDate: string | undefined,
+    endDate: string | undefined
+  ): Promise<any> {
+    try {
+      console.log('====================================');
+      console.log('Generating sales report with parameters:', { reportType, startDate, endDate });
+      console.log('====================================');
+      
+      // Ensure that all necessary parameters are provided
+      if (!reportType || !startDate || !endDate) {
+        throw new Error("Missing required parameters for generating sales report.");
+      }
+  
+      // Call the repository method to generate the report
+      const result = await this.checkoutRepo.generateProductSalesReport(startDate, endDate, reportType);
+   console.log("result",result);
+   
+      // Handle or return the result as needed
+      return result;
+      
+    } catch (error) {
+      console.error('Error generating sales report:', error);
+      // Optionally rethrow the error or handle it as needed
+      throw error; 
+    }
+  }
 }
