@@ -14,30 +14,24 @@ const Header = (props: {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const handleLogout = () => {
-    // Dispatch the logout action to clear Redux state
     dispatch(logout());
-
-    // Navigate to the login page after logout
     navigate('/');
   };
 
   const handleConfirmLogout = () => {
-    // Show the confirmation dialog before logout
     setShowConfirmDialog(true);
   };
 
   const handleCancelLogout = () => {
-    // Close the confirmation dialog if the user cancels
     setShowConfirmDialog(false);
   };
 
   return (
     <>
       <header className="sticky top-0 z-50 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
-        <div className="flex flex-grow items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
+        <div className="flex w-full items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
           {/* Left side: Toggle button and logo for small screens */}
           <div className="flex items-center gap-2 sm:gap-4 lg:hidden">
-            {/* <!-- Hamburger Toggle BTN --> */}
             <button
               aria-controls="sidebar"
               onClick={(e) => {
@@ -46,7 +40,6 @@ const Header = (props: {
               }}
               className="z-99999 block rounded-sm border border-stroke bg-white p-1.5 shadow-sm dark:border-strokedark dark:bg-boxdark lg:hidden"
             >
-              {/* Icon for Hamburger menu */}
               <svg
                 className="w-5 h-5 text-black dark:text-white"
                 fill="none"
@@ -68,17 +61,8 @@ const Header = (props: {
             </Link>
           </div>
 
-          {/* Center: Search bar */}
-          <div className="hidden lg:flex lg:flex-grow justify-center">
-            <input
-              type="text"
-              placeholder="Search..."
-              className="rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-            />
-          </div>
-
           {/* Right side: Logout button */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-end gap-3 w-full">
             <button
               type="button"
               onClick={handleConfirmLogout}
@@ -98,7 +82,7 @@ const Header = (props: {
             cancelButtonLabel="Cancel"
             onConfirm={() => {
               handleLogout();
-              setShowConfirmDialog(false); // Close the dialog after confirmation
+              setShowConfirmDialog(false);
             }}
             onCancel={handleCancelLogout}
           />
