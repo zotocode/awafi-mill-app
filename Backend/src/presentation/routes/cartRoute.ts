@@ -15,11 +15,11 @@ const cartRoutes = express.Router();
 
 
 // Define routes
-cartRoutes.post("/", cartController.createCart.bind(cartController));
-cartRoutes.get("/:userId", cartController.getCartByUserId.bind(cartController));
-cartRoutes.post("/add", cartController.addItemToCart.bind(cartController));
-cartRoutes.put("/update", cartController.updateCartItemQuantity.bind(cartController));
-cartRoutes.post("/remove", cartController.removeItemFromCart.bind(cartController));
-cartRoutes.delete("/:userId", cartController.clearCart.bind(cartController));
+cartRoutes.post("/", cartController.createCart.bind(cartController));//
+cartRoutes.get("/", cartController.getCartByUserId.bind(cartController));//
+cartRoutes.post("/add", cartController.addItemToCart.bind(cartController));//
+cartRoutes.put("/update", cartController.updateCartItemQuantity.bind(cartController));//
+cartRoutes.post("/remove", cartController.removeItemFromCart.bind(cartController));//
+cartRoutes.delete("/", cartController.clearCart.bind(cartController));//
 
 export default cartRoutes;

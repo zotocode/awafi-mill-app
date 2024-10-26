@@ -1,5 +1,5 @@
 // src/presentation/controllers/cartController.ts
-
+ 
 import { NextFunction, Request, Response } from "express";
 import ICartInteractor from "../../interface/cartInterface/IcartInteractor"; // Import Cart interactor interface
 import { CartDTO, AddToCartDTO, UpdateCartQuantityDTO, RemoveFromCartDTO } from "../../domain/dtos/CartDTO";
@@ -14,7 +14,10 @@ export class CartController {
   // Create a new cart (HTTP POST)
   async createCart(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      // @ts-ignore
+      const userId = req.user?.id;
       const cartData: CartDTO = req.body;
+      cartData.userId = userId;
       await this.cartInteractor.createCart(cartData);
       res.status(201).json({ message: "Cart created successfully" });
     } catch (error) {
@@ -25,7 +28,8 @@ export class CartController {
   // Get a cart by user ID (HTTP GET)
   async getCartByUserId(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = req.params.userId;
+      // @ts-ignore
+      const userId = req.user?.id; 
       const cart = await this.cartInteractor.getCartByUserId(userId);
       if (cart) {
         res.status(200).json(cart);
@@ -40,7 +44,10 @@ export class CartController {
   // Add item to cart (HTTP POST)
   async addItemToCart(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      // @ts-ignore
+      const userId = req.user?.id;
       const itemData: AddToCartDTO = req.body;
+      itemData.userId = userId;
       const updatedCart = await this.cartInteractor.addItemToCart(itemData);
       res.status(200).json(updatedCart);
     } catch (error) {
@@ -51,7 +58,10 @@ export class CartController {
   // Update item quantity in cart (HTTP PUT)
   async updateCartItemQuantity(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      // @ts-ignore
+      const userId = req.user?.id;
       const itemData: UpdateCartQuantityDTO = req.body;
+      itemData.userId = userId;
       const updatedCart = await this.cartInteractor.updateCartItemQuantity(itemData);
       res.status(200).json(updatedCart);
     } catch (error) {
@@ -62,7 +72,10 @@ export class CartController {
   // Remove item from cart (HTTP POST)
   async removeItemFromCart(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      // @ts-ignore
+      const userId = req.user?.id;
       const itemData: RemoveFromCartDTO = req.body;
+      itemData.userId = userId;
       const updatedCart = await this.cartInteractor.removeItemFromCart(itemData);
       res.status(200).json(updatedCart);
     } catch (error) {
@@ -73,7 +86,8 @@ export class CartController {
   // Clear cart (HTTP DELETE)
   async clearCart(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = req.params.userId;
+      // @ts-ignore 
+      const userId = req.user?.id;
       const cleared = await this.cartInteractor.deleteCart(userId);
       if (cleared) {
         res.status(200).json({ message: "Cart cleared successfully" });
