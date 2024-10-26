@@ -7,7 +7,7 @@ export default interface ICategoryInteractor {
   addCategory(data: categoryCreationDTo): Promise<categoryDTo | responseHandler>;
   getAllCategories(page:number,limit:number): Promise<LargeDataFetch>;
   getByName(page:number,limit:number,name:string): Promise<LargeDataFetch>;
-  getListedCategories(): Promise<categoryDTo[]>;
+  getListedCategories(page:number,limit:number): Promise<LargeDataFetch>;
   getCategoryById(id: mongoose.Types.ObjectId): Promise<categoryDTo | null>;
   updateCategory(id: mongoose.Types.ObjectId, data: Partial<categoryCreationDTo>): Promise<categoryDTo | null |responseHandler>;
   deleteCategory(id: mongoose.Types.ObjectId): Promise<boolean>; 

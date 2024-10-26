@@ -9,7 +9,7 @@ export interface Description {
  export interface Variant {
     weight: string;
     inPrice: string;
-    outPrice:string;
+    outPrice: string;
     stockQuantity: string;
   }
   
@@ -22,6 +22,8 @@ export interface Description {
     category: Category | null;
     images: File[];
     variants: Variant[];
+    sku:string;
+    ean:string;
   }
   
   

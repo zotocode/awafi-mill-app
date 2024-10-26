@@ -52,9 +52,15 @@ export class CategoryInteractor implements IsubCategoryInteractory {
   }
 
   // Get all listed categories
-  async getListedCategories(): Promise<categoryDTo[]> {
-    const categories = await this.categoryRepo.getListedCategories(); // Use repository method
-    return categories.map(this.mapToDTO);
+  async getListedCategories(page: number, limit: number): Promise<LargeDataFetch> {
+    try {
+      const categoriesResponse = await this.categoryRepo.getListedCategories(page, limit);
+      const categories = categoriesResponse.data.map(this.mapToDTO);
+      return { data: categories, totalPages: categoriesResponse.totalPages };
+    } catch (error) {
+      console.error('Error fetching listed categories:', error);
+      throw new Error('Failed to fetch listed categories');
+    }
   }
 
   // Get a category by ID

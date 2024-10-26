@@ -39,7 +39,9 @@ export class SubCategoryController {
     try {
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
-      const {name}=req.body
+      const name = req.query.searchName ? req.query.searchName.toString() : '';
+      
+      
       const categories = await this.categoryInteractor.searchByname(page,limit,name);
       res.status(200).json(categories);
     } catch (error) {
@@ -49,16 +51,18 @@ export class SubCategoryController {
 
   async getListedCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { Id } = req.params;
+     
+      const { mainCategoryid } = req.params;
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
       
+
       // Check if mainCategoryId is provided, and convert it to ObjectId
-      if (!Id) {
+      if (!mainCategoryid) {
          res.status(400).json({ message: "mainCategoryId is required" });
       }
   
-      const categoryId = new mongoose.Types.ObjectId(Id as string);
+      const categoryId = new mongoose.Types.ObjectId(mainCategoryid as string);
   
       const products = await this.categoryInteractor.getListedCategories(categoryId,page,limit);
       res.status(200).json(products);
@@ -71,8 +75,8 @@ export class SubCategoryController {
   // Get a category by ID (HTTP GET)
   async getCategoryById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const productId = new mongoose.Types.ObjectId(req.params.id); // Convert string to ObjectId
-      const product = await this.categoryInteractor.getCategoryById(productId);
+      const categoryId = new mongoose.Types.ObjectId(req.params.id); // Convert string to ObjectId
+      const product = await this.categoryInteractor.getCategoryById(categoryId);
       if (product) {
         res.status(200).json(product);
       } else {

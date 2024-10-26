@@ -7,16 +7,23 @@ import { IproductRepo } from "../../interface/productInterface/IproductRepo";
 import mongoose from "mongoose";
 import { IExcel } from "../../interface/serviceInterface/IexcelInterface";
 import {ProductResponseDTO} from "../../types/productTypes"
+import ICategoryRepo from "../../interface/categoryInterface/IcategoryRepo";
+import ISubCategoryRepo from "../../interface/subCategoryInterface/IsubCategoryRepo";
 
 export class ProductInteractor implements IProductInteractor {
   private productRepo: IproductRepo;
   private cloudinaryService: ICloudinaryService;
-  private excelService:IExcel
+  private excelService:IExcel;
+  private categoryRepo:ICategoryRepo;
+  private subCategoryRepo:ISubCategoryRepo;
 
-  constructor(productRepo: IproductRepo, cloudinaryService: ICloudinaryService,excelService:IExcel) {
+  constructor(productRepo: IproductRepo, cloudinaryService: ICloudinaryService,excelService:IExcel,categoryRepo:ICategoryRepo,subCategoryRepo:ISubCategoryRepo) {
     this.productRepo = productRepo;
     this.cloudinaryService = cloudinaryService;
     this.excelService=excelService
+    this.categoryRepo=categoryRepo
+    this.subCategoryRepo=subCategoryRepo
+
   }
 
   // Adding a new product
@@ -42,25 +49,81 @@ export class ProductInteractor implements IProductInteractor {
 
   async addBulkProduct(productData: any): Promise<any> {
     try {
-      const sheetData = await this.excelService.processExcel(productData.path); // Await the result of the promise
+      const sheetData = await this.excelService.processExcel(productData.path);
   
       if (sheetData && Array.isArray(sheetData)) {
-        // Use map if sheetData is an array
-        const addBulkProducts = sheetData.map((element) => {
-          return this.productRepo.addBulkProduct(element);
+        const addBulkProducts = sheetData.map(async (element) => {
+          if (element.Name) {
+            // Check if the product with the same name already exists
+            const isExist = await this.productRepo.findByName(element.Name);
+            if (isExist) {
+              // Instead of throwing an error, return a failure message
+              return { status: 'failed', message: `Product "${element.Name}" already exists` };
+            }
+          }
+  
+          // Check and set MainCategory and SubCategory IDs
+          if (element.MainCategory) {
+            const isValidMainCategory = await this.categoryRepo.findByName(element.MainCategory);
+  
+            if (isValidMainCategory) {
+              element.MainCategory = isValidMainCategory._id;
+  
+              if (element.SubCategory) {
+                const isValidSubCategory = await this.subCategoryRepo.findByName(element.SubCategory);
+                element.SubCategory = isValidSubCategory ? isValidSubCategory._id : null;
+              }
+            } else {
+              element.MainCategory = null;
+              element.SubCategory = null;
+            }
+          }
+  
+          // Add the product to the repository and return success
+          await this.productRepo.addBulkProduct(element);
+          return { status: 'success', message: `Product "${element.Name}" added successfully` };
         });
   
-        // If you need to wait for all products to be added before proceeding
-        await Promise.allSettled(addBulkProducts);
+        // Wait for all operations to finish
+        const results = await Promise.allSettled(addBulkProducts);
   
-        return { message: 'Bulk products added successfully' };
+        // Separate successful and failed operations
+        const successfulAdds = results
+          .filter(result => result.status === 'fulfilled' && (result as any).value.status === 'success')
+          .map(result => (result as any).value.message);
+  
+        const failedAdds = results
+          .filter(result => result.status === 'fulfilled' && (result as any).value.status === 'failed')
+          .map(result => (result as any).value.message);
+  
+        // if (failedAdds.length) {
+        //   console.error("Failed to add products:", failedAdds);
+        // }
+  
+        return {
+          message: 'Bulk products processed successfully',
+          successCount: successfulAdds.length,
+          failedCount: failedAdds.length,
+          failedMessages: failedAdds,
+          successMessages: successfulAdds,
+        };
       } else {
-        return { message: 'Invalid sheet data format' };
+        return { message: 'Invalid sheet data format', data: sheetData };
       }
     } catch (error) {
       console.error('Error processing bulk products:', error);
       throw new Error('Failed to add bulk products');
     }
+  }
+  
+  
+  
+  async bulkDownload(): Promise<any> {
+    const ProductResponse = await this.productRepo.findAllProducts(0,0);
+     if (ProductResponse.products){
+       const excelBuffer=await this.excelService.createExcelBuffer(ProductResponse.products)
+       return excelBuffer
+     }
   }
   
   async updateImage(id: mongoose.Types.ObjectId, index: number, path: string): Promise<boolean | string> {
@@ -90,9 +153,16 @@ export class ProductInteractor implements IProductInteractor {
   }
 
   // Filter by category
-  async fetchByCategory(mainCategoryId: mongoose.Types.ObjectId | null, subCategoryId: mongoose.Types.ObjectId | null): Promise<ProductDTO[] | null> {
-    const products = await this.productRepo.fetchByCategory(mainCategoryId, subCategoryId);
+  async fetchByCategoryAndName(page:number,limit:number,filter:any): Promise<ProductDTO[] | null> {
+    const products = await this.productRepo.fetchByCategoryAndName(page, limit,filter);
     return products ? products.map((p) => this.mapEntityToDto(p as any)) : null;
+  }
+  // liste products under sub category using maincategory id------
+
+  async listProductsBySubcategories(page:number,limit:number,mainCatId:any): Promise<any> {
+    const products = await this.productRepo.listProductsBySubcategories(page, limit,mainCatId);
+   
+    return products
   }
 
   // Retrieve a product by ID
@@ -151,6 +221,8 @@ export class ProductInteractor implements IProductInteractor {
       images: product.images,
       variants: product.variants,
       isListed: product.isListed,
+      ean: product.ean,
+      sku: product.sku,
     };
   }
 }
