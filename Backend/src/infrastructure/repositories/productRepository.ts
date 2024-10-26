@@ -5,6 +5,7 @@ import IProductSchema from "../../domain/entities/productSchema";
 import { BaseRepository } from "./baseRepository";
 import { IproductRepo } from '../../interface/productInterface/IproductRepo'
 import {ProductResponse} from '../../types/productTypes'
+import { ProductModel } from "../../infrastructure/model/producModel";
 
 type listing = {
   isListed: boolean
@@ -20,6 +21,8 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
       subCategory: productDTO.subCategory,
       category: productDTO.category,
       descriptions: productDTO.descriptions,
+      sku:productDTO.sku,
+      ean:productDTO.sku,
       images: productDTO.images,
       variants: productDTO.variants,
       createdAt: new Date(),
@@ -103,21 +106,76 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
   
     return { products: products, totalPages: Math.ceil(totalProducts / limit) };
   }
+
+
+  async listProductsBySubcategories(page: number, limit: number ,mainCatId:mongoose.Types.ObjectId ): Promise<any> {
+    try {
+      const skip = (page - 1) * limit;
+  
+      const groupedProducts = await ProductModel.aggregate([
+        { 
+          $match: { 
+            category: mainCatId, 
+            isListed: true 
+          } 
+        },
+        {
+          $group: {
+            _id: "$subCategory",
+            products: { $push: "$$ROOT" } // Push all fields for each product in this subcategory
+          }
+        },
+        {
+          $lookup: {
+            from: "subcategories", // Replace with your subcategory collection name
+            localField: "_id",
+            foreignField: "_id",
+            as: "subCategoryDetails"
+          }
+        },
+        {
+          $unwind: "$subCategoryDetails" // Unwind to make subcategory details an object, not an array
+        },
+        {
+          $project: {
+            subCategory: "$subCategoryDetails.name",
+            products: { $slice: ["$products", limit] } // Limit number of products per subcategory
+          }
+        },
+        { $skip: skip }, // Skip to the required page
+        { $limit: limit } // Limit results per page
+      ]);
+  
+      return groupedProducts;
+    } catch (error) {
+      console.error("Error listing products by subcategories:", error);
+      throw error;
+    }
+  };
   
 
-  async fetchByCategory(mainCategoryId?: mongoose.Types.ObjectId | null, subCategoryId?: mongoose.Types.ObjectId | null): Promise<IProductSchema[]> {
-    const filter: any = {};
 
-    if (mainCategoryId) {
-      filter.category = mainCategoryId;
+  
+
+  async fetchByCategoryAndName(page:number,limit:number,filter:any): Promise<IProductSchema[]> {
+
+    const queryFilter: any = {};
+    if (filter.prodctname) {
+      queryFilter.name = { $regex: filter.prodctname, $options: 'i' };
     }
-    if (subCategoryId) {
-      filter.subCategory = subCategoryId;
+    
+    if (filter.MainCategoryId) {
+      queryFilter.category = filter.MainCategoryId;
+    }
+
+    if (filter.SubCategoryId) {
+      queryFilter.subCategory = filter.SubCategoryId;
     }
 
 
+     const skip=(page-1) * limit
     // Fetch products with the filter, or all products if no IDs are provided
-    return await this.model.find(filter).exec();
+    return await this.model.find(queryFilter).skip(skip).limit(limit).exec();
   }
 
   async findByName(name: string): Promise<IProductSchema | null> {

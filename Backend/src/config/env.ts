@@ -25,7 +25,7 @@ const envConfig: EnvConfig = {
 };
 
 // Ensure that all necessary environment variables are set
-if ( !envConfig.EMAIL_USER || !envConfig.EMAIL_PASS || !envConfig.PAYMENT_GATEWAY) {
+if ( !envConfig.EMAIL_USER || !envConfig.EMAIL_PASS ) {
     throw new Error("Missing required environment variables");
 }
 

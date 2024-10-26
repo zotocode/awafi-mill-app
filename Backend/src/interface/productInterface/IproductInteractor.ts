@@ -5,11 +5,18 @@ import {ProductResponseDTO} from '../../types/productTypes'
 
 export default interface IProductInteractor {
   addProduct(data: ProductCreationDTO): Promise<ProductDTO | responseHandler>; // Ensure responseHandler is correctly spelled
+  bulkDownload(): Promise<any>; // Ensure responseHandler is correctly spelled
   addBulkProduct(data: any): Promise<any>; // Ensure responseHandler is correctly spelled
-  fetchByCategory(
-    mainCategoryId: mongoose.Types.ObjectId | null, 
-    subCategoryId: mongoose.Types.ObjectId | null
+  fetchByCategoryAndName(
+   page:number,
+   limit:number,
+   filter:any
   ): Promise<ProductDTO[] | null>;
+  listProductsBySubcategories(
+   page:number,
+   limit:number,
+   mainCatId: mongoose.Types.ObjectId
+  ): Promise<any>;
   
   getAllProducts(page:number,limit:number): Promise<ProductResponseDTO>;
   

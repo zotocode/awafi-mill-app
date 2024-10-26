@@ -1,7 +1,7 @@
 
-import Table from '../components/Tables/Table';
+import Table from '../../components/Tables/Table';
 
-const Dashboard = () => {
+const OrderManagementPage = () => {
   const productData = [
     { productName: 'Apple MacBook Pro 17"', color: 'Silver', category: 'Laptop', price: '$2999' },
     { productName: 'Microsoft Surface Pro', color: 'White', category: 'Laptop PC', price: '$1999' },
@@ -20,11 +20,18 @@ const Dashboard = () => {
   return (
     <>
     
-      <div className="p-4 sm:ml-64 mt-16">
+    <div className="flex flex-col gap-10 w-full">
+    <div className="hidden lg:flex lg:flex-grow justify-center">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+            />
+          </div>
         <Table data={productData} columns={columns} />
       </div>
     </>
   );
 };
 
-export default Dashboard;
+export default OrderManagementPage;

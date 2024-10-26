@@ -11,6 +11,7 @@ import morgan from "morgan";
 import adminRoute from "./presentation/routes/adminRoute";
 import logger from "./utilities/logger";
 import wishlistRoutes from "./presentation/routes/wishlistRoute";
+import checkoutRoutes from "./presentation/routes/checkoutRoute";
 
 
 const startServer = async (): Promise<void> => {
@@ -40,6 +41,7 @@ const startServer = async (): Promise<void> => {
     app.use('api/wishlist', wishlistRoutes)
     app.use('/api/categories', categoryRoute);
     app.use('/api/banner', bannerRoutes);
+    app.use('/api/checkout', checkoutRoutes);
 
 
 
