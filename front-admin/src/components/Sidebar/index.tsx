@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import SidebarLinkGroup from './SidebarLinks';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Logo from '../../images/white Awafi logoWithText.png'
 
 import { 
   faTachometerAlt, 
@@ -11,6 +12,7 @@ import {
   faFolderTree,    // New: for Category section
   faTree ,      // New: for Sub Categories
   faCertificate,
+  faShoppingCart
 } from '@fortawesome/free-solid-svg-icons';
 
 interface SidebarProps {
@@ -74,13 +76,13 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     >
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
-        {/* <NavLink to="/" >
-        <div className='flex flex-row justify-between'>
-          <div className='w-1/3'><img src={logo} alt="" /></div>
-          <div className="text-white text-2xl font-bold">  awafiMill</div>
+        <NavLink to="/" >
+        <div className='flex flex-row '>
+          <div className='w-2/'><img src={Logo} alt="" /></div>
+        
         </div>
         
-        </NavLink> */}
+        </NavLink>
 
         <button
           ref={trigger}
@@ -237,6 +239,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 >
                   <FontAwesomeIcon icon={faCertificate} />
                   Banners
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/order"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                    pathname.includes('order') && 'bg-graydark dark:bg-meta-4'
+                  }`}
+                >
+                  <FontAwesomeIcon  icon={faShoppingCart}  />
+                  Orders
                 </NavLink>
               </li>
             </ul>
