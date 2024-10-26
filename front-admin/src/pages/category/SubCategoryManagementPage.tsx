@@ -54,6 +54,7 @@ const SubCategoryManagementPage = () => {
       }
       if (response.status === 200) {
         setCategories(response.data.data);
+        console.log('Total page',response.data.totalPages)
         setTotalPages(response.data.totalPages);
       }
     } catch (error) {
@@ -96,7 +97,7 @@ const SubCategoryManagementPage = () => {
         updatedCategories[existingCategoryIndex] = newCategory;
         return updatedCategories;
       } else {
-        return [...prev, newCategory];
+        return [newCategory,...prev];
       }
     });
 

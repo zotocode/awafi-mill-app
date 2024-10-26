@@ -95,7 +95,7 @@ const MainCategoryManagementPage = () => {
         updatedCategories[existingCategoryIndex] = newCategory;
         return updatedCategories;
       } else {
-        return [...prev, newCategory];
+        return [newCategory,...prev];
       }
     });
     setModal(false);

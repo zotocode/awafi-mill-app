@@ -265,7 +265,6 @@ const AddProductModal: React.FC<ModalFormProps> = ({
       }
     } catch (error) {
       toast.error("Failed to add product");
-      console.error("Product save error:", error);
     } finally {
       setIsSubmitting(false);
     }

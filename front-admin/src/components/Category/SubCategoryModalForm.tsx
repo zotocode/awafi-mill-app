@@ -44,6 +44,12 @@ const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
     }
   }, [category]);
 
+  const ResetForm=()=>{
+    setName('')
+    setDescription('')
+    setMainCategory('')
+  }
+
   useEffect(() => {
     const fetchMainCategories = async () => {
       try {
@@ -105,7 +111,7 @@ const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
         onSuccess(response.data);
         toast.success(`Category ${category ? "updated" : "created"} successfully`);
       }
-
+      ResetForm()
       onClose();
     } catch (error) {
       console.error("Error submitting category:", error);

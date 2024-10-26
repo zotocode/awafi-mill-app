@@ -22,7 +22,7 @@ export class CategoryRepository extends BaseRepository<ICategory> implements ICa
     const categories= await this.model.find({isDeleted:false}).skip(skip).limit(limit);
     return{
       data:categories,
-      totalPages:totalCategories
+      totalPages: Math.ceil(totalCategories / limit)
     }
   }
   async findbyNameSpellings(page: number, limit: number, name: string): Promise<LargeDataFetch> {

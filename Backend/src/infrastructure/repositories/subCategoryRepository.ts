@@ -21,7 +21,7 @@ export class SubCategoryRepository extends BaseRepository<IsubCategory> implemen
     const category= await this.model.find().skip(skip).limit(limit);
     return{
       data:category,
-      totalPages:totalCategories
+      totalPages: Math.ceil(totalCategories / limit)
     }
 }
 async findCategoryName(page: number, limit: number, name: string): Promise<LargeDataFetch> {
@@ -52,7 +52,7 @@ async findCategoryName(page: number, limit: number, name: string): Promise<Large
     const category= await this.model.find({isListed:true,isDeleted:false,mainCategory:mainCategoryId}).skip(skip).limit(limit);
     return{
       data:category,
-      totalPages:totalCategories
+      totalPages: Math.ceil(totalCategories / limit)
     }
   }
 
