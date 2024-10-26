@@ -12,6 +12,11 @@ export default interface IProductInteractor {
    limit:number,
    filter:any
   ): Promise<ProductDTO[] | null>;
+  listProductsBySubcategories(
+   page:number,
+   limit:number,
+   mainCatId: mongoose.Types.ObjectId
+  ): Promise<any>;
   
   getAllProducts(page:number,limit:number): Promise<ProductResponseDTO>;
   

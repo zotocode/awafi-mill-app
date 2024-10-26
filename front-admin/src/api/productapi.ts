@@ -1,11 +1,11 @@
 import { useApi } from './axiosConfig'
-import { Product } from '../types/productTypes';
+
 
 class ProductApi{
     axiosInstance :any=useApi()
     async addProduct(data:FormData): Promise<any> {
         try {
-          return await this.axiosInstance.post('/api/products/product',data,{
+          return await this.axiosInstance.post('/api/products/product/admin',data,{
             headers: {
               'Content-Type': 'multipart/form-data',
             }});
@@ -16,7 +16,7 @@ class ProductApi{
       }
     async bulkAddProduct(data:FormData): Promise<any> {
         try {
-          return await this.axiosInstance.post('/api/products/product/bulk',data,{
+          return await this.axiosInstance.post('/api/products/product/bulk/admin',data,{
             headers: {
               'Content-Type': 'multipart/form-data',
             }});
@@ -27,7 +27,7 @@ class ProductApi{
       }
     async updateProductImage(productId:string,data:FormData,index:number): Promise<any> {
         try {
-          return await this.axiosInstance.patch(`/api/products/product/update-img?productId=${productId}&index=${index}`,data,{
+          return await this.axiosInstance.patch(`/api/products/product/update-img/admin/?productId=${productId}&index=${index}`,data,{
             headers: {
               'Content-Type': 'multipart/form-data',
             }});
@@ -39,7 +39,7 @@ class ProductApi{
     async bulkDownload(): Promise<any> {
         try {
 
-          return await this.axiosInstance.get(`/api/products/product/bulk/download`);
+          return await this.axiosInstance.get(`/api/products/product/bulk/download/admin`);
         } catch (error: unknown) {
          
           return error;
@@ -48,7 +48,7 @@ class ProductApi{
     async updateProduct(data:any,ProductId:string): Promise<any> {
         try {
 
-          return await this.axiosInstance.put(`/api/products/product/${ProductId}`,data);
+          return await this.axiosInstance.put(`/api/products/product/admin/${ProductId}`,data);
         } catch (error: unknown) {
          
           return error;
@@ -56,7 +56,15 @@ class ProductApi{
       }
     async fetchAllProducts(page:number,limit:number): Promise<any> {
         try {
-          return await this.axiosInstance.get(`/api/products/product?page=${page}&limit=${limit}`);
+          return await this.axiosInstance.get(`/api/products/product/admin/?page=${page}&limit=${limit}`);
+        } catch (error: unknown) {
+         
+          return error;
+        }
+      }
+    async searchByName(page:number,limit:number,search:string): Promise<any> {
+        try {
+          return await this.axiosInstance.get(`/api/products/product/search/admin/?page=${page}&limit=${limit}&searchName=${search}`);
         } catch (error: unknown) {
          
           return error;
@@ -64,7 +72,7 @@ class ProductApi{
       }
     async deleteProduct(id:string): Promise<any> {
         try {
-          return await this.axiosInstance.patch(`/api/products/product/delete/${id}`);
+          return await this.axiosInstance.patch(`/api/products/product/delete/admin/${id}`);
         } catch (error: unknown) {
          
           return error;
@@ -73,7 +81,7 @@ class ProductApi{
     async fetchProductById(id:string): Promise<any> {
         try {
             
-          return await this.axiosInstance.get(`/api/products/product/${id}`);
+          return await this.axiosInstance.get(`/api/products/product/admin/${id}`);
         } catch (error: unknown) {
          
           return error;
@@ -82,7 +90,7 @@ class ProductApi{
       async listingProduct(id:string,action:string): Promise<any> {
         try {
     
-          return await this.axiosInstance.patch(`/api/products/product/${id}?action=${action}`);
+          return await this.axiosInstance.patch(`/api/products/product/admin/${id}?action=${action}`);
         } catch (error: unknown) {
          
           return error;

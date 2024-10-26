@@ -157,6 +157,13 @@ export class ProductInteractor implements IProductInteractor {
     const products = await this.productRepo.fetchByCategoryAndName(page, limit,filter);
     return products ? products.map((p) => this.mapEntityToDto(p as any)) : null;
   }
+  // liste products under sub category using maincategory id------
+
+  async listProductsBySubcategories(page:number,limit:number,mainCatId:any): Promise<any> {
+    const products = await this.productRepo.listProductsBySubcategories(page, limit,mainCatId);
+   
+    return products
+  }
 
   // Retrieve a product by ID
   async getProductById(id: mongoose.Types.ObjectId): Promise<ProductDTO | null> {

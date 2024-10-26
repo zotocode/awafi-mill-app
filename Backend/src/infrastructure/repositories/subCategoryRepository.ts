@@ -48,7 +48,7 @@ async findCategoryName(page: number, limit: number, name: string): Promise<Large
 
   async getListedCategories(mainCategoryId:mongoose.Types.ObjectId,page:number,limit:number): Promise<LargeDataFetch> {
     const skip=(page-1)*limit
-    const totalCategories = await this.model.countDocuments();
+    const totalCategories = await this.model.countDocuments({isListed:true,isDeleted:false,mainCategory:mainCategoryId});
     const category= await this.model.find({isListed:true,isDeleted:false,mainCategory:mainCategoryId}).skip(skip).limit(limit);
     return{
       data:category,

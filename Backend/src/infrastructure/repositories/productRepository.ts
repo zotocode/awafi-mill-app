@@ -5,6 +5,7 @@ import IProductSchema from "../../domain/entities/productSchema";
 import { BaseRepository } from "./baseRepository";
 import { IproductRepo } from '../../interface/productInterface/IproductRepo'
 import {ProductResponse} from '../../types/productTypes'
+import { ProductModel } from "../../infrastructure/model/producModel";
 
 type listing = {
   isListed: boolean
@@ -105,6 +106,55 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
   
     return { products: products, totalPages: Math.ceil(totalProducts / limit) };
   }
+
+
+  async listProductsBySubcategories(page: number, limit: number ,mainCatId:mongoose.Types.ObjectId ): Promise<any> {
+    try {
+      const skip = (page - 1) * limit;
+  
+      const groupedProducts = await ProductModel.aggregate([
+        { 
+          $match: { 
+            category: mainCatId, 
+            isListed: true 
+          } 
+        },
+        {
+          $group: {
+            _id: "$subCategory",
+            products: { $push: "$$ROOT" } // Push all fields for each product in this subcategory
+          }
+        },
+        {
+          $lookup: {
+            from: "subcategories", // Replace with your subcategory collection name
+            localField: "_id",
+            foreignField: "_id",
+            as: "subCategoryDetails"
+          }
+        },
+        {
+          $unwind: "$subCategoryDetails" // Unwind to make subcategory details an object, not an array
+        },
+        {
+          $project: {
+            subCategory: "$subCategoryDetails.name",
+            products: { $slice: ["$products", limit] } // Limit number of products per subcategory
+          }
+        },
+        { $skip: skip }, // Skip to the required page
+        { $limit: limit } // Limit results per page
+      ]);
+  
+      return groupedProducts;
+    } catch (error) {
+      console.error("Error listing products by subcategories:", error);
+      throw error;
+    }
+  };
+  
+
+
   
 
   async fetchByCategoryAndName(page:number,limit:number,filter:any): Promise<IProductSchema[]> {

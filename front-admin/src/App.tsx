@@ -14,6 +14,7 @@ import PublicRoute from "./components/PublicRoute";
 import DefaultLayout from "./layouts/DefaultLayout";
 import BulkProducAddingPage from "./pages/product/BulkProducAddingPage";
 import Banner from "./pages/BannerManagement"
+import OrderManagementPage from "./pages/order/OrderManagement";
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
               <Route path="/products" element={<ProductManagementPage />} />
               <Route path="/update-product/:id" element={<UpdateProductPage />} />
               <Route path="/bulk-upload" element={<BulkProducAddingPage />} />
+              <Route path="/order" element={<OrderManagementPage />} />
 
               <Route path="/categories/main" element={<MainCategoryManagementPage />} />
               <Route path="/categories/sub" element={<SubCategoryManagementPage />} />

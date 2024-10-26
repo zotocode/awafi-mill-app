@@ -162,7 +162,8 @@ export class ProductController  {
     try {
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
-      const { name } = req.body;
+      const name = req.query.searchName ? req.query.searchName.toString() : '';
+      
 
       const products = await this.productInteractor.SearchByName(
         page,
@@ -207,6 +208,35 @@ export class ProductController  {
       next(error);
     }
   }
+  // Fetching products under subcategory using main category id
+  async listProductsBySubcategories(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { mainCatId } = req.params;
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+  
+      if (!mainCatId) {
+         res.status(400).json({ error: "Main category ID is required" });
+      }
+  
+      const MainCategoryId = new mongoose.Types.ObjectId(mainCatId as string);
+  
+      const products = await this.productInteractor.listProductsBySubcategories(
+        page,
+        limit,
+        MainCategoryId
+      );
+      
+      res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  }
+  
 
   // Get a product by ID (HTTP GET)
   async getProductById(
