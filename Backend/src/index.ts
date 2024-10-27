@@ -13,6 +13,7 @@ import logger from "./utilities/logger";
 import wishlistRoutes from "./presentation/routes/wishlistRoute";
 import checkoutRoutes from "./presentation/routes/checkoutRoute";
 import { verifyToken } from "./presentation/middleware/userAuthMiddleware";
+import reviewRoutes from "./presentation/routes/reviewRoute";
 
 
 const startServer = async (): Promise<void> => {
@@ -39,6 +40,7 @@ const startServer = async (): Promise<void> => {
     app.use('/api/admin', adminRoute)
     app.use('/api/products', productRoute);
     app.use('api/cart', verifyToken, cartRoutes)
+    app.use('api/review', verifyToken, reviewRoutes)
     app.use('api/wishlist', verifyToken, wishlistRoutes)
     app.use('/api/categories', categoryRoute);
     app.use('/api/banner', bannerRoutes);
