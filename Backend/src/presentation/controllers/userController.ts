@@ -2,10 +2,7 @@
 //user Controller
 import { Request, Response, NextFunction } from "express";
 import { IUserInteractor } from "../../interface/userInterface/IuserInteractor";
-interface CustomRequest extends Request {
-  user?: { id: string } | null; // Adjusting to include the user id
-}
-// userController.ts
+
 
 export class UserController {
   private userInteractor: IUserInteractor;
@@ -71,7 +68,7 @@ export class UserController {
     }
   }
   //  ==========================================Profile page section==================================
-  async editProfile(req: CustomRequest, res: Response, next: NextFunction) {
+  async editProfile(req: Request, res: Response, next: NextFunction) {
     try {
       const {email,name,phone}= req.body
       const id = req.user?.id;
@@ -89,7 +86,7 @@ export class UserController {
     }
   }
   //  ======================================== user profile=======================================
-  async userProfile(req: CustomRequest, res: Response, next: NextFunction) {
+  async userProfile(req: Request, res: Response, next: NextFunction) {
     try {
       console.log("====================================");
       console.log(req.user);
@@ -106,7 +103,7 @@ export class UserController {
     }
   }
   //  ======================================== user profile=======================================
-  async changePassword(req: CustomRequest, res: Response, next: NextFunction) {
+  async changePassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { password, newPassword } = req.body;
       const id = req.user?.id;
