@@ -18,7 +18,11 @@ const CategorySchema: Schema = new Schema(
     },
     photo: {
       type: String,
+<<<<<<< HEAD
       default: true, // Default value is true
+=======
+      required: true,
+>>>>>>> upstream/develop
     },
     isListed: {
       type: Boolean,

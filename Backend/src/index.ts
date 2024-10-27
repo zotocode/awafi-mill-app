@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
-import 
+import
 userRoute from "./presentation/routes/userRoute";
 import productRoute from "./presentation/routes/productRoute";
 import cartRoutes from "./presentation/routes/cartRoute";
@@ -10,6 +10,10 @@ import cors from "cors";
 import morgan from "morgan";
 import adminRoute from "./presentation/routes/adminRoute";
 import logger from "./utilities/logger";
+import wishlistRoutes from "./presentation/routes/wishlistRoute";
+import checkoutRoutes from "./presentation/routes/checkoutRoute";
+import { verifyToken } from "./presentation/middleware/userAuthMiddleware";
+import reviewRoutes from "./presentation/routes/reviewRoute";
 
 
 const startServer = async (): Promise<void> => {
@@ -33,15 +37,21 @@ const startServer = async (): Promise<void> => {
 
 
     app.use('/api/user', userRoute);
-    app.use('/api/admin',adminRoute)
+    app.use('/api/admin', adminRoute)
     app.use('/api/products', productRoute);
-    app.use('api/cart',cartRoutes)
+    app.use('api/cart', verifyToken, cartRoutes)
+    app.use('api/review', verifyToken, reviewRoutes)
+    app.use('api/wishlist', verifyToken, wishlistRoutes)
     app.use('/api/categories', categoryRoute);
     app.use('/api/banner', bannerRoutes);
+<<<<<<< HEAD
+=======
+    app.use('/api/checkout', checkoutRoutes);
+
+>>>>>>> upstream/develop
 
 
 
-    
 
     // 500 - Internal Server Error handler
     app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -63,3 +73,5 @@ const startServer = async (): Promise<void> => {
 };
 
 startServer();
+
+

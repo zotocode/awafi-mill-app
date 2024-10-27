@@ -6,6 +6,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "useUnknownInCatchVariables": false,
     "outDir": "./dist",
     "rootDir": "./src",
     "declaration": true,
@@ -13,7 +14,7 @@
     "incremental": true,
     "jsx": "react-jsx",
     "lib": ["ES2022", "DOM"],
-    "types": ["node"]
+    "types": ["node", "./src/types/express",]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.spec.ts"]

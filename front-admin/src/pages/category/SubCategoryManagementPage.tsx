@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import React from 'react';
 import  { useEffect, useState } from "react";
+=======
+import React, { useEffect, useState } from "react";
+>>>>>>> upstream/develop
 import { TableColumn } from '../../components/Tables/Table';
 import Table from "../../components/Tables/Table";
 import SubCategoryModalForm from "../../components/Category/SubCategoryModalForm";
@@ -8,6 +12,10 @@ import subcategoryapi from "../../api/subcategoryapi";
 import { toast } from "react-toastify";
 import { ListMinus, ListPlus, Pencil, Trash2 } from "lucide-react";
 import { subCategory } from '../../types/categoryType';
+<<<<<<< HEAD
+=======
+import SearchBar from "../../components/Search/SearchBar";
+>>>>>>> upstream/develop
 
 const SubCategoryManagementPage = () => {
   const [isModal, setModal] = useState(false);
@@ -16,6 +24,7 @@ const SubCategoryManagementPage = () => {
   const [showDialog, setShowDialog] = useState(false);
   const [actionType, setActionType] = useState<"list" | "delete" | null>(null);
   
+<<<<<<< HEAD
   const [currentPage, setCurrentPage] = useState(1); // Current page state
   const [totalPages, setTotalPages] = useState(1); // Total pages state
   const [itemsPerPage] = useState(10); // Define how many items to show per page
@@ -31,10 +40,57 @@ const SubCategoryManagementPage = () => {
         console.log("sub category",response.data)
         setCategories(response.data.data);
         setTotalPages(response.data.totalPages); // Set total pages from response
+=======
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage] = useState(10);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    fetchCategories();
+  }, [debouncedSearchTerm]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [currentPage]);
+
+  async function fetchCategories() {
+    setIsSearching(true);
+    try {
+      let response;
+      if (debouncedSearchTerm) {
+        response = await subcategoryapi.searchCategories(debouncedSearchTerm, currentPage, itemsPerPage);
+      } else {
+        response = await subcategoryapi.fetchAllCategories(currentPage, itemsPerPage);
+      }
+      if (response.status === 200) {
+        setCategories(response.data.data);
+        console.log('Total page',response.data.totalPages)
+        setTotalPages(response.data.totalPages);
+>>>>>>> upstream/develop
       }
     } catch (error) {
       console.error("Error fetching category data:", error);
       toast.error("Failed to fetch categories");
+<<<<<<< HEAD
+=======
+    } finally {
+      setIsSearching(false);
+>>>>>>> upstream/develop
     }
   }
 
@@ -70,7 +126,11 @@ const SubCategoryManagementPage = () => {
         updatedCategories[existingCategoryIndex] = newCategory;
         return updatedCategories;
       } else {
+<<<<<<< HEAD
         return [...prev, newCategory];
+=======
+        return [newCategory,...prev];
+>>>>>>> upstream/develop
       }
     });
 
@@ -173,10 +233,25 @@ const SubCategoryManagementPage = () => {
     <>
       <div className="flex flex-col gap-10 w-full">
         <div className="flex w-full p-5 justify-between items-center">
+<<<<<<< HEAD
           <button
             onClick={() => setModal(true)}
             type="button"
             className="text-white bg-black hover:bg-[#363333]  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+=======
+          <div className="hidden lg:flex lg:flex-grow justify-center">
+            <SearchBar 
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              isSearching={isSearching}
+            />
+          </div>
+
+          <button
+            onClick={() => setModal(true)}
+            type="button"
+            className="text-white bg-black hover:bg-[#363333] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+>>>>>>> upstream/develop
           >
             Add Category
           </button>

@@ -52,10 +52,11 @@ app.*.map.json
 # Backend
 node_modules/
 dist/
-
-#enviroment variable
+Backend/.env
+# Environment Files
 .env
 *.env
+**/.env
 
 dist/
 

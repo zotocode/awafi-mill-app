@@ -14,8 +14,13 @@ interface Variant {
 
 export default interface Product extends Document {
   ID?: string;
+<<<<<<< HEAD
   sku?: string;
   ean?: string;
+=======
+  sku: string;
+  ean: string;
+>>>>>>> upstream/develop
   name: string;
   descriptions: Description[];
   isListed: boolean;

@@ -2,6 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import SidebarLinkGroup from './SidebarLinks';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+<<<<<<< HEAD
+=======
+import Logo from '../../images/white Awafi logoWithText.png'
+>>>>>>> upstream/develop
 
 import { 
   faTachometerAlt, 
@@ -11,6 +15,10 @@ import {
   faFolderTree,    // New: for Category section
   faTree ,      // New: for Sub Categories
   faCertificate,
+<<<<<<< HEAD
+=======
+  faShoppingCart
+>>>>>>> upstream/develop
 } from '@fortawesome/free-solid-svg-icons';
 
 interface SidebarProps {
@@ -74,6 +82,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     >
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
+<<<<<<< HEAD
         {/* <NavLink to="/" >
         <div className='flex flex-row justify-between'>
           <div className='w-1/3'><img src={logo} alt="" /></div>
@@ -81,6 +90,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         </div>
         
         </NavLink> */}
+=======
+        <NavLink to="/" >
+        <div className='flex flex-row '>
+          <div className='w-2/'><img src={Logo} alt="" /></div>
+        
+        </div>
+        
+        </NavLink>
+>>>>>>> upstream/develop
 
         <button
           ref={trigger}
@@ -239,6 +257,20 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   Banners
                 </NavLink>
               </li>
+<<<<<<< HEAD
+=======
+              <li>
+                <NavLink
+                  to="/order"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                    pathname.includes('order') && 'bg-graydark dark:bg-meta-4'
+                  }`}
+                >
+                  <FontAwesomeIcon  icon={faShoppingCart}  />
+                  Orders
+                </NavLink>
+              </li>
+>>>>>>> upstream/develop
             </ul>
           </div>
         </nav>

@@ -5,6 +5,10 @@ import IProductSchema from "../../domain/entities/productSchema";
 import { BaseRepository } from "./baseRepository";
 import { IproductRepo } from '../../interface/productInterface/IproductRepo'
 import {ProductResponse} from '../../types/productTypes'
+<<<<<<< HEAD
+=======
+import { ProductModel } from "../../infrastructure/model/producModel";
+>>>>>>> upstream/develop
 
 type listing = {
   isListed: boolean
@@ -20,6 +24,11 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
       subCategory: productDTO.subCategory,
       category: productDTO.category,
       descriptions: productDTO.descriptions,
+<<<<<<< HEAD
+=======
+      sku:productDTO.sku,
+      ean:productDTO.sku,
+>>>>>>> upstream/develop
       images: productDTO.images,
       variants: productDTO.variants,
       createdAt: new Date(),
@@ -28,6 +37,8 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
 
     return await super.create(productEntity);
 
+<<<<<<< HEAD
+=======
   }
   async addBulkProduct(productData: any): Promise<any> {
     const productEntity = {
@@ -54,6 +65,34 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
      const products =await this.model.find().skip(skip).limit(limit).populate('category').exec();
     return {products:products,totalPages: Math.ceil(totalProducts / limit)}
 
+>>>>>>> upstream/develop
+  }
+  async addBulkProduct(productData: any): Promise<any> {
+    const productEntity = {
+      ID:productData.ID,
+      sku:productData.SKU,
+      ean:productData.EAN,
+      name: productData.Name,
+      subCategory: productData.SubCategory,
+      category: productData.MainCategory,
+      descriptions: productData.Descriptions,
+      images: productData.images,
+      variants: productData.variants,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+<<<<<<< HEAD
+    return await super.create(productEntity);
+
+  }
+  
+  async findAllProducts(page:number,limit:number): Promise<ProductResponse> {
+    const totalProducts = await this.model.countDocuments();
+     const skip = (page - 1) * limit;
+     const products =await this.model.find().skip(skip).limit(limit).populate('category').exec();
+    return {products:products,totalPages: Math.ceil(totalProducts / limit)}
+
   }
 
   async findListedAllProducts(page:number,limit:number): Promise<ProductResponse> {
@@ -63,6 +102,15 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
     return {products:products,totalPages: Math.ceil(totalProducts / limit)}
   }
 
+=======
+  async findListedAllProducts(page:number,limit:number): Promise<ProductResponse> {
+    const totalProducts = await this.model.countDocuments();
+     const skip = (page - 1) * limit;
+    const products= await this.model.find({ isListed: true, isDelete: false }).skip(skip).limit(limit).populate('category').exec();
+    return {products:products,totalPages: Math.ceil(totalProducts / limit)}
+  }
+
+>>>>>>> upstream/develop
   async findProductsBySpelling(page: number, limit: number, name: string): Promise<ProductResponse> {
     const totalProducts = await this.model.countDocuments({
       isListed: true,
@@ -103,6 +151,7 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
   
     return { products: products, totalPages: Math.ceil(totalProducts / limit) };
   }
+<<<<<<< HEAD
   
 
   async fetchByCategory(mainCategoryId?: mongoose.Types.ObjectId | null, subCategoryId?: mongoose.Types.ObjectId | null): Promise<IProductSchema[]> {
@@ -116,8 +165,78 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
     }
 
 
+=======
+
+
+  async listProductsBySubcategories(page: number, limit: number ,mainCatId:mongoose.Types.ObjectId ): Promise<any> {
+    try {
+      const skip = (page - 1) * limit;
+  
+      const groupedProducts = await ProductModel.aggregate([
+        { 
+          $match: { 
+            category: mainCatId, 
+            isListed: true 
+          } 
+        },
+        {
+          $group: {
+            _id: "$subCategory",
+            products: { $push: "$$ROOT" } // Push all fields for each product in this subcategory
+          }
+        },
+        {
+          $lookup: {
+            from: "subcategories", // Replace with your subcategory collection name
+            localField: "_id",
+            foreignField: "_id",
+            as: "subCategoryDetails"
+          }
+        },
+        {
+          $unwind: "$subCategoryDetails" // Unwind to make subcategory details an object, not an array
+        },
+        {
+          $project: {
+            subCategory: "$subCategoryDetails.name",
+            products: { $slice: ["$products", limit] } // Limit number of products per subcategory
+          }
+        },
+        { $skip: skip }, // Skip to the required page
+        { $limit: limit } // Limit results per page
+      ]);
+  
+      return groupedProducts;
+    } catch (error) {
+      console.error("Error listing products by subcategories:", error);
+      throw error;
+    }
+  };
+  
+
+
+  
+
+  async fetchByCategoryAndName(page:number,limit:number,filter:any): Promise<IProductSchema[]> {
+
+    const queryFilter: any = {};
+    if (filter.prodctname) {
+      queryFilter.name = { $regex: filter.prodctname, $options: 'i' };
+    }
+    
+    if (filter.MainCategoryId) {
+      queryFilter.category = filter.MainCategoryId;
+    }
+
+    if (filter.SubCategoryId) {
+      queryFilter.subCategory = filter.SubCategoryId;
+    }
+
+
+     const skip=(page-1) * limit
+>>>>>>> upstream/develop
     // Fetch products with the filter, or all products if no IDs are provided
-    return await this.model.find(filter).exec();
+    return await this.model.find(queryFilter).skip(skip).limit(limit).exec();
   }
 
   async findByName(name: string): Promise<IProductSchema | null> {

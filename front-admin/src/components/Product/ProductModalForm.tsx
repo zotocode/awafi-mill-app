@@ -5,6 +5,10 @@ import categoryapi from "../../api/categoryapi";
 import subcategoryapi from "../../api/subcategoryapi";
 import { toast } from "react-toastify";
 import productapi from "../../api/productapi";
+<<<<<<< HEAD
+=======
+import { z } from "zod";
+>>>>>>> upstream/develop
 
 interface ModalFormProps {
   isOpen: boolean;
@@ -18,6 +22,11 @@ const AddProductModal: React.FC<ModalFormProps> = ({
   onProductAdd,
 }) => {
   const [name, setName] = useState("");
+<<<<<<< HEAD
+=======
+  const [sku, setSku] = useState(""); // New state for SKU
+  const [ean, setEan] = useState(""); // New state for EAN
+>>>>>>> upstream/develop
   const [descriptions, setDescriptions] = useState<Description[]>([
     { header: "", content: "" },
   ]);
@@ -37,10 +46,17 @@ const AddProductModal: React.FC<ModalFormProps> = ({
       try {
         const response = await categoryapi.fetchAllListedCategories();
         if (response.status === 200) {
+<<<<<<< HEAD
           setCategories(response.data);
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
+=======
+          setCategories(response.data.data);
+        }
+      } catch (error) {
+
+>>>>>>> upstream/develop
         toast.error("Failed to fetch categories");
       }
     }
@@ -128,6 +144,14 @@ const AddProductModal: React.FC<ModalFormProps> = ({
   const handleRemoveVariant = (index: number) =>
     setVariants(variants.filter((_, i) => i !== index));
 
+<<<<<<< HEAD
+=======
+  const validateWeight = (value: string) => {
+    const weightRegex = /^(\d+(\.\d+)?)\s*(gram|piece|mg|stick|g|kg|ml|l)s?$/i;
+    return weightRegex.test(value);
+  };
+
+>>>>>>> upstream/develop
   const validateForm = () => {
     const errors: any = {};
 
@@ -136,6 +160,19 @@ const AddProductModal: React.FC<ModalFormProps> = ({
       errors.name = "Product name is required.";
     }
 
+<<<<<<< HEAD
+=======
+    // Validate SKU
+    if (!sku.trim()) {
+      errors.sku = "SKU is required.";
+    }
+
+    // Validate EAN
+    if (!ean.trim()) {
+      errors.ean = "EAN is required.";
+    }
+
+>>>>>>> upstream/develop
     // Validate category selection
     if (!category) {
       errors.category = "Category is required.";
@@ -151,12 +188,19 @@ const AddProductModal: React.FC<ModalFormProps> = ({
       const variantError: any = {};
 
       // Check weight
+<<<<<<< HEAD
       if (
         !variant.weight ||
         isNaN(Number(variant.weight)) ||
         Number(variant.weight) <= 0
       ) {
         variantError.weight = "Weight must be a positive number.";
+=======
+      if (!variant.weight) {
+        variantError.weight = "Weight is required.";
+      } else if (!validateWeight(variant.weight)) {
+        variantError.weight = 'Invalid weight format. Please use a number followed by a unit (e.g., 100 grams, 5 pieces, 500 mg, 2 sticks)';
+>>>>>>> upstream/develop
       }
 
       // Check inPrice
@@ -201,16 +245,29 @@ const AddProductModal: React.FC<ModalFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+<<<<<<< HEAD
     setIsSubmitting(true); // Start submitting
 
     if (!validateForm()) {
       toast.error("Please correct the errors before submitting.");
       setIsSubmitting(false); // Stop submitting
+=======
+    setIsSubmitting(true);
+
+    if (!validateForm()) {
+      toast.error("Please correct the errors before submitting.");
+      setIsSubmitting(false);
+>>>>>>> upstream/develop
       return;
     }
 
     const formData = new FormData();
     formData.append("name", name);
+<<<<<<< HEAD
+=======
+    formData.append("sku", sku);
+    formData.append("ean", ean);
+>>>>>>> upstream/develop
 
     if (category?._id) {
       formData.append("category", category._id);
@@ -227,6 +284,7 @@ const AddProductModal: React.FC<ModalFormProps> = ({
 
     variants.forEach((variant, index) => {
       formData.append(`variants[${index}][weight]`, variant.weight || "");
+<<<<<<< HEAD
       formData.append(
         `variants[${index}][inPrice]`,
         variant.inPrice.toString()
@@ -239,6 +297,11 @@ const AddProductModal: React.FC<ModalFormProps> = ({
         `variants[${index}][stockQuantity]`,
         variant.stockQuantity.toString()
       );
+=======
+      formData.append(`variants[${index}][inPrice]`, variant.inPrice.toString());
+      formData.append(`variants[${index}][outPrice]`, variant.outPrice.toString());
+      formData.append(`variants[${index}][stockQuantity]`, variant.stockQuantity.toString());
+>>>>>>> upstream/develop
     });
 
     images.forEach((image) => {
@@ -256,9 +319,14 @@ const AddProductModal: React.FC<ModalFormProps> = ({
       }
     } catch (error) {
       toast.error("Failed to add product");
+<<<<<<< HEAD
       console.error("Product save error:", error);
     } finally {
       setIsSubmitting(false); // Stop submitting in both success and error cases
+=======
+    } finally {
+      setIsSubmitting(false);
+>>>>>>> upstream/develop
     }
   };
 
@@ -344,6 +412,45 @@ const AddProductModal: React.FC<ModalFormProps> = ({
                 </div>
 
                 <div className="flex flex-row space-x-4">
+<<<<<<< HEAD
+=======
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      SKU
+                    </label>
+                    <input
+                      type="text"
+                      className={`mt-1 block w-full border ${
+                        errors.sku ? "border-red-500" : "border-gray-300"
+                      } rounded-md shadow-sm p-2`}
+                      value={sku}
+                      onChange={(e) => setSku(e.target.value)}
+                    />
+                    {errors.sku && (
+                      <p className="mt-1 text-sm text-red-600">{errors.sku}</p>
+                    )}
+                  </div>
+
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      EAN
+                    </label>
+                    <input
+                      type="text"
+                      className={`mt-1 block w-full border ${
+                        errors.ean ? "border-red-500" : "border-gray-300"
+                      } rounded-md shadow-sm p-2`}
+                      value={ean}
+                      onChange={(e) => setEan(e.target.value)}
+                    />
+                    {errors.ean && (
+                      <p className="mt-1 text-sm text-red-600">{errors.ean}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-row space-x-4">
+>>>>>>> upstream/develop
                   <div className="md:flex-1 flex-none">
                     <label className="block text-sm font-medium text-gray-700">
                       Category
@@ -466,7 +573,11 @@ const AddProductModal: React.FC<ModalFormProps> = ({
                         <div className="flex flex-col">
                           <input
                             type="text"
+<<<<<<< HEAD
                             placeholder="Weight"
+=======
+                            placeholder="Weight (e.g., 100 grams, 5 pieces)"
+>>>>>>> upstream/develop
                             className={`mt-1 block border ${
                               errors.variants && errors.variants[index]?.weight
                                 ? "border-red-500"
@@ -500,7 +611,11 @@ const AddProductModal: React.FC<ModalFormProps> = ({
                                 ? "border-red-500"
                                 : "border-gray-300"
                             } rounded-md shadow-sm p-2`}
+<<<<<<< HEAD
                             value={variant.inPrice}
+=======
+                            value={variant.inPrice.toString()}
+>>>>>>> upstream/develop
                             onChange={(e) =>
                               setVariants((prev) =>
                                 prev.map((v, i) =>
@@ -529,7 +644,11 @@ const AddProductModal: React.FC<ModalFormProps> = ({
                                 ? "border-red-500"
                                 : "border-gray-300"
                             } rounded-md shadow-sm p-2`}
+<<<<<<< HEAD
                             value={variant.outPrice}
+=======
+                            value={variant.outPrice.toString()}
+>>>>>>> upstream/develop
                             onChange={(e) =>
                               setVariants((prev) =>
                                 prev.map((v, i) =>
@@ -558,7 +677,11 @@ const AddProductModal: React.FC<ModalFormProps> = ({
                                 ? "border-red-500"
                                 : "border-gray-300"
                             } rounded-md shadow-sm p-2`}
+<<<<<<< HEAD
                             value={variant.stockQuantity}
+=======
+                            value={variant.stockQuantity.toString()}
+>>>>>>> upstream/develop
                             onChange={(e) =>
                               setVariants((prev) =>
                                 prev.map((v, i) =>

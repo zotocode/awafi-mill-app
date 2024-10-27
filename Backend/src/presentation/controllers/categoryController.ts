@@ -15,7 +15,10 @@ export class CategoryController {
     try {
       const category: categoryCreationDTo = req.body;
       const photo=req.file
+<<<<<<< HEAD
       
+=======
+>>>>>>> upstream/develop
       if(photo && typeof photo.path=="string")
       {
         category.photo=photo.path
@@ -47,7 +50,12 @@ export class CategoryController {
     try {
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
+<<<<<<< HEAD
       const{name}=req.body
+=======
+      const name = req.query.searchName ? req.query.searchName.toString(): '';
+
+>>>>>>> upstream/develop
       const products = await this.categoryInteractor.getByName(page,limit,name);
       res.status(200).json(products);
     } catch (error) {
@@ -58,7 +66,13 @@ export class CategoryController {
   // Get listed categories (HTTP GET)
   async getListedCategories(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+<<<<<<< HEAD
       const products = await this.categoryInteractor.getListedCategories();
+=======
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const products = await this.categoryInteractor.getListedCategories(page,limit);
+>>>>>>> upstream/develop
       res.status(200).json(products);
     } catch (error) {
       next(error);

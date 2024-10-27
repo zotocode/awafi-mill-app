@@ -1,5 +1,5 @@
 class ResponseModel {
-  final List<DataModel> data;
+  final List<SubCategoryModel> data;
   final int totalPages;
 
   ResponseModel({
@@ -9,8 +9,8 @@ class ResponseModel {
 
   factory ResponseModel.fromJson(Map<String, dynamic> json) {
     return ResponseModel(
-      data: List<DataModel>.from(
-          json['data'].map((item) => DataModel.fromJson(item))),
+      data: List<SubCategoryModel>.from(
+          json['data'].map((item) => SubCategoryModel.fromJson(item))),
       totalPages: json['totalPages'],
     );
   }
@@ -23,7 +23,7 @@ class ResponseModel {
   }
 }
 
-class DataModel {
+class SubCategoryModel {
   final String id;
   final String name;
   final String description;
@@ -33,7 +33,7 @@ class DataModel {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  DataModel({
+  SubCategoryModel({
     required this.id,
     required this.name,
     required this.description,
@@ -44,8 +44,8 @@ class DataModel {
     required this.updatedAt,
   });
 
-  factory DataModel.fromJson(Map<String, dynamic> json) {
-    return DataModel(
+  factory SubCategoryModel.fromJson(Map<String, dynamic> json) {
+    return SubCategoryModel(
       id: json['_id'],
       name: json['name'],
       description: json['description'],

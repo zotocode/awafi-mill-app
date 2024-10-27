@@ -8,7 +8,11 @@ export default interface ICategoryRepo {
   addCategory(data: categoryCreationDTo): Promise<ICategory>;
   getAllCategories(page:number,limit:number): Promise<LargeDataFetch>;
   findbyNameSpellings(page:number,limit:number,name:string): Promise<LargeDataFetch>;
+<<<<<<< HEAD
   getListedCategories(): Promise<ICategory[]>;
+=======
+  getListedCategories(page:number,limit:number): Promise<LargeDataFetch>;
+>>>>>>> upstream/develop
   getCategoryById(id: mongoose.Types.ObjectId): Promise<ICategory | null>;
   updateCategory(id: mongoose.Types.ObjectId, data: Partial<categoryCreationDTo>): Promise<ICategory | null>;
   deleteCategory(id: mongoose.Types.ObjectId): Promise<boolean>;

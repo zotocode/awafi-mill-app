@@ -29,6 +29,11 @@ const productSchema = z.object({
   subCategory: z.string().optional(),
   descriptions: z.array(descriptionSchema).min(1, "At least one description is required"),
   variants: z.array(variantSchema).min(1, "At least one variant is required"),
+<<<<<<< HEAD
+=======
+  sku: z.string().min(1, "SKU is required"),
+  ean: z.string().min(1, "EAN is required")  // Changed to only require non-empty string
+>>>>>>> upstream/develop
 });
 
 const UpdateProductPage: React.FC = () => {
@@ -41,7 +46,11 @@ const UpdateProductPage: React.FC = () => {
   ]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
+<<<<<<< HEAD
   const [subCategories, setSubCategories] = useState<subCategory[]>([]);
+=======
+  const [subCategories, setSubCategories] = useState<subCategory[]>([]); // Initialize as an empty array
+>>>>>>> upstream/develop
   const [subCategory, setSubCategory] = useState<Category | null>(null);
   const [images, setImages] = useState<(string | File | null)[]>(Array(MAX_IMAGES).fill(null));
   const [variants, setVariants] = useState<Variant[]>([
@@ -50,6 +59,11 @@ const UpdateProductPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [imageLoading, setImageLoading] = useState<boolean[]>(Array(MAX_IMAGES).fill(false)); // New state
   const [errors, setErrors] = useState<Record<string, string>>({});
+<<<<<<< HEAD
+=======
+  const [sku, setSku] = useState("");
+  const [ean, setEan] = useState("");
+>>>>>>> upstream/develop
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,7 +74,11 @@ const UpdateProductPage: React.FC = () => {
         ]);
 
         if (categoryResponse.status === 200) {
+<<<<<<< HEAD
           setCategories(categoryResponse.data);
+=======
+          setCategories(categoryResponse.data.data);
+>>>>>>> upstream/develop
         }
 
         if (productResponse.status === 200) 
@@ -70,7 +88,19 @@ const UpdateProductPage: React.FC = () => {
           setDescriptions(product.descriptions || [{ header: "", content: "" }]);
           setCategory(product.category || null);
           setSubCategory(product.subCategory || null);
+<<<<<<< HEAD
           setVariants(product.variants || [{ weight: "", inPrice: "", outPrice: "", stockQuantity: ""}]);
+=======
+          // Convert numeric values to strings when setting variants
+          setVariants(product.variants?.map((variant: any) => ({
+            weight: variant.weight || "",
+            inPrice: variant.inPrice?.toString() || "",
+            outPrice: variant.outPrice?.toString() || "",
+            stockQuantity: variant.stockQuantity?.toString() || ""
+          })) || [{ weight: "", inPrice: "", outPrice: "", stockQuantity: ""}]);
+          setSku(product.sku || "");
+          setEan(product.ean || "");
+>>>>>>> upstream/develop
 
           const existingImages = product.images || [];
           setImages([
@@ -104,7 +134,11 @@ const UpdateProductPage: React.FC = () => {
         try {
           const response = await subcategoryapi.fetchAllListedCategories(category._id);
           if (response.status === 200) {
+<<<<<<< HEAD
             setSubCategories(response.data);
+=======
+            setSubCategories(response.data.data);
+>>>>>>> upstream/develop
           }
         } catch (error) {
           console.error("Error fetching subcategories:", error);
@@ -191,6 +225,11 @@ const UpdateProductPage: React.FC = () => {
         subCategory: subCategory?._id,
         descriptions,
         variants,
+<<<<<<< HEAD
+=======
+        sku,
+        ean,
+>>>>>>> upstream/develop
       });
       setErrors({});
       return true;
@@ -218,7 +257,18 @@ const UpdateProductPage: React.FC = () => {
       category: category?._id,
       subCategory: subCategory?._id,
       descriptions,
+<<<<<<< HEAD
       variants,
+=======
+      variants: variants.map(variant => ({
+        ...variant,
+        inPrice: variant.inPrice.toString(),
+        outPrice: variant.outPrice.toString(),
+        stockQuantity: variant.stockQuantity.toString()
+      })),
+      sku,
+      ean,
+>>>>>>> upstream/develop
     };
 
     try {
@@ -393,7 +443,11 @@ const UpdateProductPage: React.FC = () => {
         disabled={!category}
       >
         <option value="">{subCategory ? subCategory.name : "Select a sub category"}</option>
+<<<<<<< HEAD
         {subCategories.map((subCat) => (
+=======
+        {Array.isArray(subCategories) && subCategories.map((subCat) => (
+>>>>>>> upstream/develop
           <option key={subCat._id} value={subCat._id}>
             {subCat.name}
           </option>
@@ -403,6 +457,47 @@ const UpdateProductPage: React.FC = () => {
   </div>
 </div>
 
+<<<<<<< HEAD
+=======
+<div className="bg-white shadow-lg rounded-lg p-6">
+          <h2 className="text-2xl font-semibold mb-6 text-gray-700">Product Identifiers</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* SKU Input */}
+            <div className="flex flex-col">
+              <label htmlFor="sku" className="block text-sm font-medium text-gray-700 mb-1">
+                SKU (Stock Keeping Unit)
+              </label>
+              <input
+                id="sku"
+                type="text"
+                value={sku}
+                onChange={(e) => setSku(e.target.value)}
+                className={`bg-white border ${errors['sku'] ? 'border-red-500' : 'border-gray-300'} text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
+                required
+              />
+              {errors['sku'] && <p className="mt-1 text-sm text-red-500">{errors['sku']}</p>}
+            </div>
+
+            {/* EAN Input */}
+            <div className="flex flex-col">
+              <label htmlFor="ean" className="block text-sm font-medium text-gray-700 mb-1">
+                EAN (European Article Number)
+              </label>
+              <input
+                id="ean"
+                type="text"
+                value={ean}
+                onChange={(e) => setEan(e.target.value)}
+                className={`bg-white border ${errors['ean'] ? 'border-red-500' : 'border-gray-300'} text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
+                required
+              />
+              {errors['ean'] && <p className="mt-1 text-sm text-red-500">{errors['ean']}</p>}
+            </div>
+          </div>
+        </div>
+
+
+>>>>>>> upstream/develop
         <div className="bg-white shadow-lg rounded-lg p-6">
   <h2 className="text-2xl font-semibold mb-6 text-gray-700">Descriptions</h2>
   {descriptions.map((desc, index) => (
@@ -447,7 +542,11 @@ const UpdateProductPage: React.FC = () => {
   <button
     type="button"
     onClick={handleAddDescription}
+<<<<<<< HEAD
     className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+=======
+    className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+>>>>>>> upstream/develop
   >
     Add Description
   </button>
@@ -550,17 +649,29 @@ const UpdateProductPage: React.FC = () => {
   <button
     type="button"
     onClick={handleAddVariant}
+<<<<<<< HEAD
     className="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+=======
+    className="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+>>>>>>> upstream/develop
   >
     Add Variant
   </button>
 </div>
 
+<<<<<<< HEAD
 
         <div className="flex justify-end">
           <button
             type="submit"
             className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+=======
+       
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+>>>>>>> upstream/develop
           >
             Update Product
           </button>

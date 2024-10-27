@@ -22,7 +22,11 @@ export class CategoryRepository extends BaseRepository<ICategory> implements ICa
     const categories= await this.model.find({isDeleted:false}).skip(skip).limit(limit);
     return{
       data:categories,
+<<<<<<< HEAD
       totalPages:totalCategories
+=======
+      totalPages: Math.ceil(totalCategories / limit)
+>>>>>>> upstream/develop
     }
   }
   async findbyNameSpellings(page: number, limit: number, name: string): Promise<LargeDataFetch> {
@@ -46,8 +50,22 @@ export class CategoryRepository extends BaseRepository<ICategory> implements ICa
     };
 }
 
+<<<<<<< HEAD
   async getListedCategories(): Promise<ICategory[]> {
     return await this.model.find({isListed:true,isDeleted:false});
+=======
+  async getListedCategories(page: number, limit: number): Promise<LargeDataFetch> {
+    const skip = (page - 1) * limit;
+    const totalCategories = await this.model.countDocuments({ isListed: true, isDeleted: false });
+    const categories = await this.model.find({ isListed: true, isDeleted: false })
+      .skip(skip)
+      .limit(limit);
+
+    return {
+      data: categories,
+      totalPages: Math.ceil(totalCategories / limit)
+    };
+>>>>>>> upstream/develop
   }
 
   async findByName(name: string): Promise<ICategory | null> {

@@ -7,7 +7,10 @@ import { ref, required } from 'joi';
 
 // Create the product schema
 const productSchema = new Schema<Product>({
+<<<<<<< HEAD
   ID:{type:String,required:false},
+=======
+>>>>>>> upstream/develop
   sku:{type:String,required:false},
   ean:{type:String,required:false},
   name: { type: String, required: true },
