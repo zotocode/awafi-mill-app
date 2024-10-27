@@ -1,11 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frondend/common/assigns.dart';
 import 'package:frondend/common/style.dart';
-import 'package:frondend/view/components/widgets/offer_carousal.dart';
-import 'package:frondend/view/components/widgets/prodoct.dart';
+import 'package:frondend/view/components/silvers/colleciton_banner.dart';
+import 'package:frondend/view/components/silvers/offer_banner.dart';
+import 'package:frondend/view/components/silvers/prodouct.dart';
+import 'package:frondend/view/components/silvers/welcome_banner.dart';
 import 'package:frondend/view/screens/internal_pages/categories.dart';
-import 'package:frondend/view/screens/internal_pages/collections.dart';
 import 'package:frondend/view/screens/internal_pages/home_search.dart';
 import 'package:frondend/view/screens/internal_pages/notifications.dart';
 import 'package:frondend/view/screens/onboarding_pages/login.dart';
@@ -23,9 +25,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final ScrollController scrollController = ScrollController();
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<CategoryProvider>(context, listen: false).fetchCategories();
     });
@@ -33,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHieght = MediaQuery.of(context).size.height;
     return SafeArea(
       child: GestureDetector(
         onTap: () {
@@ -117,10 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderSide: BorderSide(color: Style.themeColor))),
                 ),
                 SizedBox(height: 16),
-                OfferCarousalWidget(
-                  image: 'assets/images/Rectangle 34.png',
-                  height: 180,
-                ),
+                WelcomeBannerSilver(height: screenHieght),
                 Text(
                   'Top Categories',
                   style: GoogleFonts.mulish(
@@ -144,63 +146,106 @@ class _HomeScreenState extends State<HomeScreen> {
                     return SizedBox(
                       height: 250,
                       child: GridView.builder(
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: categoryProvider.categories.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3,
-                                  crossAxisSpacing: 8,
-                                  mainAxisSpacing: 8),
-                          itemBuilder: (context, index) {
-                            var data = categoryProvider.categories[index];
-                            return InkWell(
-                              onTap: () {
-                                Get.to(() => TopCategoriesScreen(
-                                      appBarText: data.name,
-                                    ));
-                              },
-                              child: Container(
-                                height: 40,
-                                width: 40,
-                                decoration: BoxDecoration(
-                                    border: Border.all(width: 2),
-                                    borderRadius: BorderRadius.circular(20)),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      // Image.asset(
-                                      //   data['image'],
-                                      // ),
-                                      SizedBox(height: 10),
-                                      Flexible(
-                                        child: Text(
-                                          data.name,
-                                          style: GoogleFonts.mulish(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),
-                                          textAlign: TextAlign.center,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: categoryProvider.categories.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                        ),
+                        itemBuilder: (context, index) {
+                          var data = categoryProvider.categories[index];
+                          return InkWell(
+                            onTap: () {
+                              Get.to(() =>
+                                  TopCategoriesScreen(appBarText: data.name));
+                            },
+                            child: Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                border: Border.all(width: 2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    // Use CachedNetworkImage for network images
+                                    data.photo.startsWith('http')
+                                        ? Container(
+                                            width: double.infinity,
+                                            height:
+                                                80, // Adjust height as needed
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              // You can add a border or color if needed
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(
+                                                  10), // Ensure image fits within rounded corners
+                                              child: CachedNetworkImage(
+                                                imageUrl: data.photo,
+                                                fit: BoxFit
+                                                    .cover, // This ensures the image covers the container properly
+                                                placeholder: (context, url) =>
+                                                    Center(
+                                                  child: SizedBox(
+                                                    width:
+                                                        40, // Set a fixed size for the CircularProgressIndicator
+                                                    height: 40,
+                                                    child:
+                                                        CircularProgressIndicator(),
+                                                  ),
+                                                ),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        Icon(
+                                                  Icons.error,
+                                                  size:
+                                                      40, // Fixed size for error icon
+                                                ),
+                                              ),
+                                            ),
+                                          )
+
+                                        // Use Image.asset for local asset images
+                                        : Image.asset(
+                                            data.photo,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Icon(Icons
+                                                  .error); // Show error icon if asset fails
+                                            },
+                                          ),
+                                    SizedBox(height: 10),
+                                    Flexible(
+                                      child: Text(
+                                        data.name,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.mulish(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                      )
-                                    ],
-                                  ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    )
+                                  ],
                                 ),
                               ),
-                            );
-                          }),
+                            ),
+                          );
+                        },
+                      ),
                     );
                   },
                 ),
-                SizedBox(height: 20),
-                OfferCarousalWidget(
-                    height: 140, image: 'assets/images/offer.png'),
-                SizedBox(height: 20),
-                OfferCarousalWidget(
-                  image: 'assets/images/Rectangle 34.png',
-                  height: 180,
-                ),
-                SizedBox(height: 25),
+                SizedBox(height: 16),
+                OfferCarousalWidget(height: screenHieght),
+                WelcomeBannerSilver(height: screenHieght),
                 Padding(
                   padding: const EdgeInsets.only(left: 8, right: 12),
                   child: Row(
@@ -223,66 +268,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8, right: 8),
-                  child: SizedBox(
-                    height: 750,
-                    child: ListView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: Assigns.collections.length,
-                        itemBuilder: (context, index) {
-                          var collection = Assigns.collections[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 24),
-                            child: InkWell(
-                              onTap: () {
-                                Get.to(() => CollectionsScreen(
-                                      appBarText: collection['text'],
-                                    ));
-                              },
-                              child: Container(
-                                height: 160,
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
-                                    image: DecorationImage(
-                                        image: AssetImage(collection['image']),
-                                        fit: BoxFit.cover)),
-                                child: Container(
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(16),
-                                      gradient: LinearGradient(
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight,
-                                          colors: [
-                                            Colors.black.withOpacity(0.1),
-                                            Colors.black.withOpacity(0.8),
-                                          ])),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        collection['text'],
-                                        style: GoogleFonts.mulish(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      SizedBox(width: 30),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        }),
-                  ),
-                ),
                 SizedBox(height: 20),
+                CollecitonBannerSilver(),
+                SizedBox(height: 25),
                 Padding(
                   padding: const EdgeInsets.only(left: 8, right: 8),
                   child: Row(
@@ -306,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 SizedBox(height: 14),
-                productListWidget(),
+                ProductScreen(),
               ],
             ),
           ),

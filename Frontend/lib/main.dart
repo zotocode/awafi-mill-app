@@ -5,7 +5,9 @@ import 'package:frondend/view_model/provider.dart/bottom_bar.dart';
 import 'package:frondend/view_model/provider.dart/category.dart';
 import 'package:frondend/view_model/provider.dart/field_provider.dart';
 import 'package:frondend/view_model/provider.dart/loading.dart';
+import 'package:frondend/view_model/provider.dart/prodouct_provider.dart';
 import 'package:frondend/view_model/provider.dart/quantity.dart';
+import 'package:frondend/view_model/provider.dart/wishlist_provider.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -23,6 +25,8 @@ void main() async {
       ChangeNotifierProvider(create: (_) => ProductQuantity()),
       ChangeNotifierProvider(create: (_) => LoadingProvider()),
       ChangeNotifierProvider(create: (_) => CategoryProvider()),
+      ChangeNotifierProvider(create: (_) => ProductProvider()),
+      ChangeNotifierProvider(create: (_) => WishlistProvider()),
     ],
     child: AwafiMill(),
   ));

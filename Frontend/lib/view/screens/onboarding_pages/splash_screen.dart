@@ -147,8 +147,10 @@ class _AnimationExampleState extends State<AnimationExample>
                           animatedTexts: [
                             TypewriterAnimatedText(
                               'AWAFI MILL',
-                              textStyle: GoogleFonts.mulish(
-                                  letterSpacing: 1, fontSize: 24),
+                              textStyle: GoogleFonts.ubuntu(
+                                  letterSpacing: 4,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w900),
                               speed: const Duration(
                                   milliseconds: 300), // Slower typing speed
                             ),

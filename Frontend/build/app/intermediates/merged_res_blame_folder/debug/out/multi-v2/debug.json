@@ -410,7 +410,7 @@
             "outputFile": "com.example.frondend.app-merged_res-27:/values-night-v8_values-night-v8.arsc.flat",
             "map": [
                 {
-                    "source": "E:\\flutter\\awafi-mill-app\\Frontend\\android\\app\\src\\main\\res\\values-night\\styles.xml",
+                    "source": "E:\\flutter\\awafi-mill-app2\\Frontend\\android\\app\\src\\main\\res\\values-night\\styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",
@@ -3102,7 +3102,7 @@
                     }
                 },
                 {
-                    "source": "E:\\flutter\\awafi-mill-app\\Frontend\\android\\app\\src\\main\\res\\values\\styles.xml",
+                    "source": "E:\\flutter\\awafi-mill-app2\\Frontend\\android\\app\\src\\main\\res\\values\\styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",

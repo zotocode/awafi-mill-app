@@ -1,9 +1,9 @@
-#Thu Oct 24 21:05:35 IST 2024
-base.0=E\:\\flutter\\awafi-mill-app\\Frontend\\build\\app\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
-base.1=E\:\\flutter\\awafi-mill-app\\Frontend\\build\\app\\intermediates\\dex\\debug\\mergeLibDexDebug\\0\\classes.dex
-base.2=E\:\\flutter\\awafi-mill-app\\Frontend\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
-base.3=E\:\\flutter\\awafi-mill-app\\Frontend\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\1\\classes.dex
-base.4=E\:\\flutter\\awafi-mill-app\\Frontend\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\3\\classes.dex
+#Sun Oct 27 00:10:32 IST 2024
+base.0=E\:\\flutter\\awafi-mill-app2\\Frontend\\build\\app\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
+base.1=E\:\\flutter\\awafi-mill-app2\\Frontend\\build\\app\\intermediates\\dex\\debug\\mergeLibDexDebug\\0\\classes.dex
+base.2=E\:\\flutter\\awafi-mill-app2\\Frontend\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
+base.3=E\:\\flutter\\awafi-mill-app2\\Frontend\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\1\\classes.dex
+base.4=E\:\\flutter\\awafi-mill-app2\\Frontend\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\3\\classes.dex
 path.0=classes.dex
 path.1=0/classes.dex
 path.2=0/classes.dex

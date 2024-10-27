@@ -3,8 +3,10 @@ class categoryModel {
   final String id;
   final bool? isListed;
   final bool? isDeleted;
+  final String photo;
 
   categoryModel({
+    required this.photo,
     required this.name,
     required this.id,
     this.isListed,
@@ -12,10 +14,11 @@ class categoryModel {
   });
   factory categoryModel.fromJson(Map<String, dynamic> json) {
     return categoryModel(
-      name: json['name'],
+      name: json['name'] ?? '',
+      photo: json['photo'] ?? '',
       id: json['_id'],
-      isListed: json['isListed'],
-      isDeleted: json['isDeleted'],
+      isListed: json['isListed'] ?? "",
+      isDeleted: json['isDeleted'] ?? '',
     );
   }
 

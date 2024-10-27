@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frondend/model/entities.dart/category.dart';
-import 'package:frondend/view_model/services.dart/category.dart';
+import 'package:frondend/view_model/services.dart/category_sercvice.dart';
 
 class CategoryProvider with ChangeNotifier {
   List<categoryModel> _categories = [];

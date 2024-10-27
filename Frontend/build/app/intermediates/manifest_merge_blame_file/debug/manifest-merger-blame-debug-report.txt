@@ -13,8 +13,8 @@
 13         to allow setting breakpoints, to provide hot reload, etc.
 14    -->
 15    <uses-permission android:name="android.permission.INTERNET" />
-15-->E:\flutter\awafi-mill-app\Frontend\android\app\src\debug\AndroidManifest.xml:6:5-66
-15-->E:\flutter\awafi-mill-app\Frontend\android\app\src\debug\AndroidManifest.xml:6:22-64
+15-->E:\flutter\awafi-mill-app2\Frontend\android\app\src\main\AndroidManifest.xml:2:4-66
+15-->E:\flutter\awafi-mill-app2\Frontend\android\app\src\main\AndroidManifest.xml:2:21-63
 16    <!--
 17     Required to query activities that can process text, see:
 18         https://developer.android.com/training/package-visibility and
@@ -23,16 +23,16 @@
 21         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin.
 22    -->
 23    <queries>
-23-->E:\flutter\awafi-mill-app\Frontend\android\app\src\main\AndroidManifest.xml:39:5-44:15
+23-->E:\flutter\awafi-mill-app2\Frontend\android\app\src\main\AndroidManifest.xml:41:5-46:15
 24        <intent>
-24-->E:\flutter\awafi-mill-app\Frontend\android\app\src\main\AndroidManifest.xml:40:9-43:18
+24-->E:\flutter\awafi-mill-app2\Frontend\android\app\src\main\AndroidManifest.xml:42:9-45:18
 25            <action android:name="android.intent.action.PROCESS_TEXT" />
-25-->E:\flutter\awafi-mill-app\Frontend\android\app\src\main\AndroidManifest.xml:41:13-72
-25-->E:\flutter\awafi-mill-app\Frontend\android\app\src\main\AndroidManifest.xml:41:21-70
+25-->E:\flutter\awafi-mill-app2\Frontend\android\app\src\main\AndroidManifest.xml:43:13-72
+25-->E:\flutter\awafi-mill-app2\Frontend\android\app\src\main\AndroidManifest.xml:43:21-70
 26
 27            <data android:mimeType="text/plain" />
-27-->E:\flutter\awafi-mill-app\Frontend\android\app\src\main\AndroidManifest.xml:42:13-50
-27-->E:\flutter\awafi-mill-app\Frontend\android\app\src\main\AndroidManifest.xml:42:19-48
+27-->E:\flutter\awafi-mill-app2\Frontend\android\app\src\main\AndroidManifest.xml:44:13-50
+27-->E:\flutter\awafi-mill-app2\Frontend\android\app\src\main\AndroidManifest.xml:44:19-48
 28        </intent>
 29    </queries>
 30
@@ -90,13 +90,13 @@
 76            android:value="2" />
 77
 78        <activity
-78-->[:url_launcher_android] E:\flutter\awafi-mill-app\Frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:8:9-11:74
+78-->[:url_launcher_android] E:\flutter\awafi-mill-app2\Frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:8:9-11:74
 79            android:name="io.flutter.plugins.urllauncher.WebViewActivity"
-79-->[:url_launcher_android] E:\flutter\awafi-mill-app\Frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:9:13-74
+79-->[:url_launcher_android] E:\flutter\awafi-mill-app2\Frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:9:13-74
 80            android:exported="false"
-80-->[:url_launcher_android] E:\flutter\awafi-mill-app\Frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:10:13-37
+80-->[:url_launcher_android] E:\flutter\awafi-mill-app2\Frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:10:13-37
 81            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
-81-->[:url_launcher_android] E:\flutter\awafi-mill-app\Frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:11:13-71
+81-->[:url_launcher_android] E:\flutter\awafi-mill-app2\Frontend\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:11:13-71
 82
 83        <uses-library
 83-->[androidx.window:window:1.2.0] C:\Users\Lenovo\.gradle\caches\transforms-3\3e108fe9d597d03770ae82acaebb5b63\transformed\jetified-window-1.2.0\AndroidManifest.xml:23:9-25:40
