@@ -3,6 +3,7 @@ import { IUserRepo } from "../../interface/userInterface/IuserRepo";
 import { IuserDocument, userModel } from "../model/userModel";
 import { InewUserData } from "../../types/userTypes";
 import { BaseRepository } from "./baseRepository";
+import { UserDTO } from "../../domain/dtos/AdminDto";
 
 export class UserRepo extends BaseRepository<IuserDocument> implements IUserRepo {
   constructor() {
@@ -38,26 +39,25 @@ export class UserRepo extends BaseRepository<IuserDocument> implements IUserRepo
           phone:userData.phone
         });
         await newUser.save();
-        return "registration completed";
+        return "registration completed"
       }
+
+
       async updatePassword(id: string, hashedPassword: string): Promise<void> {
-        await userModel.updateOne({ _id: id }, { $set: { password: hashedPassword } });
+      await userModel.updateOne({ _id: id }, { $set: { password: hashedPassword } });
     }
       
     async updateProfile(id: string, email: string, name: string, phone: number): Promise<void> {
       const updateFields: any = {};
     
       // Build update object only with defined fields
-      if (email !== undefined) updateFields.email = email;
+      if (email !== undefined) updateFields.email = email; 
       if (name !== undefined) updateFields.name = name;
       if (phone !== undefined) updateFields.phone = phone; 
     
       if (Object.keys(updateFields).length === 0) {
         throw new Error("No fields to update");
       }  
-      console.log('====================================');
-      console.log(updateFields);
-      console.log('====================================');
       const result = await userModel.updateOne(
         { _id: id },  
         { $set: updateFields }  
@@ -65,14 +65,23 @@ export class UserRepo extends BaseRepository<IuserDocument> implements IUserRepo
       
     }
 
-    async find(): Promise<any> {
+    async findAll(): Promise<UserDTO[]> {  // Ensure return type is strictly UserDTO[]
       try {
-        return await this.model.find({}); 
+        const users: IuserDocument[] = await this.model.find({}); // Fetch users as IuserDocument[]
+        
+        // Map the raw Mongoose documents to UserDTO
+        const userDTOs: UserDTO[] = users.map((user: IuserDocument) => ({
+          _id: user._id.toString(), // Convert ObjectId to string
+          email: user.email,
+          name: user.name,
+          phone: user.phone,
+          isBlocked: user.isBlocked,
+        }));
+  
+        return userDTOs; // Return UserDTO[]
       } catch (error) {
-        console.error("Error finding user:", error);
-        throw error;
+        console.error("Error finding users:", error);
+        throw error; // Rethrow error for further handling
       }
     }
-
-    
 }

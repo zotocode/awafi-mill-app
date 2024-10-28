@@ -24,6 +24,9 @@ const envConfig: EnvConfig = {
     // STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY as string
 };
 
+// Log loaded environment variables for debugging
+console.log("Environment Variables Loaded:", envConfig);
+
 // Ensure that all necessary environment variables are set
 if ( !envConfig.EMAIL_USER || !envConfig.EMAIL_PASS ) {
     throw new Error("Missing required environment variables");
