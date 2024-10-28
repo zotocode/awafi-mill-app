@@ -12,8 +12,12 @@ export class CheckoutController {
 
   async checkout(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      // @ts-ignore
+  
       const userId = req.user?.id;
+      if (!userId) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+      }
       const checkoutData: CheckoutDTO = req.body;
       checkoutData.userId = userId;
       await this.checkoutInteractor.processCheckout(checkoutData);
