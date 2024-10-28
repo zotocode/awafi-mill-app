@@ -36,15 +36,16 @@ class ProductApi{
           return error;
         }
       }
-    async bulkDownload(): Promise<any> {
+      async bulkDownload(): Promise<any> {
         try {
-
-          return await this.axiosInstance.get(`/api/products/product/bulk/download/admin`);
+          return await this.axiosInstance.get(`/api/products/product/bulk/download/admin`, {
+            responseType: 'arraybuffer', // Set to receive binary data
+          });
         } catch (error: unknown) {
-         
           return error;
         }
-      }
+    }
+    
     async updateProduct(data:any,ProductId:string): Promise<any> {
         try {
 

@@ -9,7 +9,8 @@ interface EnvConfig {
     EMAIL_USER: string;
     EMAIL_PASS: string;
     PAYMENT_GATEWAY: string
-    STRIPE_SECRET_KEY: string
+    STRIPE_SECRET_KEY: string;
+    Atlas_Url:string
     // STRIPE_PUBLIC_KEY: string
 }
 
@@ -21,6 +22,7 @@ const envConfig: EnvConfig = {
     EMAIL_PASS: process.env.EMAIL_PASS as string,
     PAYMENT_GATEWAY: process.env.PAYMENT_GATEWAY as string,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
+    Atlas_Url:process.env.Atlas_Url as string
     // STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY as string
 };
 

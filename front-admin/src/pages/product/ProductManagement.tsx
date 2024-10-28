@@ -122,31 +122,27 @@ const ProductManagement: React.FC = () => {
   };
   const handleBulkDownload = async () => {
     try {
-      const response = await productapi.bulkDownload();
+        const response = await productapi.bulkDownload();
 
-      if (response.data) {
-        console.log("response", response.data);
-        // Check if the response is already a Blob
-        const blob = new Blob([response.data], {
-          type: response.headers["content-type"],
-        });
-        console.log("blob", blob);
+        if (response.data) {
+            const blob = new Blob([response.data], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            });
 
-        const link = document.createElement("a");
-        link.href = window.URL.createObjectURL(blob);
-        link.download = "products.xlsx";
-        link.click();
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = "products.xlsx";
+            link.click();
 
-        // Clean up
-        window.URL.revokeObjectURL(link.href);
-      } else {
-        console.error("No data received from the server");
-      }
+            window.URL.revokeObjectURL(link.href);
+        } else {
+            console.error("No data received from the server");
+        }
     } catch (error) {
-      console.error("Error downloading bulk data:", error);
-      // Handle the error (e.g., show an error message to the user)
+        console.error("Error downloading bulk data:", error);
     }
-  };
+};
+
 
   const handlePreviewProduct = (product: Product) => {
     setSelectedProduct(product);
