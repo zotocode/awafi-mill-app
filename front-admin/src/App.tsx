@@ -15,6 +15,7 @@ import DefaultLayout from "./layouts/DefaultLayout";
 import BulkProducAddingPage from "./pages/product/BulkProducAddingPage";
 import Banner from "./pages/BannerManagement"
 import OrderManagementPage from "./pages/order/OrderManagement";
+import SalesReport from "./pages/SalesReports";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
               <Route path="/categories/main" element={<MainCategoryManagementPage />} />
               <Route path="/categories/sub" element={<SubCategoryManagementPage />} />
               <Route path="/banner" element={<Banner />} />
+              <Route path="/sales-report" element={<SalesReport />} />
             </Route>
           </Route>
         </Routes>

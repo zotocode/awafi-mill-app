@@ -126,4 +126,43 @@ export class UserController {
     }
   }
 
+
+  async addUserAddress(req: CustomRequest, res: Response, next: NextFunction) {
+    try {
+      const id = req.user?.id;
+      if (!id) {
+        return res.status(400).json({ message: "User ID not found in token" });
+      }
+      const userAddress = await this.userInteractor.addUserAddress(id, req.body); 
+      if (userAddress.status) {
+        return res.status(200).json({ status: true, message: userAddress.message });
+      } else {
+        return res.status(400).json({ status: false, message: userAddress.message });
+      }
+    } catch (error) {
+      console.error("Error in addUserAddress controller:", error);
+      next(error)
+    }
+  }
+  
+
+  async updateUserAddress(req: CustomRequest, res: Response, next: NextFunction){
+    try{
+      const id = req.user?.id;
+      if (!id) {
+        return res.status(400).json({ message: "User ID not found in token" });
+      }
+      const userEditAddress = await this.userInteractor.editUserAddress(id, req.body); 
+      if (userEditAddress.status) {
+        return res.status(200).json({ status: true, message: userEditAddress.message });
+      } else {
+        return res.status(400).json({ status: false, message: userEditAddress.message });
+      }
+    } catch (error) {
+      console.error("Error in addUserAddress controller:", error);
+      next(error)
+    }
+    }
+
+
 }

@@ -10,7 +10,7 @@ import { userDTO,userCreationDTO } from "../../domain/dtos/UserDTO";  // Import 
 import RedisServices from "../../application/services/redisServices";
  import {IEmailServices} from '../../application/services/emailService'
 import { userProfileDTO,userPasswordChangeDTO } from "../../domain/dtos/UserDTO";
-
+import { IaddressRepo } from "../../interface/addressInterface/IaddressRepo";
 
 
 export class UserInteractor implements IUserInteractor {
@@ -18,12 +18,14 @@ export class UserInteractor implements IUserInteractor {
   private bcrypt: IBcrypt;
   private jwt: Ijwt;
   private emailService: IEmailServices;
+  private addressRepo : IaddressRepo;
 
-  constructor(userRepository: IUserRepo, bcrypt: IBcrypt, jwt: Ijwt,emailService:IEmailServices) {
+  constructor(userRepository: IUserRepo, bcrypt: IBcrypt, jwt: Ijwt,emailService:IEmailServices,addressRepo : IaddressRepo ) {
     this.userRepository = userRepository;
     this.bcrypt = bcrypt;
     this.jwt = jwt;
     this.emailService=emailService;
+    this.addressRepo = addressRepo;
   }
 
   //=-========================================login===============
@@ -154,5 +156,33 @@ async changeUserPassword(id: string, password: string, newPassword: string): Pro
     return {status:true,message:"change password succesfully"}
   }
 }
+
+async addUserAddress(id: string, address: any): Promise<any> {
+  try {
+    const result = await this.addressRepo.addAddress(id, address);
+
+    if (!result.status) {
+      return { status: false, message: result.message };
+    }
+
+    return { status: true, message: "User address added successfully" };
+  } catch (error) {
+    console.error("Error in addUserAddress:", error);
+    return { status: false, message: "An error occurred while adding the user address" };
+  }
+}
+
+ async editUserAddress(id: string, newAddress: any): Promise<any> {
+   try{
+    const result = await this.addressRepo.editAddress(id,newAddress)
+    if (!result.status) {
+      return { status: false, message: result.message };
+    }
+    return { status: true, message: "User address added successfully" };
+   }catch(error){
+    console.error("Error in addUserAddress:", error);
+    return { status: false, message: "An error occurred while adding the user address" };
+   }
+ }
 
 }

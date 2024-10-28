@@ -51,7 +51,7 @@ export class UserRepo extends BaseRepository<IuserDocument> implements IUserRepo
       const updateFields: any = {};
     
       // Build update object only with defined fields
-      if (email !== undefined) updateFields.email = email;
+      if (email !== undefined) updateFields.email = email; 
       if (name !== undefined) updateFields.name = name;
       if (phone !== undefined) updateFields.phone = phone; 
     

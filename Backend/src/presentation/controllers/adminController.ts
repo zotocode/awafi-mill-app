@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { IadminInteractor } from "../../interface/adminInterface/IadminInteractor";
+import { string } from "joi";
 
 export class AdminController {
     private adminInteractor : IadminInteractor
@@ -79,4 +80,18 @@ export class AdminController {
     }
 }
   
+async salesReport(req:Request,res:Response,next:NextFunction){
+  try{
+  console.log('====================================');
+  console.log("reachd here.................",req.query);
+  console.log('====================================');
+  const reportType = req.query.reportType as string | undefined;
+  const startDate = req.query.startDate as string | undefined;
+  const endDate = req.query.endDate as string | undefined;
+  const result = await this.adminInteractor.salesReport(reportType,startDate,endDate)
+
+  }catch(error){
+
+  }
+}
 }
