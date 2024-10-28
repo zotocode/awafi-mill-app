@@ -127,7 +127,7 @@ export class UserController {
   }
 
 
-  async addUserAddress(req: CustomRequest, res: Response, next: NextFunction) {
+  async addUserAddress(req: Request, res: Response, next: NextFunction) {
     try {
       const id = req.user?.id;
       if (!id) {
@@ -146,7 +146,7 @@ export class UserController {
   }
   
 
-  async updateUserAddress(req: CustomRequest, res: Response, next: NextFunction){
+  async updateUserAddress(req: Request, res: Response, next: NextFunction){
     try{
       const id = req.user?.id;
       if (!id) {
