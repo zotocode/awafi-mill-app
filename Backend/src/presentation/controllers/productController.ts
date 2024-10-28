@@ -17,6 +17,8 @@ export class ProductController  {
     next: NextFunction
   ): Promise<void> {
     try {
+      // console.log('file',req.file)
+      // console.log('data',req.body)
       const photos: any = req.files || [];
       const productData: ProductCreationDTO = req.body;
 
@@ -69,11 +71,10 @@ export class ProductController  {
       // const limit = req.query.limit ? Number(req.query.limit) : 10;
       const products = await this.productInteractor.bulkDownload();
       if (products) {
-        res.setHeader(
-          "Content-Type",
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        );
-        res.setHeader("Content-Disposition", "attachment; filename=data.xlsx");
+        res.set({
+          'Content-Disposition': 'attachment; filename="data.xlsx"',
+          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
         res.send(products);
       }
     } catch (error) {
