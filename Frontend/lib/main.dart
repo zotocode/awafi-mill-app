@@ -18,18 +18,20 @@ void main() async {
   Hive.registerAdapter(UserDataAdapter());
   await Hive.openBox<UserData>('userBox');
 
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(create: (_) => BottomNavProvider()),
-      ChangeNotifierProvider(create: (_) => FieldProvider()),
-      ChangeNotifierProvider(create: (_) => ProductQuantity()),
-      ChangeNotifierProvider(create: (_) => LoadingProvider()),
-      ChangeNotifierProvider(create: (_) => CategoryProvider()),
-      ChangeNotifierProvider(create: (_) => ProductProvider()),
-      ChangeNotifierProvider(create: (_) => WishlistProvider()),
-    ],
-    child: AwafiMill(),
-  ));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => BottomNavProvider()),
+        ChangeNotifierProvider(create: (_) => FieldProvider()),
+        ChangeNotifierProvider(create: (_) => ProductQuantity()),
+        ChangeNotifierProvider(create: (_) => LoadingProvider()),
+        ChangeNotifierProvider(create: (_) => CategoryProvider()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => WishlistProvider()),
+      ],
+      child: AwafiMill(),
+    ),
+  );
 }
 
 class AwafiMill extends StatelessWidget {

@@ -61,6 +61,5 @@ Backend/.env
 dist/
 
 uploads/
-Backend/
-front-admin/
+
 
