@@ -22,17 +22,17 @@ export class CartInteractor implements ICartInteractor {
   }
 
   async addItemToCart(data: AddToCartDTO): Promise<CartDTO | null> {
-    const updatedCart = await this.cartRepo.addItemToCart(data.userId, data.productId, data.quantity);
+    const updatedCart = await this.cartRepo.addItemToCart(data.userId, data.productId, data.variantId, data.quantity);
     return updatedCart ? this.mapToDTO(updatedCart) : null;
   }
 
   async updateCartItemQuantity(data: UpdateCartQuantityDTO): Promise<CartDTO | null> {
-    const updatedCart = await this.cartRepo.updateItemQuantity(data.userId, data.productId, data.quantity);
+    const updatedCart = await this.cartRepo.updateItemQuantity(data.userId, data.productId, data.variantId, data.quantity);
     return updatedCart ? this.mapToDTO(updatedCart) : null;
   }
 
   async removeItemFromCart(data: RemoveFromCartDTO): Promise<CartDTO | null> {
-    const updatedCart = await this.cartRepo.removeItemFromCart(data.userId, data.productId);
+    const updatedCart = await this.cartRepo.removeItemFromCart(data.userId, data.productId, data.variantId);
     return updatedCart ? this.mapToDTO(updatedCart) : null;
   }
 
@@ -44,8 +44,11 @@ export class CartInteractor implements ICartInteractor {
   private mapToDTO(iCart: IUserCart): CartDTO {
     return {
       userId: iCart.user.toString(),
-      items: iCart.items.map(item => ({ productId: item.product.toString(), quantity: item.quantity })),
+      items: iCart.items.map(item => ({
+        productId: item.product.toString(),
+        variantId: item.variant.toString(),
+        quantity: item.quantity
+      })),
     };
   }
 }
-
