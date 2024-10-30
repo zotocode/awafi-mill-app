@@ -4,6 +4,7 @@ import { BannerController } from "../controllers/bannerController";
 import { BannerInteractor } from "../../application/interactor/bannerInteractor";
 import { uploadImages } from "../../config/multerConfig";
 import CloudinaryService from "../../application/services/cloudinary";
+import { verifyAdminToken } from "../middleware/adminAuthMiddleware";
 
 
 // Set up dependencies
@@ -15,6 +16,7 @@ const bannerController = new BannerController(bannerInteractor)
 const bannerRoutes = express.Router();
 
 // Define routes
+bannerRoutes.use(verifyAdminToken)
 bannerRoutes.post("/offerBanner",uploadImages.single('image'),bannerController.addOfferBanner.bind(bannerController))
 bannerRoutes.get("/allBanners",bannerController.allBanners.bind(bannerController))
 bannerRoutes.post("/unlistBanner",bannerController.unlistBanner.bind(bannerController))

@@ -10,7 +10,7 @@ import { userDTO,userCreationDTO } from "../../domain/dtos/UserDTO";  // Import 
 import RedisServices from "../../application/services/redisServices";
  import {IEmailServices} from '../../application/services/emailService'
 import { userProfileDTO,userPasswordChangeDTO } from "../../domain/dtos/UserDTO";
-
+import { IaddressRepo } from "../../interface/addressInterface/IaddressRepo";
 
 
 export class UserInteractor implements IUserInteractor {
@@ -18,12 +18,14 @@ export class UserInteractor implements IUserInteractor {
   private bcrypt: IBcrypt;
   private jwt: Ijwt;
   private emailService: IEmailServices;
+  private addressRepo : IaddressRepo;
 
-  constructor(userRepository: IUserRepo, bcrypt: IBcrypt, jwt: Ijwt,emailService:IEmailServices) {
+  constructor(userRepository: IUserRepo, bcrypt: IBcrypt, jwt: Ijwt,emailService:IEmailServices,addressRepo : IaddressRepo ) {
     this.userRepository = userRepository;
     this.bcrypt = bcrypt;
     this.jwt = jwt;
     this.emailService=emailService;
+    this.addressRepo = addressRepo;
   }
 
   //=-========================================login===============
@@ -99,7 +101,7 @@ async verifyOtp(email: string, otp: string): Promise<any> {
         phone: userData.phone,  
         isVerified:true
       };
-      await this.userRepository.registerUser(newUser);      // Clear user data from Redis after successful registration
+      await this.userRepository.registerUser(newUser);      
       await RedisServices.deleteData(email);
       return { success: true, message: "User registered successfully." };
     } else {
@@ -110,13 +112,12 @@ async verifyOtp(email: string, otp: string): Promise<any> {
     throw new Error("OTP verification failed.");
   }
 }
-// Edit Profile----------------------------------
+
+
+//-------------------- Edit Profile----------------------------------
 async editProfile(id:string,email:string,name:string,phone:number): Promise<any> {
   try{
     const userData = await this.userRepository.findUser(id);
-    console.log('====================================');
-    console.log(userData,id,email,name,phone);
-    console.log('====================================');
     if(!userData){
       return null
     }
@@ -130,7 +131,7 @@ async editProfile(id:string,email:string,name:string,phone:number): Promise<any>
 async profileData(id: string): Promise<userProfileDTO | null> {
   const user = await this.userRepository.findUser(id);
   if (!user) {
-    return null; // Return null or throw an error if user is not found
+    return null; 
   }
   return this.mapToUserProfileDTO(user);
 }
@@ -149,14 +150,39 @@ async changeUserPassword(id: string, password: string, newPassword: string): Pro
     return null
   }
   const userLogin = await this.bcrypt.comparePassword(password, userData.password);
-  console.log('====================================');
-  console.log("userLogin",userLogin);
-  console.log('====================================');
   if(userLogin){
     const hashedPassword = await this.bcrypt.encryptPassword(newPassword);
     await this.userRepository.updatePassword(id, hashedPassword)
     return {status:true,message:"change password succesfully"}
   }
 }
+
+async addUserAddress(id: string, address: any): Promise<any> {
+  try {
+    const result = await this.addressRepo.addAddress(id, address);
+
+    if (!result.status) {
+      return { status: false, message: result.message };
+    }
+
+    return { status: true, message: "User address added successfully" };
+  } catch (error) {
+    console.error("Error in addUserAddress:", error);
+    return { status: false, message: "An error occurred while adding the user address" };
+  }
+}
+
+ async editUserAddress(id: string, newAddress: any): Promise<any> {
+   try{
+    const result = await this.addressRepo.editAddress(id,newAddress)
+    if (!result.status) {
+      return { status: false, message: result.message };
+    }
+    return { status: true, message: "User address added successfully" };
+   }catch(error){
+    console.error("Error in addUserAddress:", error);
+    return { status: false, message: "An error occurred while adding the user address" };
+   }
+ }
 
 }

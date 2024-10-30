@@ -14,13 +14,9 @@ interface User {
 const UserManagementPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
-  
-  // Fetch users data when the component mounts
   useEffect(() => {
     fetchUsers();
   }, []);
-
-  // Function to fetch user data
   const fetchUsers = async () => {
     setError(null);
     try {
@@ -28,6 +24,8 @@ const UserManagementPage = () => {
       console.log(response);
 
       if (response.status === 200 && response.data) {
+        console.log(response.data.data);
+        
         setUsers(response.data.data);
       } else {
         throw new Error("Invalid response from API");
@@ -50,7 +48,7 @@ const UserManagementPage = () => {
         return row.isBlocked ? "Blocked" : "Active";
       },
     },
-  ];
+  ]
 
   const userActions = (row: User) => (
     <div className="flex space-x-2">
