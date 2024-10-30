@@ -6,8 +6,10 @@ import 'package:iconly/iconly.dart';
 
 class TopCategoriesScreen extends StatelessWidget {
   final String appBarText;
+  final String mainCategoryId;
 
-  const TopCategoriesScreen({super.key, required this.appBarText});
+  const TopCategoriesScreen(
+      {super.key, required this.appBarText, required this.mainCategoryId});
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +26,15 @@ class TopCategoriesScreen extends StatelessWidget {
         child: Column(
           children: [
             SubCategoryWidget(
+              mainCategoryId: mainCategoryId,
               text: 'Incence wood',
             ),
             SubCategoryWidget(
+              mainCategoryId: mainCategoryId,
               text: 'Smudge Stick',
             ),
             SubCategoryWidget(
+              mainCategoryId: mainCategoryId,
               text: 'Benzoin',
             ),
           ],

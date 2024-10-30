@@ -53,6 +53,7 @@ app.*.map.json
 node_modules/
 dist/
 Backend/.env
+
 # Environment Files
 .env
 *.env

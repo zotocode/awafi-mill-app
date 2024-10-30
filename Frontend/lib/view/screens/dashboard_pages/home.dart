@@ -155,10 +155,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         itemBuilder: (context, index) {
                           var data = categoryProvider.categories[index];
+                          var mainCategoryId =
+                              categoryProvider.categories[index].id;
                           return InkWell(
                             onTap: () {
-                              Get.to(() =>
-                                  TopCategoriesScreen(appBarText: data.name));
+                              Get.to(() => TopCategoriesScreen(
+                                    appBarText: data.name,
+                                    mainCategoryId: mainCategoryId,
+                                  ));
                             },
                             child: Container(
                               height: 40,

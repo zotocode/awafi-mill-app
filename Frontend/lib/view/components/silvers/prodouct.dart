@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frondend/model/entities.dart/prodouct.dart';
 import 'package:frondend/view/screens/internal_pages/product_details.dart';
+import 'package:frondend/view/shimmers/product_shimmer.dart';
 import 'package:frondend/view_model/provider.dart/prodouct_provider.dart';
 import 'package:frondend/view_model/provider.dart/wishlist_provider.dart';
 import 'package:get/get.dart';
@@ -28,7 +29,7 @@ class _ProductScreenState extends State<ProductScreen> {
     return Consumer<ProductProvider>(
       builder: (context, productProvider, child) {
         if (productProvider.isLoading && productProvider.products.isEmpty) {
-          return Center(child: CircularProgressIndicator());
+          return ProductShimmer();
         }
 
         return SingleChildScrollView(

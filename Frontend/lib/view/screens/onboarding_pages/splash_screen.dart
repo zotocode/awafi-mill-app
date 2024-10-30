@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math'; // For rotation
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:frondend/common/assigns.dart';
 import 'package:frondend/common/style.dart';
 import 'package:frondend/view/screens/dashboard_pages/bottom.dart';
@@ -24,7 +25,7 @@ class _AnimationExampleState extends State<AnimationExample>
   @override
   void initState() {
     super.initState();
-
+    FlutterNativeSplash.remove();
     // Initialize AnimationController
     _controller = AnimationController(
       vsync: this,

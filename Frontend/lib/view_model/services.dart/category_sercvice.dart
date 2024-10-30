@@ -8,14 +8,22 @@ import 'package:http/http.dart' as http;
 class CategoryServices {
   static Future<List<categoryModel>> getCategories() async {
     try {
-      final response = await http.get(
-        Uri.parse(EndPoint.CategorydUrl),
-      );
+      final response = await http.get(Uri.parse(EndPoint.CategorydUrl));
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        print('category Items retrieved successfully');
-        return data.map((value) => categoryModel.fromJson(value)).toList();
+        final Map<String, dynamic> data = jsonDecode(response.body);
+
+        // Access the categories list under 'data' directly
+        if (data['data'] != null && data['data'] is List) {
+          final List<dynamic> categoryList = data['data'];
+          print('Category items retrieved successfully');
+          return categoryList
+              .map((category) => categoryModel.fromJson(category))
+              .toList();
+        } else {
+          print('Error: categories key not found or is not a list');
+          return [];
+        }
       } else {
         print('Failed to retrieve category items');
         return [];
@@ -26,10 +34,8 @@ class CategoryServices {
     }
   }
 
-  static Future<ResponseModel> fetchSubCategories(String mainCategoryId,
-      {int page = 1, int limit = 4}) async {
-    final url = Uri.parse(
-        '${EndPoint.subCategory}/listedCategory/sub/$mainCategoryId?page=$page&limit=$limit');
+  static Future<ResponseModel> fetchSubCategories(String mainCategoryId) async {
+    final url = Uri.parse('${EndPoint.subCategory}/$mainCategoryId');
 
     final response = await http.get(url);
 
@@ -37,7 +43,7 @@ class CategoryServices {
       final jsonData = json.decode(response.body);
       return ResponseModel.fromJson(jsonData);
     } else {
-      throw Exception('Failed to load data');
+      throw Exception('Failed to load subcategories');
     }
   }
 }

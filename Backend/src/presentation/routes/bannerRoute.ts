@@ -16,7 +16,11 @@ const bannerController = new BannerController(bannerInteractor)
 const bannerRoutes = express.Router();
 
 // Define routes
+<<<<<<< HEAD
 // bannerRoutes.use(verifyAdminToken)
+=======
+bannerRoutes.use(verifyAdminToken)
+>>>>>>> upstream/develop
 bannerRoutes.post("/offerBanner",uploadImages.single('image'),bannerController.addOfferBanner.bind(bannerController))
 bannerRoutes.get("/allBanners",bannerController.allBanners.bind(bannerController))
 bannerRoutes.post("/unlistBanner",bannerController.unlistBanner.bind(bannerController))

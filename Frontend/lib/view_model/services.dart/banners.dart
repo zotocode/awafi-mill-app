@@ -7,7 +7,9 @@ class Banners {
 // Import your BannerResponse model
 
   static Future<List<BannerModel>> fetchWelcomeBanners() async {
-    final response = await http.get(Uri.parse(EndPoint.welcomeBannerUrl));
+    final response = await http.get(
+      Uri.parse(EndPoint.welcomeBannerUrl),
+    );
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);

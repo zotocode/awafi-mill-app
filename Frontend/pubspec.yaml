@@ -48,7 +48,33 @@ dependencies:
   hive: ^2.2.3
   cached_network_image: ^3.4.1
   shimmer: ^3.0.0
+  flutter_native_splash: ^2.4.2
   
+flutter_native_splash:
+  # color: "#042a49"
+  color_dark: "#042a49" 
+   # Optional: for dark mode
+  image: assets/images/logo.png
+  #image_dark: assets/splash_dark.png  # Optional: for dark mode
+  
+  android_12:
+    # color: "#042a49"
+    color_dark: "#042a49"
+    image: assets/images/logo.png
+    #image_dark: assets/splash_dark.png
+    
+  android: true
+  ios: true
+  web: false  # Set to true if needed
+  
+  # Optional: custom android settings
+  android_gravity: center
+  ios_content_mode: center
+  fullscreen: true
+  
+  # Optional: to maintain splash longer in android 12
+  branding: assets/images/logo.png
+  branding_mode: bottom
 
 dev_dependencies:
   flutter_test:
