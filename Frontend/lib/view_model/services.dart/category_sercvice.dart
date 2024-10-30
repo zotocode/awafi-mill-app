@@ -35,7 +35,8 @@ class CategoryServices {
   }
 
   static Future<ResponseModel> fetchSubCategories(String mainCategoryId) async {
-    final url = Uri.parse('${EndPoint.subCategory}/$mainCategoryId');
+    final url =
+        Uri.parse('${EndPoint.subCategory}${mainCategoryId}?page=0&limit=0');
 
     final response = await http.get(url);
 

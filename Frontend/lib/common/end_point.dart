@@ -7,7 +7,7 @@ class EndPoint {
 
   static String CategorydUrl =
       '${baseUrl}/categories/listedCategory?page=0&limit=0';
-  static String subCategory = '${baseUrl}/categories/category/sub/';
+  static String subCategory = '${baseUrl}categories/listedCategory/sub/';
   static final String productUrl =
       '${baseUrl}/products/product/listed?page=0&limit=0';
   static final String welcomeBannerUrl = "${baseUrl}/banner/viewWelcomeBanner";

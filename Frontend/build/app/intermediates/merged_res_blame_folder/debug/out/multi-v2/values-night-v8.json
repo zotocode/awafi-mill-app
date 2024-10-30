@@ -1,0 +1,28 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.example.frondend.app-mergeDebugResources-25:/values-night-v8/values-night-v8.xml",
+            "map": [
+                {
+                    "source": "E:\\flutter\\awafi-mill-app\\Frontend\\android\\app\\src\\main\\res\\values-night\\styles.xml",
+                    "from": {
+                        "startLines": "3,18",
+                        "startColumns": "4,4",
+                        "startOffsets": "172,1092",
+                        "endLines": "11,20",
+                        "endColumns": "12,12",
+                        "endOffsets": "745,1256"
+                    },
+                    "to": {
+                        "startLines": "2,10",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,505",
+                        "endLines": "9,12",
+                        "endColumns": "12,12",
+                        "endOffsets": "500,669"
+                    }
+                }
+            ]
+        }
+    ]
+}
