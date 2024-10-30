@@ -6,6 +6,7 @@ import { JWT } from '../../application/services/jwtService';
 const jwtService = new JWT();
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+  console.log(req.body);
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer')) {
     return res.status(401).json({ message: 'No token provided' });

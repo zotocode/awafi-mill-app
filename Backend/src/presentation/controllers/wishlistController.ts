@@ -50,6 +50,7 @@ export class WishlistController {
 
   // Add item to wishlist (HTTP POST)
   async addItemToWishlist(req: Request, res: Response, next: NextFunction): Promise<void> {
+    console.log(req.body);
     try {
       
       const userId = req.user?.id;
@@ -58,6 +59,7 @@ export class WishlistController {
         return;
       }
       const itemData: AddToWishlistDTO = req.body;
+      
       itemData.userId = userId;
       const updatedWishlist = await this.wishlistInteractor.addItemToWishlist(itemData);
       res.status(200).json(updatedWishlist);
