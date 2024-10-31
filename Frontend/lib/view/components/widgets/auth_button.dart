@@ -6,12 +6,14 @@ class AuthenticateSaveButton extends StatelessWidget {
   final String buttonText;
   final VoidCallback onpressed;
   final bool? isIcon;
+  final bool isLoading;
 
   const AuthenticateSaveButton(
       {super.key,
       required this.buttonText,
       required this.onpressed,
-      this.isIcon});
+      this.isIcon,
+      this.isLoading = false});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -22,7 +24,7 @@ class AuthenticateSaveButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
       ),
       child: ElevatedButton(
-        onPressed: onpressed,
+        onPressed: isLoading ? null : onpressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
@@ -30,26 +32,32 @@ class AuthenticateSaveButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            isIcon == true
-                ? Icon(
-                    IconlyLight.delete,
-                    size: 20,
-                    color: Colors.white,
-                  )
-                : SizedBox(),
-            SizedBox(width: 10),
-            Text(
-              buttonText,
-              style: GoogleFonts.mulish(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
+        child: isLoading
+            ? Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  isIcon == true
+                      ? Icon(
+                          IconlyLight.delete,
+                          size: 20,
+                          color: Colors.white,
+                        )
+                      : SizedBox(),
+                  SizedBox(width: 10),
+                  Text(
+                    buttonText,
+                    style: GoogleFonts.mulish(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
       ),
     );
   }

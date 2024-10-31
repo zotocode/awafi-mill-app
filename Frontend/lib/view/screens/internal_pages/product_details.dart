@@ -1,10 +1,9 @@
-import 'dart:ui';
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frondend/common/style.dart';
 import 'package:frondend/view/components/widgets/auth_button.dart';
+import 'package:frondend/view/screens/dashboard_pages/cart.dart';
 import 'package:frondend/view_model/provider.dart/quantity.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,6 +19,15 @@ class ProductDetailsScreen extends StatefulWidget {
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int currentIndex = 0;
   bool isExpand = false;
+  bool isChange = false;
+  void toglleChange() {
+    setState(() {
+      isChange = !isChange;
+    });
+    if (!isChange) {
+      Get.to(() => CartScreen());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -372,8 +380,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                             left: 12, right: 12, top: 8),
                                         child: AuthenticateSaveButton(
                                           isIcon: true,
-                                          buttonText: 'ADD To CART',
-                                          onpressed: () {},
+                                          buttonText: isChange
+                                              ? 'View Cart'
+                                              : 'Add Cart',
+                                          onpressed: () {
+                                            toglleChange();
+                                          },
                                         ),
                                       ),
                                     ],
@@ -504,8 +516,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     left: 12, right: 12, top: 8),
                                 child: AuthenticateSaveButton(
                                     isIcon: true,
-                                    buttonText: 'ADD To CART',
-                                    onpressed: () {}),
+                                    buttonText:
+                                        isChange ? 'View Cart' : 'Add Cart',
+                                    onpressed: () {
+                                      toglleChange();
+                                    }),
                               )
                             ],
                           ),
