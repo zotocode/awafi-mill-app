@@ -31,7 +31,6 @@ const productRoutes = express.Router();
 
 
 // Admin product routes
-productRoutes.get("/product/filter/admin", productController.FilterProducts.bind(productController));
 productRoutes.get("/product/listed/admin", productController.getAllListedProducts.bind(productController));
 productRoutes.put("/product/admin/:id", productController.updateProduct.bind(productController));
 productRoutes.get("/product/admin/:id", productController.getProductById.bind(productController));

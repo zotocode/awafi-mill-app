@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frondend/common/assigns.dart';
+import 'package:frondend/model/repos.dart/loading.dart';
 import 'package:frondend/view/components/widgets/auth_button.dart';
+import 'package:frondend/view/screens/dashboard_pages/bottom.dart';
+import 'package:get/get.dart';
 
 class SucessLastScreen extends StatelessWidget {
   const SucessLastScreen({super.key});
@@ -42,7 +45,10 @@ class SucessLastScreen extends StatelessWidget {
             padding: EdgeInsets.only(bottom: 40, left: 30, right: 30),
             child: AuthenticateSaveButton(
               buttonText: 'START SHOPPING',
-              onpressed: () {},
+              onpressed: () {
+                handleLoading(context);
+                Get.to(() => BottomScreen());
+              },
             ),
           ),
           SizedBox(height: 20),

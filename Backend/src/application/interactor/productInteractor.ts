@@ -119,8 +119,9 @@ export class ProductInteractor implements IProductInteractor {
   
   
   async bulkDownload(): Promise<any> {
-    const ProductResponse = await this.productRepo.findAllProducts(0,0);
+    const ProductResponse = await this.productRepo.findAllProductsInJsonWithAggregation();
      if (ProductResponse.products){
+      console.log("product data sets",ProductResponse.products)
        const excelBuffer=await this.excelService.createExcelBuffer(ProductResponse.products)
        return excelBuffer
      }

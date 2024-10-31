@@ -58,6 +58,59 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
     return {products:products,totalPages: Math.ceil(totalProducts / limit)}
 
   }
+  async findAllProductsInJsonWithAggregation(): Promise<ProductResponse> {
+    try {
+        const products = await this.model.aggregate([
+            { $match: {} },
+            {
+                $lookup: {
+                    from: 'MainCategory',
+                    localField: 'category',
+                    foreignField: '_id',
+                    as: 'categoryDetails'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'SubCategory',
+                    localField: 'subCategory',
+                    foreignField: '_id',
+                    as: 'subCategoryDetails'
+                }
+            },
+            { $unwind: { path: '$categoryDetails', preserveNullAndEmptyArrays: true } },
+            { $unwind: { path: '$subCategoryDetails', preserveNullAndEmptyArrays: true } },
+            { $unwind:  '$variants'},
+            { $unwind: '$descriptions'},
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    sku: 1,
+                    ean: 1,
+                    descriptions: 1,
+                    images: 1,
+                    variants: 1,
+                    isListed: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    category: '$categoryDetails.name',
+                    subCategory: '$subCategoryDetails.name'
+                }
+            }
+        ]);
+
+        const totalProducts = await this.model.countDocuments();
+        
+        return {
+            products: JSON.parse(JSON.stringify(products)),
+            totalPages: 0
+        };
+    } catch (error) {
+        console.error('Error in findAllProductsInJsonWithAggregation:', error);
+        throw error;
+    }
+  }
 
   async findListedAllProducts(page:number,limit:number): Promise<ProductResponse> {
     const totalProducts = await this.model.countDocuments();
@@ -159,7 +212,7 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
 
   async fetchByCategoryAndName(page:number,limit:number,filter:any): Promise<IProductSchema[]> {
 
-    const queryFilter: any = {};
+    const queryFilter: any = {isListed:true};
     if (filter.prodctname) {
       queryFilter.name = { $regex: filter.prodctname, $options: 'i' };
     }

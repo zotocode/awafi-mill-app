@@ -10,6 +10,7 @@ export interface IproductRepo {
   findByName(name: string): Promise<Product | null>;
   findByNameAndNotCurrentId(id: mongoose.Types.ObjectId, name: string): Promise<Product | null>;
   findAllProducts(page:number,limit:number): Promise<ProductResponse>;
+  findAllProductsInJsonWithAggregation(): Promise<ProductResponse>;
   findListedAllProducts(page:number,limit:number): Promise<ProductResponse>;
   findProductsBySpelling(page:number,limit:number,name:string): Promise<ProductResponse>;
   productFindById(id: mongoose.Types.ObjectId): Promise<Product | null>;

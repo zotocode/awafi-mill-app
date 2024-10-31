@@ -9,4 +9,6 @@ export interface IUserInteractor{
     editProfile(id:string,email:string,name:string,phone:number):Promise<any>
     profileData(id:string):Promise<userProfileDTO|null>
     changeUserPassword(id:string,password?:string,newPassword?:string):Promise<userPasswordChangeDTO|null|undefined>
+    addUserAddress(id:string,address:any):Promise<any>
+    editUserAddress(id:string, newAddress:any):Promise<any>; 
 }
