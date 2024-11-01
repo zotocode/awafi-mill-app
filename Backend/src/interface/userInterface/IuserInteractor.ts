@@ -11,5 +11,4 @@ export interface IUserInteractor{
     changeUserPassword(id:string,password?:string,newPassword?:string):Promise<userPasswordChangeDTO|null|undefined>
     addUserAddress(id:string,address:any):Promise<any>
     editUserAddress(id:string, newAddress:any):Promise<any>; 
-    clearUserSession(token:string):Promise<void>
 }

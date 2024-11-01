@@ -88,7 +88,7 @@ export class UserController {
   //  ======================================== user profile=======================================
   async userProfile(req: Request, res: Response, next: NextFunction) {
     try {
-
+      console.log("====================================");
       console.log(req.user);
       const id = req.user?.id;
       if (!id) {
@@ -125,27 +125,6 @@ export class UserController {
       next(error);
     }
   }
-  // logout user------------------------------------------
-
-  async logoutUser(req: Request, res: Response, next: NextFunction) {
-    try {
-      const userId = req.user?.id;
-      const token =req.token
-      if(!token){
-        return res.status(400).json({ message: "token not verified" });
-      }
-      if (!userId) {
-        return res.status(400).json({ message: "User ID not found in token" });
-      }
-
-      await this.userInteractor.clearUserSession(token);
-
-      return res.status(200).json({ message: "User logged out successfully",token:null });
-    } catch (error) {
-      next(error);
-    }
-  }
-
 
 
   async addUserAddress(req: Request, res: Response, next: NextFunction) {

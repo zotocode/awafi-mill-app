@@ -8,7 +8,6 @@ declare global {
         id: string;
         email?: string; // Optional if not always provided
       };
-      token?:string
     }
   }
 }

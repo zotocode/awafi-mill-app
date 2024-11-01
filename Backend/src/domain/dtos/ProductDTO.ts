@@ -18,7 +18,7 @@ interface Variant {
 
 
 export interface ProductDTO {
-  _id:mongoose.Types.ObjectId;
+  _id:unknown
   name: string;
   descriptions: Description[];
   category:mongoose.Types.ObjectId | null;

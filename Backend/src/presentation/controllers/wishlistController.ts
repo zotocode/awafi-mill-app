@@ -42,7 +42,6 @@ export class WishlistController {
         res.status(401).json({ message: "Unauthorized" });
         return;
       }
-     
       const itemData: AddToWishlistDTO = req.body;
 
       itemData.userId = userId;
