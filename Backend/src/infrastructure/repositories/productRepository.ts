@@ -78,26 +78,10 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
                     as: 'subCategoryDetails'
                 }
             },
-            { $unwind: { path: '$categoryDetails', preserveNullAndEmptyArrays: true } },
-            { $unwind: { path: '$subCategoryDetails', preserveNullAndEmptyArrays: true } },
+           
             { $unwind:  '$variants'},
-            { $unwind: '$descriptions'},
-            {
-                $project: {
-                    _id: 1,
-                    name: 1,
-                    sku: 1,
-                    ean: 1,
-                    descriptions: 1,
-                    images: 1,
-                    variants: 1,
-                    isListed: 1,
-                    createdAt: 1,
-                    updatedAt: 1,
-                    category: '$categoryDetails.name',
-                    subCategory: '$subCategoryDetails.name'
-                }
-            }
+            // { $unwind: '$descriptions'},
+       
         ]);
 
         const totalProducts = await this.model.countDocuments();
