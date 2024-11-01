@@ -6,7 +6,6 @@ const email = process.env.ADMIN_EMAIL; // Get the admin email from the environme
 const jwtService = new JWT();
 
 export const verifyAdminToken = (req: Request, res: Response, next: NextFunction) => {
-    console.log("reached on authntication middle");
     
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -20,6 +19,7 @@ export const verifyAdminToken = (req: Request, res: Response, next: NextFunction
     if (payload.id !== email) {
         return res.status(403).json({ status: false, message: 'Unauthorized: Invalid email' });
     }
+  
     (req as any).user = { id: payload.id };
     next();
 };

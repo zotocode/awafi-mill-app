@@ -38,13 +38,13 @@ export class UserInteractor implements IUserInteractor {
 
       const userLogin = await this.bcrypt.comparePassword(password, userData.password);
       if (userLogin) {
-        const accessToken = this.jwt.generateToken({ id: userData.id }, "1h");
+        const accessToken = this.jwt.generateToken({ id: userData.id }, "1d");
         return { success: true, message: "Login successful", data: accessToken };
       } else {
         return { success: false, message: "Invalid credentials" };
       }
     } catch (error) {
-      console.log("error", error);
+
       throw new Error("Login failed");
     }
   }
@@ -184,5 +184,10 @@ async addUserAddress(id: string, address: any): Promise<any> {
     return { status: false, message: "An error occurred while adding the user address" };
    }
  }
+
+async clearUserSession(token: string): Promise<void> {
+  this.jwt.clearToken(token)
+   return
+}
 
 }

@@ -2,15 +2,15 @@ import mongoose, { Document } from "mongoose";
 
 // Checkout interface
 export interface ICheckout extends Document {
+  _id:mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
   cart: mongoose.Types.ObjectId;
-  items: { 
-    product: mongoose.Types.ObjectId; 
-    quantity: number; 
-  }[];
-  paymentMethod: string;
+  items: ItemsList[];
+  transactionId?:string;
+  paymentMethod: 'COD' | 'Razorpay' | 'Stripe';
   amount: number;
   currency: string;
+  cancellationReason?:string;
   
   // Address fields
   shippingAddress: {
@@ -44,4 +44,9 @@ export interface ICheckout extends Document {
   deliveredAt?: Date;
   createdAt: Date;
   updatedAt: Date;
+}
+
+type ItemsList={
+  product: mongoose.Types.ObjectId;
+  quantity:number;
 }

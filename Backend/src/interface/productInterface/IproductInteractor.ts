@@ -5,7 +5,7 @@ import {ProductResponseDTO} from '../../types/productTypes'
 
 export default interface IProductInteractor {
   addProduct(data: ProductCreationDTO): Promise<ProductDTO | responseHandler>; // Ensure responseHandler is correctly spelled
-  bulkDownload(): Promise<any>; // Ensure responseHandler is correctly spelled
+  bulkDownload(): Promise<Buffer>; // Ensure responseHandler is correctly spelled
   addBulkProduct(data: any): Promise<any>; // Ensure responseHandler is correctly spelled
   fetchByCategoryAndName(
    page:number,

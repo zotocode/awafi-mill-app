@@ -13,6 +13,14 @@ interface TableProps {
 }
 
 const Table: React.FC<TableProps> = ({ data, columns, actions }) => {
+  if (!data.length) {
+    return (
+      <div className="text-center p-4 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 rounded-lg shadow-md">
+        Data not found
+      </div>
+    );
+  }
+
   return (
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">

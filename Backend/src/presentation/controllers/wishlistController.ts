@@ -51,13 +51,15 @@ export class WishlistController {
   // Add item to wishlist (HTTP POST)
   async addItemToWishlist(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      
+    
       const userId = req.user?.id;
       if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
         return;
       }
+     
       const itemData: AddToWishlistDTO = req.body;
+     
       itemData.userId = userId;
       const updatedWishlist = await this.wishlistInteractor.addItemToWishlist(itemData);
       res.status(200).json(updatedWishlist);

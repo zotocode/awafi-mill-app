@@ -8,4 +8,5 @@ export interface IUserRepo {
     registerUser(data: any): Promise<string>;
     updatePassword(id: string, hashedPassword: string): Promise<void>;
     updateProfile(id: string, email: string, name: string, phone: number): Promise<void>; 
+
 }
