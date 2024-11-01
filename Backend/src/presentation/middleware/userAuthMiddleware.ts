@@ -7,6 +7,8 @@ const jwtService = new JWT();
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
+  console.log(req.headers);
+  
   if (!authHeader || !authHeader.startsWith('Bearer')) {
     return res.status(401).json({ message: 'No token provided' });
   }

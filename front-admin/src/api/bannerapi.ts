@@ -39,6 +39,15 @@ class BannerApi {
         
       }
   }
+
+  async deleteBanners(row:any):Promise<any>{
+    try{
+      const responce = await this.axiosInstance.post('api/banner/deleteBanner',row)
+      return responce
+      }catch(error){
+        console.log(error)     
+      }
+  }
 }
 
 

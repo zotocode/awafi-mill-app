@@ -8,7 +8,6 @@ export class BannerInteractor implements IBannerInteractor {
   constructor(cloudinaryService: ICloudinaryService) {
     this.cloudinaryService = cloudinaryService;
   }
-
   // Add Offer or Welcome Banner with Cloudinary URL, startDate, endDate, and name
   async addOfferBanner(
     path: string,
@@ -55,7 +54,7 @@ export class BannerInteractor implements IBannerInteractor {
           imageUrl: banner.imageUrl,
           startDate: banner.startDate,
           endDate: banner.endDate,
-          name: banner.name, // Include name in the response
+          name: banner.name, 
         }));
 
       // Return only the filtered banner data
@@ -67,7 +66,6 @@ export class BannerInteractor implements IBannerInteractor {
       // throw new Error(`Failed to add banner: ${error.message}`);
     }
   }
-
   async allBanners(): Promise<any> {
     try {
       const banners = await BannerModel.find().lean(); // Fetch all banners and convert to plain JavaScript objects
@@ -110,7 +108,6 @@ export class BannerInteractor implements IBannerInteractor {
       // throw new Error(`Failed to retrieve banners: ${error.message}`);
     }
   }
-
   async toggleBannerListedStatus(imageUrl: string, name: string): Promise<any> {
     console.log(imageUrl, "image url", name, "name");
     try {
@@ -193,7 +190,6 @@ export class BannerInteractor implements IBannerInteractor {
       // throw new Error(`Failed to toggle banner status: ${error.message}`);
     }
   }
-
   async viewWelcomeBanner(): Promise<any> {
     try {
       // Fetch the banner document(s)
@@ -216,7 +212,6 @@ export class BannerInteractor implements IBannerInteractor {
       console.error("Error in viewWelcomeBanner:", error)
     }
   }
-
   async viewOfferBanner(): Promise<any> {
     try {
       // Fetch the banner document(s)
@@ -239,8 +234,6 @@ export class BannerInteractor implements IBannerInteractor {
       console.error("Error in viewWelcomeBanner:", error)
     }
   }
-
-
   async viewCollectionBanner(): Promise<any> {
     try {
       // Fetch the banner document(s)
@@ -263,5 +256,39 @@ export class BannerInteractor implements IBannerInteractor {
       console.error("Error in viewWelcomeBanner:", error)
     }
   }
-  
+  async deleteBanner(imageUrl: string, name: string): Promise<any> {
+    console.log(imageUrl, "image url", name, "name");
+    try {
+        // Update the banner model by removing the specified banner from the relevant arrays
+        const updatedBanner = await BannerModel.findOneAndUpdate(
+            {
+                $or: [
+                    { "offerBanners.imageUrl": imageUrl, "offerBanners.name": name },
+                    { "welcomeBanners.imageUrl": imageUrl, "welcomeBanners.name": name },
+                    { "collectionBanners.imageUrl": imageUrl, "collectionBanners.name": name },
+                ],
+            },
+            {
+                $pull: {
+                    offerBanners: { imageUrl: imageUrl, name: name },
+                    welcomeBanners: { imageUrl: imageUrl, name: name },
+                    collectionBanners: { imageUrl: imageUrl, name: name },
+                },
+            },
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedBanner) {
+            console.log("No banner was found with the specified criteria");
+            return null;
+        }
+
+        console.log("Banner deleted successfully");
+        return updatedBanner;
+    } catch (error) {
+        console.error("Error in deleteBanner:", error);
+        throw new Error(`Failed to delete banner: ${error.message}`);
+    }
+}
+
 }
