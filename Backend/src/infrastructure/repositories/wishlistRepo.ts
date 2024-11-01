@@ -11,9 +11,9 @@ export class WishlistRepository extends BaseRepository<IWishlist> implements IWi
   }
 
   private async getOrCreateWishlist(userId: string): Promise<IWishlist> {
-    let wishlist = await this.model.findOne({ user: userId }).exec();
+    const wishlist = await this.model.findOne({ user: userId }).exec();
     if (!wishlist) {
-      wishlist = await this.createWishlist({ userId, items: [] });
+      return await this.createWishlist({ userId, items: [] });
     }
     return wishlist;
   }

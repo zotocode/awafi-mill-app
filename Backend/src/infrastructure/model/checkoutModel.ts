@@ -63,7 +63,8 @@ const checkoutSchema = new mongoose.Schema({
   // Coupons
   couponCode: { type: String },
   discountAmount: { type: Number, default: 0 }, 
-
+  cancellationReason: { type: String, requiered:false }, 
+  trackingId:{type:String,required:false},
   // Tracking timestamps
   paymentCompletedAt: { type: Date },
   deliveredAt: { type: Date }
