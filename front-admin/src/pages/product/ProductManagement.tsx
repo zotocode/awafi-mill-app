@@ -1,7 +1,7 @@
 import productapi from "../../api/productapi";
 import ConfirmationDialog from "../../components/ConfirmationDialog";
-import ProductModalForm from "../../components/Modals/Product/ProductModalForm";
-import ImagePreviewModal from "../../components/Modals/Product/ProductPreview";
+import ProductModalForm from "../../components/Product/ProductModalForm";
+import ImagePreviewModal from "../../components/Product/ProductPreview";
 import Table from "../../components/Tables/Table";
 import { TableColumn } from "../../components/Tables/Table";
 import { Product } from "../../types/productTypes";

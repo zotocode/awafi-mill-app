@@ -84,8 +84,4 @@ export class UserRepo extends BaseRepository<IuserDocument> implements IUserRepo
         throw error; // Rethrow error for further handling
       }
     }
-
-
-
-    
 }

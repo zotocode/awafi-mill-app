@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Product } from "../../../types/productTypes";
+import { Product } from "../../types/productTypes";
 import { X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 
 interface ImagePreviewModalProps {

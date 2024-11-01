@@ -63,7 +63,6 @@ const checkoutSchema = new mongoose.Schema({
   // Coupons
   couponCode: { type: String },
   discountAmount: { type: Number, default: 0 }, 
-  cancellationReason: { type: String, requiered:false }, 
 
   // Tracking timestamps
   paymentCompletedAt: { type: Date },
@@ -72,6 +71,4 @@ const checkoutSchema = new mongoose.Schema({
   timestamps: true
 });
 
- const CheckoutModel: Model<ICheckout> = mongoose.model<ICheckout>("Checkout", checkoutSchema);
-export default CheckoutModel;
-
+export const CheckoutModel: Model<ICheckout> = mongoose.model<ICheckout>("Checkout", checkoutSchema);
