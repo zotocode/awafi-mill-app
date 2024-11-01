@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import BannerApi from '../api/bannerapi';
 import Table from '../components/Tables/Table';
+import { toast } from 'react-toastify';
+
+
+
+
 
 const Banner = () => {
   const [banners, setBanners] = useState<any[]>([]); // State for all banners
@@ -10,14 +15,19 @@ const Banner = () => {
   const [bannerName, setBannerName] = useState(''); 
   const [offerStartDate, setOfferStartDate] = useState('');
   const [offerEndDate, setOfferEndDate] = useState('');
+  const [loading,setLoading] = useState(false)
+
 
   // Define fetchBanners outside the useEffect so it can be reused
   const fetchBanners = async () => {
+    setLoading(true);
     try {
       const response = await BannerApi.fetchBanners();
       setBanners(response.data); // Update banners state
     } catch (error) {
       console.error('Error fetching banners:', error);
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -50,23 +60,46 @@ const Banner = () => {
   };
 
   const handleAddBanner = async () => {
-    if (selectedFile && offerStartDate && offerEndDate && selectedBannerType && bannerName) {
-      const uploadedImageUrl = await uploadImage(selectedFile, offerStartDate, offerEndDate, bannerName, selectedBannerType);
-      if (uploadedImageUrl) {
-        setBanners((prevBanners) => [
-          ...prevBanners,
-          { 
-            type: selectedBannerType, 
-            name: bannerName, 
-            image: uploadedImageUrl, 
-            startDate: offerStartDate, 
-            endDate: offerEndDate,
-          },
-        ]);
-        resetModal(); 
-      }
+    const currentDate = new Date().toISOString().split("T")[0]; // Get the current date in YYYY-MM-DD format
+    if (!offerStartDate || !offerEndDate) {
+      toast.error("Please select both start and end dates.");
+      return;
     }
-  };
+    
+    if (offerStartDate < currentDate) {
+        toast.error("Start date must be today or a future date.");
+        return;
+    }
+
+    if (offerEndDate <= offerStartDate) {
+        toast.error("End date must be after the start date.");
+        return;
+    }
+
+    if (selectedFile && selectedBannerType && bannerName) {
+      setLoading(true);
+        const uploadedImageUrl = await uploadImage(selectedFile, offerStartDate, offerEndDate, bannerName, selectedBannerType);
+        if (uploadedImageUrl) {
+            setBanners((prevBanners) => [
+                ...prevBanners,
+                { 
+                    type: selectedBannerType, 
+                    name: bannerName, 
+                    image: uploadedImageUrl, 
+                    startDate: offerStartDate, 
+                    endDate: offerEndDate,
+                },
+            ]);
+            resetModal();
+            toast.success("Banner added successfully!");
+        }
+        setLoading(false);
+    } else {
+        toast.error("Please fill in all fields.");
+    }
+    resetModal()
+};
+
 
   const resetModal = () => {
     setIsModalOpen(false);
@@ -78,15 +111,28 @@ const Banner = () => {
   };
 
   const handleToggleListed = async (row: any) => {
+    setLoading(true);
     try {
       const data = await BannerApi.unlistBanners(row);  // Call the API to toggle listed status
       console.log(data);
       await fetchBanners();  // Re-fetch banner data to reflect the changes in the table
     } catch (error) {
       console.error('Error toggling listed status:', error);
+    }finally {
+      setLoading(false);
     }
   };
+ 
+  const deleteBanner = async (row:any)=>{
+    try {
+      const data = await BannerApi.deleteBanners(row);  // Call the API to toggle listed status
+      console.log(data);
+      await fetchBanners();  // Re-fetch banner data to reflect the changes in the table
+    } catch (error) {
+      console.error('Error toggling listed status:', error);
+    }
 
+  }
 
   // Define columns for the table component
   const columns = [
@@ -99,7 +145,7 @@ const Banner = () => {
     { header: 'Start Date', accessor: 'startDate', render: (row: any) => new Date(row.startDate).toLocaleDateString() },
     { header: 'End Date', accessor: 'endDate', render: (row: any) => new Date(row.endDate).toLocaleDateString() },
     {
-      header: 'Listed',
+      header: 'Status',
       accessor: 'listed',
       render: (row: any) => (
         <button
@@ -109,7 +155,20 @@ const Banner = () => {
           {row.listed ? 'Unlist' : 'List'}
         </button>
       ),
+    },
+    {
+      header: 'Delete',
+      accessor: 'delete',
+      render: (row: any) => (
+        <button
+          onClick={() => deleteBanner(row)}
+          className={"px-4 py-2 rounded bg-red-500 text-white"}
+        >
+          Delete
+        </button>
+      ),
     }
+
   ];
 
   return (
@@ -123,6 +182,11 @@ const Banner = () => {
   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"> {/* Added z-50 */}
     <div className="bg-white p-6 rounded-lg shadow-lg w-96 z-60"> {/* Added z-60 */}
       <h3 className="text-xl font-bold mb-4">Add Banner</h3>
+      {loading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-200 bg-opacity-75 z-70">
+                <div className="loader">Loading...</div>
+              </div>
+            )}
       <label className="block text-gray-700">Select Banner Type:</label>
       <select
         value={selectedBannerType}
@@ -178,32 +242,43 @@ const Banner = () => {
       {/* Welcome Banners Table */}
 
       <div>
-        <h2 className="text-xl font-bold">Welcome Banners</h2>
-        <Table 
-          data={welcomeBanners}
-          columns={columns}
-          
-        />
-      </div>
+  <h2 className="text-xl font-bold">Welcome Banners</h2>
+  {welcomeBanners.length === 0 ? (
+    <p className="text-red-500">There are no welcome banners present.</p> // Message when there are no welcome banners
+  ) : (
+    <Table 
+      data={welcomeBanners}
+      columns={columns}
+    />
+  )}
+</div>
 
-      {/* Offer Banners Table */}
-      <div className="mt-8">
+{/* Offer Banners Table */}
+<div className="mt-8">
         <h2 className="text-xl font-bold">Offer Banners</h2>
-        <Table 
-          data={offerBanners}
-          columns={columns}
-          
-        />
+        {offerBanners.length === 0 ? (
+          <p className="text-red-500">There are no offer banners present.</p>
+        ) : (
+          <Table 
+            data={offerBanners}
+            columns={columns}
+          />
+        )}
       </div>
 
-      <div className="mt-8">
-        <h2 className="text-xl font-bold"> Product Banners</h2>
-        <Table 
-          data={collectionBanners}
-          columns={columns}
-          
-        />
+{/* Product Banners Table */}
+<div className="mt-8">
+        <h2 className="text-xl font-bold">Product Banners</h2>
+        {collectionBanners.length === 0 ? (
+          <p className="text-red-500">There are no product banners present.</p>
+        ) : (
+          <Table 
+            data={collectionBanners}
+            columns={columns}
+          />
+        )}
       </div>
+
     </div>
   );
 };

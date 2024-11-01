@@ -11,6 +11,7 @@ import RedisServices from "../../application/services/redisServices";
  import {IEmailServices} from '../../application/services/emailService'
 import { userProfileDTO,userPasswordChangeDTO } from "../../domain/dtos/UserDTO";
 import { IaddressRepo } from "../../interface/addressInterface/IaddressRepo";
+import { log } from "console";
 
 
 export class UserInteractor implements IUserInteractor {
@@ -184,5 +185,67 @@ async addUserAddress(id: string, address: any): Promise<any> {
     return { status: false, message: "An error occurred while adding the user address" };
    }
  }
+
+ async forgotPassword(email: string): Promise<any> {
+  try {
+    const userData = await this.userRepository.findUserEmail(email);
+    if (!userData) {
+      return { status: false, message: "User not found" };
+    }
+    if (userData.email === email) {
+      const otp = generateOTP();
+      const userData = { email, otp };
+      await RedisServices.setData(email, userData, 300);
+      await this.emailService.OtpEmail(email, otp);    
+      return { status: true, message: `OTP sent to the registered email. Please verify OTP.${otp}` };
+    } else {
+      return { status: false, message: "Email mismatch" };
+    }
+  } catch (error) {
+    console.error("Error in forgotPassword:", error);
+    return { status: false, message: "An error occurred while processing the request" };
+  }
+}
+
+async verifyFogotOtp(email: string, userOtp: string): Promise<any> {
+  try{
+    const userData = await RedisServices.getData<{ email: string; otp: string }>(email);
+    console.log(userData);
+    
+    if (!userData) {
+      return { status: false, message: "User data not found or expired" };
+    }
+   if(userData.otp === userOtp){
+      return { status: true, message: "otp verification success" };
+   }else{
+    return { status: false, message: "Invalid Otp" };
+   }
+  }catch(error){
+    console.log(error);
+    
+  }
+}
+async updateNewPassword(email: string, otp: string, newPassword: string): Promise<any> {
+  try{
+    const userData = await RedisServices.getData<{ email: string; otp: string }>(email);
+    if (!userData) {
+      return { status: false, message: "User data not found or expired" };
+    }
+   if(userData.otp === otp){
+    const userDb = await this.userRepository.findUserEmail(email)
+    if(!userDb?._id){
+      return { status: false, message: "User data not found or expired" };
+    }
+    const hashedPassword = await this.bcrypt.encryptPassword(newPassword); 
+    await this.userRepository.updatePassword(userDb.id, hashedPassword)
+    await RedisServices.deleteData(email);
+    return {status:true,message:"change password succesfully"}
+   }else{
+    return { status: false, message: "Invalid Otp" };
+   }
+  }catch(error){
+    console.log(error);   
+  }
+}
 
 }
