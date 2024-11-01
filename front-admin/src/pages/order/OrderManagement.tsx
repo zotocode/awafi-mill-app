@@ -45,14 +45,18 @@ const OrderManagementPage = () => {
     failed: 'bg-red-100 text-red-800 border border-red-200',
   };
 
-  const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
+  const handleStatusChange = async (
+    orderId: string, 
+    newStatus: OrderStatus,
+    trackingId?: string
+  ) => {
     try {
-      console.log('Updating status:', { orderId, newStatus });
+      console.log('Updating status:', { orderId, newStatus, trackingId });
       
       const response = await OrderApi.updateOrderStatus(
         orderId, 
         newStatus, 
-        newStatus === 'shipped' ? trackingId : undefined
+        trackingId
       );
 
       if (response.status === 200) {
@@ -64,9 +68,6 @@ const OrderManagementPage = () => {
               : order
           )
         );
-        if (newStatus === 'shipped') {
-          setTrackingId('');
-        }
       }
     } catch (error) {
       console.error('Failed to update status:', error);
@@ -124,6 +125,18 @@ const OrderManagementPage = () => {
     
     const [localTrackingId, setLocalTrackingId] = useState('');
     
+    const handleStatusChangeWithTracking = async (newStatus: OrderStatus) => {
+      if (newStatus === 'shipped' && !localTrackingId.trim()) {
+        alert('Please enter a tracking ID');
+        return;
+      }
+      await handleStatusChange(
+        typedRow._id.toString(), 
+        newStatus, 
+        newStatus === 'shipped' ? localTrackingId : undefined
+      );
+    };
+
     return (
       <div className="flex items-center gap-3">
         {isProcessingToShipped ? (
@@ -162,7 +175,7 @@ const OrderManagementPage = () => {
             onChange={(e) => {
               const newStatus = e.target.value as OrderStatus;
               console.log('Status change selected:', newStatus);
-              handleStatusChange(typedRow._id.toString(), newStatus);
+              handleStatusChangeWithTracking(newStatus);
             }}
             className="rounded-lg px-3 py-1.5 text-sm border border-gray-300 bg-white text-gray-700
                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent

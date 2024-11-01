@@ -6,7 +6,7 @@ import { UserRepo } from "../../infrastructure/repositories/userRepo";
 import { JWT } from "../../application/services/jwtService";
 import { verifyAdminToken } from "../middleware/adminAuthMiddleware";
 import { CheckoutRepository } from "../../infrastructure/repositories/checkoutRepo"; 
-import CheckoutModel  from "../../infrastructure/model/checkoutModel"; 
+import { CheckoutModel } from "../../infrastructure/model/checkoutModel"; 
 //services
 const userRepository = new UserRepo()
 const jwt = new JWT()

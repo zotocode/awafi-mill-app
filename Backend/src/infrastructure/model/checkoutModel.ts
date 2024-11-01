@@ -72,6 +72,4 @@ const checkoutSchema = new mongoose.Schema({
   timestamps: true
 });
 
- const CheckoutModel: Model<ICheckout> = mongoose.model<ICheckout>("Checkout", checkoutSchema);
-export default CheckoutModel;
-
+export const CheckoutModel: Model<ICheckout> = mongoose.model<ICheckout>("Checkout", checkoutSchema);

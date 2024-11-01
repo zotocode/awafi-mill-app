@@ -98,7 +98,7 @@ export class OrderInteractor implements IOrderInteractor {
       currency: order.currency || 'USD',
       discountAmount: order.discountAmount || 0,
       paymentStatus:order.paymentStatus,
-      trackingId:order.trackingId
+      trackingId:order.trackingId || ''
     };
   }
 } 

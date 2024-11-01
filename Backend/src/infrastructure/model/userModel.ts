@@ -39,4 +39,4 @@ const userSchema: Schema<IuserDocument> = new Schema(
 
 );
 
-export  const userModel:Model<IuserDocument> =mongoose.model<IuserDocument>("User",userSchema)
+export  const userModel:Model<IuserDocument> =mongoose.model<IuserDocument>("user",userSchema)

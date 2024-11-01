@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Product, Description, Variant } from "../../../types/productTypes";
-import { Category } from "../../../types/categoryType";
-import categoryapi from "../../../api/categoryapi";
-import subcategoryapi from "../../../api/subcategoryapi";
+import { Product, Description, Variant } from "../../types/productTypes";
+import { Category } from "../../types/categoryType";
+import categoryapi from "../../api/categoryapi";
+import subcategoryapi from "../../api/subcategoryapi";
 import { toast } from "react-toastify";
-import productapi from "../../../api/productapi";
+import productapi from "../../api/productapi";
 import { z } from "zod";
 
 interface ModalFormProps {
@@ -347,7 +347,6 @@ const AddProductModal: React.FC<ModalFormProps> = ({
                       accept="image/*"
                       onChange={handleImageChange}
                       className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                      required
                     />
                   </div>
                 </div>

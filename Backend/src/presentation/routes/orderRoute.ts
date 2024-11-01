@@ -3,14 +3,14 @@ import express from "express";
 import { OrderRepository } from "../../infrastructure/repositories/orderRepo";
 import { OrderController } from "../controllers/orderController";
 import { OrderInteractor } from "../../application/interactor/OrderInteractor";
-import ChekoutModel from "../../infrastructure/model/checkoutModel";
 import { verifyAdminToken } from "../middleware/adminAuthMiddleware";
 import { verifyToken } from "../middleware/userAuthMiddleware";
+import { CheckoutModel } from "../../infrastructure/model/checkoutModel";
 
 
 verifyAdminToken
 // Set up dependencies
-const orderRepo = new OrderRepository(ChekoutModel);
+const orderRepo = new OrderRepository(CheckoutModel);
 const orderInteractor = new OrderInteractor(orderRepo);
 const orderController = new OrderController(orderInteractor);
 

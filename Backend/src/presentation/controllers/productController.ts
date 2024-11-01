@@ -113,8 +113,6 @@ export class ProductController  {
         currentIndex,
         path
       );
-    
- 
       res.status(200).json(products);
     } catch (error) {
       next(error);

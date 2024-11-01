@@ -121,6 +121,7 @@ export class ProductInteractor implements IProductInteractor {
   async bulkDownload(): Promise<any> {
     const ProductResponse = await this.productRepo.findAllProductsInJsonWithAggregation();
      if (ProductResponse.products){
+      console.log("product data sets",ProductResponse.products)
        const excelBuffer=await this.excelService.createExcelBuffer(ProductResponse.products)
        return excelBuffer
      }
@@ -212,7 +213,6 @@ export class ProductInteractor implements IProductInteractor {
 
   // Mapping Product entity to DTO
   private mapEntityToDto(product: Product): ProductDTO {
-  
     return {
       _id: product._id, // Use the hashed ID here
       name: product.name,

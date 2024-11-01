@@ -13,7 +13,7 @@ interface Variant {
 }
 
 export default interface Product extends Document {
-  _id:mongoose.Types.ObjectId;
+  ID?: string;
   sku: string;
   ean: string;
   name: string;

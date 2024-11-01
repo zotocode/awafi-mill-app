@@ -11,7 +11,6 @@ import { CategoryRepository } from "../../infrastructure/repositories/categoryRe
 import CategoryModel from "../../infrastructure/model/categoryModel";
 import SubCategoryModel from "../../infrastructure/model/subCategoryModel";
 import { SubCategoryRepository } from "../../infrastructure/repositories/subCategoryRepository";
-import { verifyAdminToken } from "../middleware/adminAuthMiddleware";
 
 const productRepo = new ProductRepository(ProductModel);
 const categoryRepo = new CategoryRepository(CategoryModel);
@@ -32,20 +31,20 @@ const productRoutes = express.Router();
 
 
 // Admin product routes
-productRoutes.get("/product/listed/admin",verifyAdminToken, productController.getAllListedProducts.bind(productController));
-productRoutes.put("/product/admin/:id",verifyAdminToken, productController.updateProduct.bind(productController));
-productRoutes.get("/product/admin/:id",verifyAdminToken, productController.getProductById.bind(productController));
+productRoutes.get("/product/listed/admin", productController.getAllListedProducts.bind(productController));
+productRoutes.put("/product/admin/:id", productController.updateProduct.bind(productController));
+productRoutes.get("/product/admin/:id", productController.getProductById.bind(productController));
 
-productRoutes.get("/product/search/admin",verifyAdminToken, productController.SearchByName.bind(productController));
-productRoutes.post("/product/bulk/upload/admin",verifyAdminToken, uploadExcel.single("file"), productController.bulkAdding.bind(productController));
-productRoutes.get("/product/bulk/download/admin",verifyAdminToken, productController.bulkDownload.bind(productController));
+productRoutes.get("/product/search/admin", productController.SearchByName.bind(productController));
+productRoutes.post("/product/bulk/upload/admin", uploadExcel.single("file"), productController.bulkAdding.bind(productController));
+productRoutes.get("/product/bulk/download/admin", productController.bulkDownload.bind(productController));
 
-productRoutes.post("/product/admin",verifyAdminToken, uploadImages.array("images", 5), productController.addProduct.bind(productController));
-productRoutes.patch("/product/update-img/admin",verifyAdminToken, uploadImages.single("image"), productController.updateImage.bind(productController));
-productRoutes.get("/product/admin",verifyAdminToken, productController.getAllProducts.bind(productController));
-productRoutes.patch("/product/list-status/admin/:id",verifyAdminToken, productController.toggleListStatus.bind(productController));
-productRoutes.patch("/product/delete/admin/:id",verifyAdminToken, productController.deleteProduct.bind(productController));
-productRoutes.put("/product/:id",verifyAdminToken, productController.updateProduct.bind(productController));
+productRoutes.post("/product/admin", uploadImages.array("images", 5), productController.addProduct.bind(productController));
+productRoutes.patch("/product/update-img/admin", uploadImages.single("image"), productController.updateImage.bind(productController));
+productRoutes.get("/product/admin", productController.getAllProducts.bind(productController));
+productRoutes.patch("/product/list-status/admin/:id", productController.toggleListStatus.bind(productController));
+productRoutes.patch("/product/delete/admin/:id", productController.deleteProduct.bind(productController));
+productRoutes.put("/product/:id", productController.updateProduct.bind(productController));
 
 
 // User product routes

@@ -5,8 +5,11 @@ export interface ICheckout extends Document {
   _id:mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
   cart: mongoose.Types.ObjectId;
-  items: ItemsList[];
-  transactionId?:string;
+  transactionId:string;
+  items: { 
+    product: mongoose.Types.ObjectId; 
+    quantity: number; 
+  }[];
   paymentMethod: 'COD' | 'Razorpay' | 'Stripe';
   amount: number;
   currency: string;
@@ -44,9 +47,4 @@ export interface ICheckout extends Document {
   deliveredAt?: Date;
   createdAt: Date;
   updatedAt: Date;
-}
-
-type ItemsList={
-  product: mongoose.Types.ObjectId;
-  quantity:number;
 }

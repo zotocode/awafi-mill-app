@@ -56,7 +56,7 @@ export class OrderRepository extends BaseRepository<ICheckout> implements IOrder
       const [orders, total] = await Promise.all([
         this.model
           .find(query)
-      .populate('user','cart')
+      // .populate('user')
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(params.limit)
@@ -75,7 +75,7 @@ export class OrderRepository extends BaseRepository<ICheckout> implements IOrder
       const orderObjectId = this.validateAndConvertId(orderId, 'Order');
       return await this.model
         .findById(orderObjectId)
-        .populate('user', 'name email')
+        // .populate('user')
         .exec();
     } catch (error) {
       throw new Error(`Error finding order: ${error instanceof Error ? error.message : String(error)}`);
