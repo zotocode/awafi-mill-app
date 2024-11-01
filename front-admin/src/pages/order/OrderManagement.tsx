@@ -15,14 +15,12 @@ const OrderManagementPage = () => {
   const [orderData, setOrderData] = useState<OrderType[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<OrderType | null>(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
-  const [showTransactionCheck, setShowTransactionCheck] = useState<string | null>(null);
-  const [isTransactionVerified, setIsTransactionVerified] = useState(false);
-  const [transactionId, setTransactionId] = useState<string>('');
+  const [trackingId, setTrackingId] = useState<string>('');
 
   const getAvailableStatuses = (currentStatus: OrderStatus): OrderStatus[] => {
     switch (currentStatus) {
       case 'processing':
-        return ['processing', 'shipped', 'cancelled'];
+        return ['processing', 'cancelled'];
       case 'shipped':
         return ['shipped', 'delivered'];
       case 'delivered':
@@ -30,7 +28,7 @@ const OrderManagementPage = () => {
       case 'cancelled':
         return ['cancelled'];
       default:
-        return ['processing', 'shipped', 'delivered', 'cancelled'];
+        return ['processing'];
     }
   };
 
@@ -48,21 +46,17 @@ const OrderManagementPage = () => {
   };
 
   const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
-    // If changing from processing to shipped, show transaction verification first
-    if (newStatus === 'shipped' && orderData.find(order => order._id.toString() === orderId)?.orderStatus === 'processing') {
-      setShowTransactionCheck(orderId);
-      setIsTransactionVerified(false);
-      setTransactionId('');
-      return;
-    }
-
     try {
+      console.log('Updating status:', { orderId, newStatus });
+      
       const response = await OrderApi.updateOrderStatus(
         orderId, 
         newStatus, 
-        newStatus === 'shipped' ? transactionId : undefined
+        newStatus === 'shipped' ? trackingId : undefined
       );
+
       if (response.status === 200) {
+        console.log("Order status updated successfully:", response.data);
         setOrderData(prevOrders =>
           prevOrders.map(order =>
             order._id.toString() === orderId
@@ -70,9 +64,9 @@ const OrderManagementPage = () => {
               : order
           )
         );
-        setShowTransactionCheck(null);
-        setIsTransactionVerified(false);
-        setTransactionId('');
+        if (newStatus === 'shipped') {
+          setTrackingId('');
+        }
       }
     } catch (error) {
       console.error('Failed to update status:', error);
@@ -126,7 +120,9 @@ const OrderManagementPage = () => {
   const actions = (row: { [key: string]: any }): JSX.Element => {
     const typedRow = row as OrderType;
     const availableStatuses = getAvailableStatuses(typedRow.orderStatus);
-    const isProcessingToShipped = showTransactionCheck === typedRow._id.toString();
+    const isProcessingToShipped = typedRow.orderStatus === 'processing';
+    
+    const [localTrackingId, setLocalTrackingId] = useState('');
     
     return (
       <div className="flex items-center gap-3">
@@ -134,25 +130,26 @@ const OrderManagementPage = () => {
           <div className="flex items-center gap-2">
             <input
               type="text"
-              value={transactionId}
-              onChange={(e) => setTransactionId(e.target.value)}
-              placeholder="Enter Transaction ID"
+              value={localTrackingId}
+              onChange={(e) => {
+                console.log('Tracking ID changed:', e.target.value);
+                setLocalTrackingId(e.target.value);
+                setTrackingId(e.target.value);
+              }}
+              placeholder="Enter Tracking ID"
               className="px-3 py-1.5 text-sm border rounded-lg"
             />
-            <label className="flex items-center gap-2 text-sm text-gray-700">
-              <input
-                type="checkbox"
-                checked={isTransactionVerified}
-                onChange={(e) => setIsTransactionVerified(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              Verify Transaction
-            </label>
             <button
-              onClick={() => handleStatusChange(typedRow._id.toString(), 'shipped')}
-              disabled={!isTransactionVerified || !transactionId.trim()}
+              onClick={() => {
+                console.log('Shipping confirmation clicked', {
+                  orderId: typedRow._id.toString(),
+                  trackingId: localTrackingId
+                });
+                handleStatusChange(typedRow._id.toString(), 'shipped');
+              }}
+              disabled={!localTrackingId.trim()}
               className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors
-                ${(isTransactionVerified && transactionId.trim()) 
+                ${localTrackingId.trim() 
                   ? 'bg-blue-600 text-white hover:bg-blue-700' 
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
             >
@@ -162,7 +159,11 @@ const OrderManagementPage = () => {
         ) : (
           <select
             value={typedRow.orderStatus}
-            onChange={(e) => handleStatusChange(typedRow._id.toString(), e.target.value as OrderStatus)}
+            onChange={(e) => {
+              const newStatus = e.target.value as OrderStatus;
+              console.log('Status change selected:', newStatus);
+              handleStatusChange(typedRow._id.toString(), newStatus);
+            }}
             className="rounded-lg px-3 py-1.5 text-sm border border-gray-300 bg-white text-gray-700
                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                      disabled:bg-gray-50 disabled:text-gray-500"
@@ -170,7 +171,7 @@ const OrderManagementPage = () => {
           >
             {availableStatuses.map((status) => (
               <option key={status} value={status}>
-                Change to {status.charAt(0).toUpperCase() + status.slice(1)}
+                {status.charAt(0).toUpperCase() + status.slice(1)}
               </option>
             ))}
           </select>

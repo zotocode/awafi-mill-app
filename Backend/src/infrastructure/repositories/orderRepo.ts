@@ -84,14 +84,15 @@ export class OrderRepository extends BaseRepository<ICheckout> implements IOrder
 
   async updateStatus(data: UpdateOrderStatusDTO): Promise<ICheckout | null> {
     try {
-      console.log("data here",data)
+    
     //   const orderObjectId = this.validateAndConvertId(data.orderId, 'Order');
       return await this.model.findByIdAndUpdate(
         data.orderId,
         { 
           $set: { 
             orderStatus: data.orderStatus,
-            updatedAt: new Date()
+            updatedAt: new Date(),
+            trackingId:data.trackingId
           } 
         },
         { new: true }

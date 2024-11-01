@@ -23,10 +23,10 @@ class OrderApi {
     }
   }
 
-  async updateOrderStatus(orderId: string, status: string ,transactionId ?:string) {
+  async updateOrderStatus(orderId: string, status: string ,trackingId ?:string) {
     try {
       const response = await this.axiosInstance.patch(`/api/orders/order/admin/${orderId}/status`, {
-        orderStatus:status,transactionId
+        orderStatus:status,trackingId
       });
       return response;
     } catch (error) {

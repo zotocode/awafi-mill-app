@@ -72,12 +72,13 @@ export class OrderController {
     try {
      
       const orderIdentifier = new mongoose.Types.ObjectId(req.params.id); // Convert to ObjectId
-  
-     
+      
+     const {trackingId}= req.body
   
       const updateData: UpdateOrderStatusDTO = {
         orderId: orderIdentifier, // Using the new ObjectId
         orderStatus: req.body.orderStatus,
+        trackingId:trackingId==undefined ? ' ':trackingId
       };
    
       const updatedOrder = await this.orderInteractor.updateOrderStatus(updateData);

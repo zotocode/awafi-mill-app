@@ -11,7 +11,7 @@ export interface ICheckout extends Document {
   amount: number;
   currency: string;
   cancellationReason?:string;
-  
+  trackingId?:string;
   // Address fields
   shippingAddress: {
     fullName: string;

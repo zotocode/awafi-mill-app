@@ -80,11 +80,13 @@ export interface CreateOrderDTO {
     deliveredAt?: Date;
     createdAt: Date;
     updatedAt: Date;
+    trackingId?:string;
   }
   
   export interface UpdateOrderStatusDTO {
     orderId: mongoose.Types.ObjectId;
     userId?: mongoose.Types.ObjectId;
+    trackingId?:string;
     paymentStatus?: 'pending' | 'completed' | 'failed';
     orderStatus?: 'processing' | 'shipped' | 'delivered' | 'cancelled';
     returnStatus?: 'not_requested' | 'requested' | 'approved' | 'rejected';
