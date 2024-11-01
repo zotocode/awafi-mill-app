@@ -21,12 +21,12 @@ export class WishlistInteractor implements IWishlistInteractor {
   }
 
   async addItemToWishlist(data: AddToWishlistDTO): Promise<WishlistDTO | null> {
-    const updatedWishlist = await this.wishlistRepo.addItemToWishlist(data.userId, data.productId);
+    const updatedWishlist = await this.wishlistRepo.addItemToWishlist(data.userId, data.productId, data.variantId);
     return updatedWishlist ? this.mapToDTO(updatedWishlist) : null;
   }
 
   async removeItemFromWishlist(data: RemoveFromWishlistDTO): Promise<WishlistDTO | null> {
-    const updatedWishlist = await this.wishlistRepo.removeItemFromWishlist(data.userId, data.productId);
+    const updatedWishlist = await this.wishlistRepo.removeItemFromWishlist(data.userId, data.productId, data.variantId);
     return updatedWishlist ? this.mapToDTO(updatedWishlist) : null;
   }
 
@@ -38,7 +38,10 @@ export class WishlistInteractor implements IWishlistInteractor {
   private mapToDTO(iWishlist: IWishlist): WishlistDTO {
     return {
       userId: iWishlist.user.toString(),
-      productIds: iWishlist.items.map(item => item.toString())
+      items: iWishlist.items.map(item => ({
+        productId: item.productId.toString(),
+        variantId: item.variantId.toString() // Ensure variantId is also included
+      }))
     };
   }
 }

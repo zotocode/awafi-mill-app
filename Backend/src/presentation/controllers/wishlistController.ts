@@ -2,7 +2,7 @@
 import { NextFunction, Request, Response } from "express";
 import IWishlistInteractor from "../../interface/wishlistInterface/IwishlistInteractor"; // Import Wishlist interactor interface
 import { WishlistDTO, AddToWishlistDTO, RemoveFromWishlistDTO } from "../../domain/dtos/WishlistDTO";
- 
+
 export class WishlistController {
   private wishlistInteractor: IWishlistInteractor; // Use the Wishlist interactor interface
 
@@ -10,28 +10,12 @@ export class WishlistController {
     this.wishlistInteractor = wishlistInteractor;
   }
 
-  // Create a new wishlist (HTTP POST)
-  async createWishlist(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-       
-      const userId = req.user?.id;
-      if (!userId) {
-        res.status(401).json({ message: "Unauthorized" });
-        return;
-      }
-      const wishlistData: WishlistDTO = req.body;
-      wishlistData.userId = userId;
-      await this.wishlistInteractor.createWishlist(wishlistData);
-      res.status(201).json({ message: "Wishlist created successfully" });
-    } catch (error) {
-      next(error);
-    }
-  }
+
 
   // Get a wishlist by user ID (HTTP GET)
   async getWishlistByUserId(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      
+
       const userId = req.user?.id;
       if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
@@ -52,14 +36,14 @@ export class WishlistController {
   async addItemToWishlist(req: Request, res: Response, next: NextFunction): Promise<void> {
     console.log(req.body);
     try {
-      
+
       const userId = req.user?.id;
       if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
         return;
       }
       const itemData: AddToWishlistDTO = req.body;
-      
+
       itemData.userId = userId;
       const updatedWishlist = await this.wishlistInteractor.addItemToWishlist(itemData);
       res.status(200).json(updatedWishlist);
@@ -71,7 +55,7 @@ export class WishlistController {
   // Remove item from wishlist (HTTP POST)
   async removeItemFromWishlist(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      
+
       const userId = req.user?.id;
       if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
@@ -86,10 +70,34 @@ export class WishlistController {
     }
   }
 
+
+
+
+
+
+  // Create a new wishlist (HTTP POST)
+  async createWishlist(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+
+      const userId = req.user?.id;
+      if (!userId) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+      }
+      const wishlistData: WishlistDTO = req.body;
+      wishlistData.userId = userId;
+      await this.wishlistInteractor.createWishlist(wishlistData);
+      res.status(201).json({ message: "Wishlist created successfully" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+
   // Delete a wishlist (HTTP DELETE)
   async deleteWishlist(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      
+
       const userId = req.user?.id;
       if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
@@ -105,4 +113,7 @@ export class WishlistController {
       next(error);
     }
   }
+
+
+
 }
