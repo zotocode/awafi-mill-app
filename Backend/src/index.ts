@@ -73,5 +73,5 @@ startServer();
 
 
 
-// "dev": "nodemon --exec ts-node src/index.ts",
+
 // ts-node-dev --respawn --transpile-only src
