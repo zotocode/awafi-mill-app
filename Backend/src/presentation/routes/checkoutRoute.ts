@@ -2,7 +2,7 @@ import express from "express";
 import { CheckoutRepository } from "../../infrastructure/repositories/checkoutRepo"; 
 import { CheckoutController } from "../controllers/checkoutController"; 
 import { CheckoutInteractor } from "../../application/interactor/checkoutInteractor"; 
-import { CheckoutModel } from "../../infrastructure/model/checkoutModel"; 
+import CheckoutModel  from "../../infrastructure/model/checkoutModel"; 
 import { CartRepository } from "../../infrastructure/repositories/cartRepo"; 
 import { CartModel } from "../../infrastructure/model/cartModel"; 
 import { ProductRepository } from "../../infrastructure/repositories/productRepository"; 

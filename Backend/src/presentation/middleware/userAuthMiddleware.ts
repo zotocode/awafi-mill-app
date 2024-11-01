@@ -21,6 +21,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
     return res.status(403).json({ status: false, message });
   }
   req.user = { id: payload.id };
+  req.token =token
   next();
 };
     
