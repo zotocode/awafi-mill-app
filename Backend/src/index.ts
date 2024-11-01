@@ -72,3 +72,6 @@ const startServer = async (): Promise<void> => {
 startServer();
 
 
+
+
+// ts-node-dev --respawn --transpile-only src

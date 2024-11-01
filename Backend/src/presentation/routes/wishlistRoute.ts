@@ -13,10 +13,11 @@ const wishlistController = new WishlistController(wishlistInteractor);
 
 const wishlistRoutes = express.Router();
 // Define routes
-wishlistRoutes.post("/", wishlistController.createWishlist.bind(wishlistController));
 wishlistRoutes.get("/", wishlistController.getWishlistByUserId.bind(wishlistController));
 wishlistRoutes.post("/add", wishlistController.addItemToWishlist.bind(wishlistController));
 wishlistRoutes.post("/remove", wishlistController.removeItemFromWishlist.bind(wishlistController));
+
+wishlistRoutes.post("/", wishlistController.createWishlist.bind(wishlistController));
 wishlistRoutes.delete("/", wishlistController.deleteWishlist.bind(wishlistController));
 
 export default wishlistRoutes;
