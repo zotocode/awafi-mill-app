@@ -4,8 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 class ProfileFieldWidget extends StatelessWidget {
   final VoidCallback onTap;
+  final TextEditingController controller;
 
-  const ProfileFieldWidget({super.key, required this.onTap});
+  const ProfileFieldWidget(
+      {super.key, required this.onTap, required this.controller});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -18,9 +20,10 @@ class ProfileFieldWidget extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.all(8.0),
         child: TextField(
+          controller: controller,
           decoration: InputDecoration(
             border: InputBorder.none,
-            labelText: 'Type here',
+            hintText: 'Type here',
             labelStyle: GoogleFonts.mulish(fontSize: 12),
             suffixIcon: GestureDetector(
               onTap: onTap,

@@ -2,76 +2,110 @@ import 'package:flutter/material.dart';
 import 'package:frondend/common/style.dart';
 import 'package:frondend/view/screens/internal_pages/product_details.dart';
 import 'package:frondend/view/screens/internal_pages/sub_category_view_all.dart';
+import 'package:frondend/view_model/provider.dart/category.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
-class SubCategoryWidget extends StatelessWidget {
+class SubCategoryWidget extends StatefulWidget {
   final String text;
+  final String mainCategoryId;
 
   const SubCategoryWidget({
     super.key,
     required this.text,
+    required this.mainCategoryId,
   });
+
+  @override
+  State<SubCategoryWidget> createState() => _SubCategoryWidgetState();
+}
+
+class _SubCategoryWidgetState extends State<SubCategoryWidget> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<CategoryProvider>(context, listen: false)
+          .fetchSubCategories(widget.mainCategoryId);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Column(
         children: [
-          InkWell(
-            onTap: () {
-              Get.to(() => SubCategoryViewAllScreen(appBarText: text));
-            },
-            child: Container(
-              height: 60,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 18, right: 18),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        text,
-                        style: GoogleFonts.mulish(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      Container(
-                        child: Row(
-                          children: [
-                            Text(
-                              'View all',
-                              style: GoogleFonts.mulish(
+          Consumer<CategoryProvider>(
+            builder: (context, subCategoryProvider, child) {
+              if (subCategoryProvider.isSubcategoryLoading) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              if (subCategoryProvider.subCategories.isEmpty) {
+                return Center(
+                  child: Text('No subCategory Name'),
+                );
+              }
+              return InkWell(
+                onTap: () {
+                  Get.to(
+                      () => SubCategoryViewAllScreen(appBarText: widget.text));
+                },
+                child: Container(
+                  height: 60,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 18, right: 18),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            widget.text,
+                            style: GoogleFonts.mulish(
                                 color: Colors.white,
-                                fontSize: 16,
-                              ),
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          Container(
+                            child: Row(
+                              children: [
+                                Text(
+                                  'View all',
+                                  style: GoogleFonts.mulish(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                CircleAvatar(
+                                  maxRadius: 8,
+                                  backgroundColor: Colors.white,
+                                  child: IconButton(
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () {},
+                                      icon: Icon(
+                                        Icons.arrow_forward,
+                                        size: 14,
+                                      )),
+                                )
+                              ],
                             ),
-                            SizedBox(width: 10),
-                            CircleAvatar(
-                              maxRadius: 8,
-                              backgroundColor: Colors.white,
-                              child: IconButton(
-                                  padding: EdgeInsets.zero,
-                                  onPressed: () {},
-                                  icon: Icon(
-                                    Icons.arrow_forward,
-                                    size: 14,
-                                  )),
-                            )
-                          ],
-                        ),
-                      )
-                    ],
+                          )
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
           SizedBox(height: 20),
           SizedBox(
