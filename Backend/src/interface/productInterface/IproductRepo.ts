@@ -14,7 +14,7 @@ export interface IproductRepo {
   findListedAllProducts(page:number,limit:number): Promise<ProductResponse>;
   findProductsBySpelling(page:number,limit:number,name:string): Promise<ProductResponse>;
   productFindById(id: mongoose.Types.ObjectId): Promise<Product | null>;
-  fetchByCategoryAndName(page:number,limit:number,filter:any): Promise<ProductDTO[] | null>;
+  fetchByCategoryAndName(page:number,limit:number,filter:any): Promise<ProductResponse>;
   listProductsBySubcategories(page:number,limit:number,mainCatId:mongoose.Types.ObjectId): Promise<ProductDTO[] | null>;
   updateImage(id: mongoose.Types.ObjectId, index: number, imageUrl: string): Promise<{ modifiedCount: number }>;
   deleteProduct(id: mongoose.Types.ObjectId): Promise<boolean>;
