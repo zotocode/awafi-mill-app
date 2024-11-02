@@ -210,9 +210,9 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
 
   
 
-  async fetchByCategoryAndName(page:number,limit:number,filter:any): Promise<IProductSchema[]> {
+  async fetchByCategoryAndName(page: number, limit: number, filter: any): Promise<ProductResponse> {
 
-    const queryFilter: any = {isListed:true};
+    const queryFilter: any = { isListed: true };
     if (filter.prodctname) {
       queryFilter.name = { $regex: filter.prodctname, $options: 'i' };
     }
@@ -220,16 +220,19 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
     if (filter.MainCategoryId) {
       queryFilter.category = filter.MainCategoryId;
     }
-
+  
     if (filter.SubCategoryId) {
       queryFilter.subCategory = filter.SubCategoryId;
     }
-
-
-     const skip=(page-1) * limit
+  
+    const skip = (page - 1) * limit;
+    const totalProducts=await this.model.countDocuments(queryFilter)
     // Fetch products with the filter, or all products if no IDs are provided
-    return await this.model.find(queryFilter).skip(skip).limit(limit).exec();
+    const products= await this.model.find(queryFilter).skip(skip).limit(limit).exec();
+    
+    return { products: products, totalPages: Math.ceil(totalProducts / limit) };
   }
+  
 
   async findByName(name: string): Promise<IProductSchema | null> {
     const regex = new RegExp(`^${name}$`, 'i');

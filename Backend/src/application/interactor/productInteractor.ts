@@ -154,9 +154,10 @@ export class ProductInteractor implements IProductInteractor {
   }
 
   // Filter by category
-  async fetchByCategoryAndName(page:number,limit:number,filter:any): Promise<ProductDTO[] | null> {
-    const products = await this.productRepo.fetchByCategoryAndName(page, limit,filter);
-    return products ? products.map((p) => this.mapEntityToDto(p as any)) : null;
+  async fetchByCategoryAndName(page:number,limit:number,filter:any): Promise<ProductResponseDTO> {
+    const ProductResponse = await this.productRepo.fetchByCategoryAndName(page, limit,filter);
+    const products= ProductResponse.products.map((p) => this.mapEntityToDto(p));
+    return  {products:products,totalPages:ProductResponse.totalPages}
   }
   // liste products under sub category using maincategory id------
 
