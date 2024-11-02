@@ -2,12 +2,12 @@ import mongoose, { Document } from 'mongoose';
 import IProductSchema from "../domain/entities/productSchema";
 import { ProductDTO } from '../domain/dtos/ProductDTO';
 
-interface Description {
+export interface Description {
   header: string;
   content: string;
 }
 
-interface Variant {
+export interface Variant {
   weight: string;
   inPrice: number;
   outPrice: number;
@@ -16,9 +16,8 @@ interface Variant {
 
 export default interface Product  {
   _id:mongoose.Types.ObjectId ,
-  ID?: string;
   sku?: string;
-  Ean?: string;
+  ean?: string;
   name: string;
   descriptions: Description[];
   isListed: boolean;
@@ -39,4 +38,18 @@ export type ProductResponse={
 export type ProductResponseDTO={
   products:ProductDTO[],
   totalPages:number
+}
+export type ProdutFormData={
+ _id:mongoose.Types.ObjectId,
+ sku:string,
+ ean:string,
+ name:string,
+ isListed:boolean,
+ images:string,
+ variantWeight:string,
+ variantInPrice:number,
+ variantOutPrice:number,
+ variantStockQuantity:number,
+ createdAt:Date,
+ updatedAt:Date
 }

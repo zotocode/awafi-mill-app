@@ -1,5 +1,5 @@
 // src/infrastructure/repositories/productRepository.ts
-import { ProductCreationDTO } from "../../domain/dtos/ProductDTO";
+import { ProductCreationDTO, Variant } from "../../domain/dtos/ProductDTO";
 import mongoose, { Model } from "mongoose";
 import IProductSchema from "../../domain/entities/productSchema";
 import { BaseRepository } from "./baseRepository";
@@ -33,16 +33,21 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
 
   }
   async addBulkProduct(productData: any): Promise<any> {
+   
     const productEntity = {
-      ID:productData.ID,
-      sku:productData.SKU,
-      ean:productData.EAN,
-      name: productData.Name,
-      subCategory: productData.SubCategory,
-      category: productData.MainCategory,
+      sku:productData.sku,
+      ean:productData.ean,
+      name: productData.name,
+      subCategory: productData.subCategory,
+      category: productData.mainCategory,
       descriptions: productData.Descriptions,
-      images: productData.images,
-      variants: productData.variants,
+      images: productData.images.toString().split(','),
+      variants:[{
+        weight:productData.variantWeight,
+        inPrice:productData.variantInPrice,
+        outPrice:productData.variantOutPrice,
+        stockQuantity:productData.variantStockQuantity
+      }],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -80,8 +85,7 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
             },
             { $unwind: { path: '$categoryDetails', preserveNullAndEmptyArrays: true } },
             { $unwind: { path: '$subCategoryDetails', preserveNullAndEmptyArrays: true } },
-            { $unwind:  '$variants'},
-            { $unwind: '$descriptions'},
+          
             {
                 $project: {
                     _id: 1,
@@ -115,7 +119,7 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
   async findListedAllProducts(page:number,limit:number): Promise<ProductResponse> {
     const totalProducts = await this.model.countDocuments();
      const skip = (page - 1) * limit;
-    const products= await this.model.find({ isListed: true, isDelete: false }).skip(skip).limit(limit).populate('category').exec();
+    const products= await this.model.find({ isListed: true, isDelete: false }).skip(skip).limit(limit).populate('category').populate('subCategory').exec();
     return {products:products,totalPages: Math.ceil(totalProducts / limit)}
   }
 
@@ -228,16 +232,22 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
     const skip = (page - 1) * limit;
     const totalProducts=await this.model.countDocuments(queryFilter)
     // Fetch products with the filter, or all products if no IDs are provided
-    const products= await this.model.find(queryFilter).skip(skip).limit(limit).exec();
+    const products= await this.model.find(queryFilter).skip(skip).limit(limit).populate('category').populate('subCategory').exec();
     
     return { products: products, totalPages: Math.ceil(totalProducts / limit) };
   }
   
 
   async findByName(name: string): Promise<IProductSchema | null> {
-    const regex = new RegExp(`^${name}$`, 'i');
-    return await super.findOne({ name: regex });
+   
+    return await this.model.findOne({ name: name });
   }
+  async findByNameAndVariant(query:{name:string,weight:string}): Promise<boolean>{
+    
+    const products= await super.find({ name: query.name,variants:{weight:query.weight} })
+     return products.length>0 ? true : false
+  }
+
   async findByNameAndNotCurrentId(id: mongoose.Types.ObjectId, name: string): Promise<IProductSchema | null> {
     const regex = new RegExp(`^${name}$`, 'i');
     return await super.findOne({
@@ -273,9 +283,32 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
   }
   // Update in productRepository.ts
 
-async updateProduct(id: mongoose.Types.ObjectId, data: Partial<ProductCreationDTO>): Promise<IProductSchema | null> {
-  return await this.model.findByIdAndUpdate(id, data, { new: true }).exec();
-}
+  async updateProduct(id: mongoose.Types.ObjectId, data: Partial<ProductCreationDTO> | Variant): Promise<IProductSchema | null> {
+    const product = await this.model.findById(id);
+  
+    if (!product) {
+      throw new Error("Product not found");
+    }
+  
+    if ('weight' in data && 'inPrice' in data && 'outPrice' in data && 'stockQuantity' in data) {
+      const variantData = data as Variant;
+      const variant = product.variants.find((v: Variant) => v.weight === variantData.weight);
+  
+      if (variant) {
+        variant.inPrice = variantData.inPrice;
+        variant.outPrice = variantData.outPrice;
+        variant.stockQuantity = variantData.stockQuantity;
+      } else {
+        product.variants.push(variantData);
+      }
+  
+      await product.save();
+      return product;
+    } else {
+      return await this.model.findByIdAndUpdate(id, data, { new: true }).exec();
+    }
+  }
+  
 
 
 
