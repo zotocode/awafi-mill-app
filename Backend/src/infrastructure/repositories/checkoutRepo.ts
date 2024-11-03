@@ -2,7 +2,7 @@
 import { Model } from "mongoose";
 import { PipelineStage } from "mongoose";
 import ICheckoutRepo from "../../interface/checkoutInterface/IcheckoutRepo"; 
-import { CheckoutDTO,OrderSummary,RevenueSummary } from "../../domain/dtos/CheckoutDTO";
+import { CheckoutDTO,OrderSummary,RevenueSummary,CheckoutCreateDTO} from "../../domain/dtos/CheckoutDTO";
 import { ICheckout } from "../../domain/entities/checkoutSchema";
 import { BaseRepository } from "./baseRepository";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns'; 
@@ -14,9 +14,9 @@ export class CheckoutRepository extends BaseRepository<ICheckout> implements ICh
     super(model);
   }
 
-  async createCheckout(data: CheckoutDTO): Promise<ICheckout> {
-    const checkoutEntity = { user: data.userId, paymentMethod: data.paymentMethod };
-    return await super.create(checkoutEntity);
+  async createCheckout(data:CheckoutCreateDTO ): Promise<ICheckout> {
+   
+    return await super.create(data);
   }
 
   async viewAllorders(): Promise<OrderSummary[]> {

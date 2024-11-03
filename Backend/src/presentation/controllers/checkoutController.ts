@@ -18,9 +18,10 @@ export class CheckoutController {
         res.status(401).json({ message: "Unauthorized" });
         return;
       }
-      const checkoutData: CheckoutDTO = req.body;
-      checkoutData.userId = userId;
-      await this.checkoutInteractor.processCheckout(checkoutData);
+      const data: CheckoutDTO = req.body;
+      data.userId = userId;
+
+      await this.checkoutInteractor.processCheckout(data);
       res.status(200).json({ message: "Checkout successful!" });
     } catch (error) {
       next(error);
