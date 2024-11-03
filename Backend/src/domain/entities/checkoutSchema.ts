@@ -6,6 +6,7 @@ export interface ICheckout extends Document {
   user: mongoose.Types.ObjectId;
   cart: mongoose.Types.ObjectId;
   transactionId:string;
+  orderPlacedAt:Date;
   items: { 
     product: mongoose.Types.ObjectId; 
     quantity: number; 
@@ -16,7 +17,7 @@ export interface ICheckout extends Document {
   cancellationReason?:string;
   trackingId?:string;
   // Address fields
-  shippingAddress: {
+  shippingAddress?: {
     fullName: string;
     addressLine1: string;
     addressLine2?: string;
@@ -25,7 +26,7 @@ export interface ICheckout extends Document {
     country: string;
     phone: string;
   };
-  billingAddress: {
+  billingAddress?: {
     fullName: string;
     addressLine1: string;
     addressLine2?: string;

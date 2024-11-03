@@ -1,13 +1,14 @@
 import mongoose from "mongoose";
-import { ProductCreationDTO, ProductDTO } from "../../domain/dtos/ProductDTO";
+import { ProductCreationDTO, ProductDTO,Variant } from "../../domain/dtos/ProductDTO";
 import Product from "../../domain/entities/productSchema";
 import {ProductResponse} from '../../types/productTypes'
 
 export interface IproductRepo {
   addProduct(productData: ProductCreationDTO): Promise<Product>;
   addBulkProduct(productData:any):Promise<void>
-  updateProduct(id: mongoose.Types.ObjectId, data: Partial<ProductCreationDTO>): Promise<Product | null>;
+  updateProduct(id: mongoose.Types.ObjectId, data: Partial<ProductCreationDTO> | Variant): Promise<Product | null>;
   findByName(name: string): Promise<Product | null>;
+  findByNameAndVariant(query:{name:string,weight:string}): Promise<boolean>;
   findByNameAndNotCurrentId(id: mongoose.Types.ObjectId, name: string): Promise<Product | null>;
   findAllProducts(page:number,limit:number): Promise<ProductResponse>;
   findAllProductsInJsonWithAggregation(): Promise<ProductResponse>;

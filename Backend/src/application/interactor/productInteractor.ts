@@ -1,4 +1,4 @@
-import { ProductCreationDTO, ProductDTO } from "../../domain/dtos/ProductDTO";
+import { ProductCreationDTO, ProductDTO ,Variant } from "../../domain/dtos/ProductDTO";
 import IProductInteractor from "../../interface/productInterface/IproductInteractor";
 import Product from "../../domain/entities/productSchema";
 import { responseHandler } from '../../types/commonTypes'; // Corrected spelling
@@ -53,59 +53,87 @@ export class ProductInteractor implements IProductInteractor {
   
       if (sheetData && Array.isArray(sheetData)) {
         const addBulkProducts = sheetData.map(async (element) => {
-          if (element.Name) {
-            // Check if the product with the same name already exists
-            const isExist = await this.productRepo.findByName(element.Name);
-            if (isExist) {
-              // Instead of throwing an error, return a failure message
-              return { status: 'failed', message: `Product "${element.Name}" already exists` };
+          try {
+            if (!element.name) {
+              return { status: 'failed', message: `Product entry is missing the "name" field.` };
             }
-          }
   
-          // Check and set MainCategory and SubCategory IDs
-          if (element.MainCategory) {
-            const isValidMainCategory = await this.categoryRepo.findByName(element.MainCategory);
+            // Check if the product already exists by name
+            const existingProduct = await this.productRepo.findByName(element.name);
+            if (existingProduct) {
+              // Check if the variant exists within the product
+              const existingVariant = existingProduct.variants.find(
+                (v: Variant) => v.weight === element.variantWeight
+              );
   
-            if (isValidMainCategory) {
-              element.MainCategory = isValidMainCategory._id;
-  
-              if (element.SubCategory) {
-                const isValidSubCategory = await this.subCategoryRepo.findByName(element.SubCategory);
-                element.SubCategory = isValidSubCategory ? isValidSubCategory._id : null;
+              if (existingVariant) {
+                // Update existing variant data
+                existingVariant.inPrice = element.variantInPrice;
+                existingVariant.outPrice = element.variantOutPrice;
+                existingVariant.stockQuantity = element.variantStockQuantity;
+                await existingProduct.save();
+                return {
+                  status: 'failed',
+                  message: `Product "${element.name}" with variant weight "${element.variantWeight}" already exists and was updated.`,
+                };
+              } else {
+                // Add new variant if it doesn't exist in the product
+                existingProduct.variants.push({
+                  weight: element.variantWeight,
+                  inPrice: element.variantInPrice,
+                  outPrice: element.variantOutPrice,
+                  stockQuantity: element.variantStockQuantity,
+                });
+                await existingProduct.save();
+                return {
+                  status: 'success',
+                  message: `New variant for product "${element.name}" added successfully.`,
+                };
               }
             } else {
-              element.MainCategory = null;
-              element.SubCategory = null;
-            }
-          }
+              // If the product doesn't exist, create a new one
   
-          // Add the product to the repository and return success
-          await this.productRepo.addBulkProduct(element);
-          return { status: 'success', message: `Product "${element.Name}" added successfully` };
+              // Associate Main and Subcategory IDs if present
+              if (element.MainCategory) {
+                const mainCategory = await this.categoryRepo.findByName(element.MainCategory);
+                element.MainCategory = mainCategory ? mainCategory._id : null;
+  
+                if (element.SubCategory && mainCategory) {
+                  const subCategory = await this.subCategoryRepo.findByName(element.SubCategory);
+                  element.SubCategory = subCategory ? subCategory._id : null;
+                } else {
+                  element.SubCategory = null;
+                }
+              }
+  
+              // Add new product
+              await this.productRepo.addBulkProduct(element);
+              return { status: 'success', message: `Product "${element.name}" added successfully.` };
+            }
+          } catch (error) {
+            return {
+              status: 'failed',
+              message: `Failed to process product "${element.name}": ${error.message}`,
+            };
+          }
         });
   
-        // Wait for all operations to finish
         const results = await Promise.allSettled(addBulkProducts);
   
-        // Separate successful and failed operations
-        const successfulAdds = results
-          .filter(result => result.status === 'fulfilled' && (result as any).value.status === 'success')
-          .map(result => (result as any).value.message);
+        const successMessages = results
+          .filter((result) => result.status === 'fulfilled' && (result as any).value.status === 'success')
+          .map((result) => (result as any).value.message);
   
-        const failedAdds = results
-          .filter(result => result.status === 'fulfilled' && (result as any).value.status === 'failed')
-          .map(result => (result as any).value.message);
-  
-        // if (failedAdds.length) {
-        //   console.error("Failed to add products:", failedAdds);
-        // }
+        const failedMessages = results
+          .filter((result) => result.status === 'fulfilled' && (result as any).value.status === 'failed')
+          .map((result) => (result as any).value.message);
   
         return {
-          message: 'Bulk products processed successfully',
-          successCount: successfulAdds.length,
-          failedCount: failedAdds.length,
-          failedMessages: failedAdds,
-          successMessages: successfulAdds,
+          message: 'Bulk product processing completed',
+          successCount: successMessages.length,
+          failedCount: failedMessages.length,
+          successMessages,
+          failedMessages,
         };
       } else {
         return { message: 'Invalid sheet data format', data: sheetData };
@@ -115,6 +143,8 @@ export class ProductInteractor implements IProductInteractor {
       throw new Error('Failed to add bulk products');
     }
   }
+  
+  
   
   
   
