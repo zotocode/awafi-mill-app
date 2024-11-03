@@ -11,7 +11,7 @@ export default interface IProductInteractor {
    page:number,
    limit:number,
    filter:any
-  ): Promise<ProductDTO[] | null>;
+  ): Promise<ProductResponseDTO>;
   listProductsBySubcategories(
    page:number,
    limit:number,

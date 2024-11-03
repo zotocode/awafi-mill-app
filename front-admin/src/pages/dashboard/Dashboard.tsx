@@ -3,7 +3,8 @@ import CardDataStats from '../../components/CardDataStats';
 import ChartOne from '../../components/Charts/ChartOne';
 import ChartTwo from '../../components/Charts/ChartTwo';
 import ChartThree from '../../components/Charts/ChartThree';
-import adminDashBoard from '../../api/adminDashBoard';
+import adminDashBoard from '../../api/adminDashBoard'; 
+import LoadingSpinner from '../../components/Spinner/LoadingSpinner';
 
 const Dashboard = () => {
   // State to store fetched data
@@ -81,7 +82,7 @@ const Dashboard = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner />
   }
 
   if (error) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import BannerApi from '../api/bannerapi';
 import Table from '../components/Tables/Table';
 import { toast } from 'react-toastify';

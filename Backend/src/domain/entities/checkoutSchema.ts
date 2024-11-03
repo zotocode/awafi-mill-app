@@ -2,16 +2,19 @@ import mongoose, { Document } from "mongoose";
 
 // Checkout interface
 export interface ICheckout extends Document {
+  _id:mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
   cart: mongoose.Types.ObjectId;
+  transactionId:string;
   items: { 
     product: mongoose.Types.ObjectId; 
     quantity: number; 
   }[];
-  paymentMethod: string;
+  paymentMethod: 'COD' | 'Razorpay' | 'Stripe';
   amount: number;
   currency: string;
-  
+  cancellationReason?:string;
+  trackingId?:string;
   // Address fields
   shippingAddress: {
     fullName: string;

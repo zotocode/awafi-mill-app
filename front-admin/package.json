@@ -12,6 +12,7 @@
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@headlessui/react": "^2.2.0",
     "@hookform/resolvers": "^3.9.0",
     "@mui/material": "^6.1.5",
     "@reduxjs/toolkit": "^2.3.0",
@@ -23,6 +24,7 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.447.0",
     "mogoose": "^0.0.1-security",
+    "mongoose": "^8.8.0",
     "react": "^18.3.1",
     "react-apexcharts": "^1.4.1",
     "react-chartjs-2": "^5.2.0",
