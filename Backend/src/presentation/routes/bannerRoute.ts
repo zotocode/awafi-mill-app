@@ -23,6 +23,8 @@ bannerRoutes.post("/unlistBanner",bannerController.unlistBanner.bind(bannerContr
 bannerRoutes.get("/viewWelcomeBanner",bannerController.welcomeBanners.bind(bannerController))
 bannerRoutes.get("/viewOfferBanner",bannerController.offerBanners.bind(bannerController))
 bannerRoutes.get("/viewCollectionBanner",bannerController.collectionBanners.bind(bannerController))
+bannerRoutes.post("/deleteBanner",bannerController.deleteBanner.bind(bannerController))
+
 
 
 export default bannerRoutes;
