@@ -48,7 +48,7 @@ const startServer = async (): Promise<void> => {
     app.use('/api/categories', categoryRoute);
     app.use('/api/sub-categories', subCategoryRoutes);
     app.use('/api/banner', bannerRoutes);
-    app.use('/api/checkout', checkoutRoutes);
+    app.use('/api/checkout',verifyToken, checkoutRoutes);
 
 
 

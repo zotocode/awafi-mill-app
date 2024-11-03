@@ -5,7 +5,7 @@ import { IUserCart } from "../../domain/entities/userCartSchema";
 import { BaseRepository } from "./baseRepository";
 import ICartRepo from "../../interface/cartInterface/IcartRepo";
 import { ProductModel } from "../model/producModel"; // Adjust the import based on your project structure
-
+import mongoose from "mongoose";
 // Cart repository extending the base repository
 export class CartRepository extends BaseRepository<IUserCart> implements ICartRepo {
   constructor(model: Model<IUserCart>) {
@@ -24,7 +24,8 @@ export class CartRepository extends BaseRepository<IUserCart> implements ICartRe
 
   async findCartByUser(userId: string): Promise<IUserCart | null> {
     try {
-      return await this.model.findOne({ user: userId }).exec();
+      return await this.model.findOne({ user: userId })
+      .exec();
     } catch (error) {
       console.error("Error finding cart for user:", error);
       throw new Error("Could not find cart for the user. Please check the user ID.");
@@ -151,7 +152,25 @@ export class CartRepository extends BaseRepository<IUserCart> implements ICartRe
       throw new Error("Could not remove item from cart. Please check the item details.");
     }
   }
+  
 
+async findByCartId(cartId: mongoose.Types.ObjectId): Promise<IUserCart | null> {
+  try {
+    const cart = await this.model.findById(cartId)
+      .populate('items.product')
+      .populate('items.variant')
+      .exec();
+    
+    if (!cart) {
+      throw new Error(`Cart not found with ID: ${cartId}`);
+    }
+    
+    return cart;
+  } catch (error) {
+    console.error("Error finding cart by ID:", error);
+    throw new Error("Could not find cart. Please check the cart ID and try again.");
+  }
+}
   async clearCart(userId: string): Promise<IUserCart | null> {
     try {
       const clearedCart = await this.model.findOneAndDelete({ user: userId }).exec();
