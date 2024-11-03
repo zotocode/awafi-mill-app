@@ -20,12 +20,14 @@ const Dashboard = () => {
   });
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      
+      setError(null); // Clear previous errors before a new request
+
       // Fetch total views (actual data)
       const viewsData = await adminDashBoard.fetchTotalViews();
       setDashboardData(prevData => ({
@@ -33,30 +35,15 @@ const Dashboard = () => {
         totalViews: { total: viewsData.total, rate: viewsData.rate },
       }));
 
-      // Dummy data for total profit
-      const dummyProfitData = {
-        total: 5000, // Example total profit
-        rate: 10, // Example rate of profit
-      };
+      // Dummy data for total profit and products
       setDashboardData(prevData => ({
         ...prevData,
-        totalProfit: dummyProfitData,
-      }));
-
-      // Dummy data for total products
-      const dummyProductsData = {
-        total: 200, // Example total products
-        rate: 5, // Example rate of products
-      };
-      setDashboardData(prevData => ({
-        ...prevData,
-        totalProducts: dummyProductsData,
+        totalProfit: { total: 5000, rate: 10 },
+        totalProducts: { total: 200, rate: 5 },
       }));
 
       // Fetch order status data
-      const orderStatusResponse = await adminDashBoard.fetchTotalViews(); // Assuming you have this function to fetch order status data
-      
-      
+      const orderStatusResponse = await adminDashBoard.fetchTotalViews();
       const orderStatusTypes = ['shipped', 'processing', 'delivered'] as const;
       type OrderStatusType = typeof orderStatusTypes[number];
       interface Order {
@@ -82,9 +69,8 @@ const Dashboard = () => {
         ...prevData,
         orderStatusCounts: orderCounts,
       }));
-
-    } catch (error:any) {
-      setError(error);
+    } catch (error) {
+      setError('Failed to load data. Please try again.');
       console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
@@ -100,7 +86,14 @@ const Dashboard = () => {
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div>
+        <p>{error}</p>
+        <button onClick={fetchDashboardData} className="retry-button">
+          Retry
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -112,8 +105,8 @@ const Dashboard = () => {
         <CardDataStats title="Delivered Orders" total={dashboardData.orderStatusCounts.delivered.count.toString()} />
       </div>
       <ChartOne />
-      <ChartTwo  />
-      <ChartThree  />
+      <ChartTwo />
+      <ChartThree />
     </>
   );
 };
