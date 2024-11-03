@@ -24,6 +24,7 @@ bannerRoutes.get("/viewWelcomeBanner",bannerController.welcomeBanners.bind(banne
 bannerRoutes.get("/viewOfferBanner",bannerController.offerBanners.bind(bannerController))
 bannerRoutes.get("/viewCollectionBanner",bannerController.collectionBanners.bind(bannerController))
 bannerRoutes.post("/deleteBanner",bannerController.deleteBanner.bind(bannerController))
+bannerRoutes.get("/viewAllBanners",bannerController.allBanners.bind(bannerController))
 
 
 
