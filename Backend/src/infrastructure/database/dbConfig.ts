@@ -1,8 +1,10 @@
 import mongoose from 'mongoose';
+import envConfig from '../../config/env';
 
 export const connectDB = async (): Promise<void> => {
   try {
-    const connect = await mongoose.connect("mongodb://localhost:27017/Awafi-mobile");
+
+    const connect = await mongoose.connect(envConfig.Atlas_Url);
     console.log(`Database connected: ${connect.connection.host}`);
   } catch (err) {
     if (err instanceof Error) {

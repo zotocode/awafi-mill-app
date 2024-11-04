@@ -20,5 +20,7 @@ const checkoutRoutes = express.Router();
 
 
 checkoutRoutes.post("/", checkoutController.checkout.bind(checkoutController));
+checkoutRoutes.get("/", checkoutController.getSecretKey.bind(checkoutController));
+
 
 export default checkoutRoutes;
