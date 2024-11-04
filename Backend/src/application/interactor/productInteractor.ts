@@ -52,32 +52,35 @@ export class ProductInteractor implements IProductInteractor {
       const sheetData = await this.excelService.processExcel(productData.path);
   
       if (sheetData && Array.isArray(sheetData)) {
-        const addBulkProducts = sheetData.map(async (element) => {
+        const results = [];
+      
+        for (const element of sheetData) {
           try {
             if (!element.name) {
-              return { status: 'failed', message: `Product entry is missing the "name" field.` };
+              results.push({ status: 'failed', message: `Product entry is missing the "name" field.` });
+              continue;
             }
-  
-            // Check if the product already exists by name
-            const existingProduct = await this.productRepo.findByName(element.name);
+      
+            const existingProduct = await this.productRepo.findByName(element.name.trim().toLowerCase());
+      
             if (existingProduct) {
-              // Check if the variant exists within the product
+          
               const existingVariant = existingProduct.variants.find(
                 (v: Variant) => v.weight === element.variantWeight
               );
-  
+      
               if (existingVariant) {
-                // Update existing variant data
+    
                 existingVariant.inPrice = element.variantInPrice;
                 existingVariant.outPrice = element.variantOutPrice;
                 existingVariant.stockQuantity = element.variantStockQuantity;
                 await existingProduct.save();
-                return {
+                results.push({
                   status: 'failed',
                   message: `Product "${element.name}" with variant weight "${element.variantWeight}" already exists and was updated.`,
-                };
+                });
               } else {
-                // Add new variant if it doesn't exist in the product
+       
                 existingProduct.variants.push({
                   weight: element.variantWeight,
                   inPrice: element.variantInPrice,
@@ -85,49 +88,41 @@ export class ProductInteractor implements IProductInteractor {
                   stockQuantity: element.variantStockQuantity,
                 });
                 await existingProduct.save();
-                return {
+                results.push({
                   status: 'success',
                   message: `New variant for product "${element.name}" added successfully.`,
-                };
+                });
               }
             } else {
-              // If the product doesn't exist, create a new one
-  
-              // Associate Main and Subcategory IDs if present
-              if (element.MainCategory) {
-                const mainCategory = await this.categoryRepo.findByName(element.MainCategory);
-                element.MainCategory = mainCategory ? mainCategory._id : null;
-  
-                if (element.SubCategory && mainCategory) {
-                  const subCategory = await this.subCategoryRepo.findByName(element.SubCategory);
-                  element.SubCategory = subCategory ? subCategory._id : null;
+              if (element.mainCategory) {
+        
+                const mainCategory = await this.categoryRepo.findByName(element.mainCategory);
+                element.mainCategory = mainCategory ? mainCategory._id : null;
+            //  console.log(" is existig main",mainCategory)
+                if (element.subCategory && mainCategory) {
+                  // console.log("Sub category",element.subCategory)
+                  const subCategory = await this.subCategoryRepo.findByName(element.subCategory);
+                  element.subCategory = subCategory ? subCategory._id : null;
                 } else {
-                  element.SubCategory = null;
+                  element.subCategory = null;
                 }
               }
-  
-              // Add new product
+          
               await this.productRepo.addBulkProduct(element);
-              return { status: 'success', message: `Product "${element.name}" added successfully.` };
+
+              results.push({ status: 'success', message: `Product "${element.name}" added successfully.` });
             }
           } catch (error) {
-            return {
+            results.push({
               status: 'failed',
               message: `Failed to process product "${element.name}": ${error.message}`,
-            };
+            });
           }
-        });
-  
-        const results = await Promise.allSettled(addBulkProducts);
-  
-        const successMessages = results
-          .filter((result) => result.status === 'fulfilled' && (result as any).value.status === 'success')
-          .map((result) => (result as any).value.message);
-  
-        const failedMessages = results
-          .filter((result) => result.status === 'fulfilled' && (result as any).value.status === 'failed')
-          .map((result) => (result as any).value.message);
-  
+        }
+      
+        const successMessages = results.filter((result) => result.status === 'success').map((result) => result.message);
+        const failedMessages = results.filter((result) => result.status === 'failed').map((result) => result.message);
+      
         return {
           message: 'Bulk product processing completed',
           successCount: successMessages.length,
@@ -138,6 +133,7 @@ export class ProductInteractor implements IProductInteractor {
       } else {
         return { message: 'Invalid sheet data format', data: sheetData };
       }
+      
     } catch (error) {
       console.error('Error processing bulk products:', error);
       throw new Error('Failed to add bulk products');
@@ -151,7 +147,6 @@ export class ProductInteractor implements IProductInteractor {
   async bulkDownload(): Promise<any> {
     const ProductResponse = await this.productRepo.findAllProductsInJsonWithAggregation();
      if (ProductResponse.products){
-      console.log("product data sets",ProductResponse.products)
        const excelBuffer=await this.excelService.createExcelBuffer(ProductResponse.products)
        return excelBuffer
      }

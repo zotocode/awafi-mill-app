@@ -240,7 +240,7 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
 
   async findByName(name: string): Promise<IProductSchema | null> {
    
-    return await this.model.findOne({ name: name });
+    return await this.model.findOne({ name:name });
   }
   async findByNameAndVariant(query:{name:string,weight:string}): Promise<boolean>{
     

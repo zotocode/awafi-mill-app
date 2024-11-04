@@ -16,7 +16,7 @@ class ProductApi{
       }
     async bulkAddProduct(data:FormData): Promise<any> {
         try {
-          return await this.axiosInstance.post('/api/products/product/bulk/admin',data,{
+          return await this.axiosInstance.post('/api/products/product/bulk/upload/admin',data,{
             headers: {
               'Content-Type': 'multipart/form-data',
             }});
