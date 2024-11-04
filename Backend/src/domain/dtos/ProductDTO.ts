@@ -7,7 +7,7 @@ interface Description {
   content: string;
 }
 
-interface Variant {
+export interface Variant {
   weight: string;
   inPrice: number;
   outPrice: number;

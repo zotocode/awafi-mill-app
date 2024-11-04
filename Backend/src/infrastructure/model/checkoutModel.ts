@@ -7,30 +7,31 @@ const checkoutSchema = new mongoose.Schema({
   cart: { type: mongoose.Schema.Types.ObjectId, ref: "Cart", required: true },
   items: [{
     product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
+    variant: { type: mongoose.Schema.Types.ObjectId, ref: "Variant", required: true },
     quantity: { type: Number, required: true }
   }],
   paymentMethod: { type: String, enum: ['COD', 'Razorpay', 'Stripe'], required: true },
-  transactionId: { type: String, required: true }, 
+  transactionId: { type: String, required: false }, 
   amount: { type: Number, required: true },
   currency: { type: String, default: 'INR' },
-  
+
   shippingAddress: {
-    fullName: { type: String, required: true },
-    addressLine1: { type: String, required: true },
-    addressLine2: { type: String },
-    city: { type: String, required: true },
-    postalCode: { type: String, required: true },
-    country: { type: String, required: true },
-    phone: { type: String, required: true }
+    fullName: { type: String, required: false },
+    addressLine1: { type: String, required: false },
+    addressLine2: { type: String ,required:false},
+    city: { type: String, required: false },
+    postalCode: { type: String, required: false },
+    country: { type: String, required: false },
+    phone: { type: String, required: false }
   },
   billingAddress: {
-    fullName: { type: String, required: true },
-    addressLine1: { type: String, required: true },
-    addressLine2: { type: String },
-    city: { type: String, required: true },
-    postalCode: { type: String, required: true },
-    country: { type: String, required: true },
-    phone: { type: String, required: true }
+    fullName: { type: String, required: false },
+    addressLine1: { type: String, required: false },
+    addressLine2: { type: String ,required:false},
+    city: { type: String, required: false },
+    postalCode: { type: String, required: false },
+    country: { type: String, required: false },
+    phone: { type: String, required: false }
   },
 
   // Payment-related fields
@@ -61,12 +62,14 @@ const checkoutSchema = new mongoose.Schema({
   },
 
   // Coupons
-  couponCode: { type: String },
-  discountAmount: { type: Number, default: 0 }, 
-
+  couponCode: { type: String, required:false },
+  discountAmount: { type: Number, default: 0,required:false }, 
+  cancellationReason: { type: String, requiered:false }, 
+  trackingId:{type:String,required:false},
   // Tracking timestamps
-  paymentCompletedAt: { type: Date },
-  deliveredAt: { type: Date }
+  paymentCompletedAt: { type: Date ,required:false},
+  orderPlacedAt:{type:Date,required:true},
+  deliveredAt: { type: Date ,required:true}
 }, {
   timestamps: true
 });

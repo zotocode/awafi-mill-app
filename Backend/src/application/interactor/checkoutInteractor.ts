@@ -2,7 +2,7 @@
 import ICartRepo from "../../interface/cartInterface/IcartRepo";
 import ICheckoutRepo from "../../interface/checkoutInterface/IcheckoutRepo";
 import ICheckoutInteractor from "../../interface/checkoutInterface/IcheckoutInteractor";
-import { CheckoutDTO } from "../../domain/dtos/CheckoutDTO";
+import { CheckoutDTO ,CheckoutCreateDTO} from "../../domain/dtos/CheckoutDTO";
 import { IUserCart } from "../../domain/entities/userCartSchema";
 import { IPaymentGateway } from "../../infrastructure/paymentGateways/IPaymentGateway";
 import { IproductRepo } from "../../interface/productInterface/IproductRepo"; // Import IproductRepo
@@ -26,19 +26,26 @@ export class CheckoutInteractor implements ICheckoutInteractor {
 
         if (!cart) throw new Error("Cart not found");
 
-        // Check inventory for each product in the cart 
-        for (const item of cart.items) {
-            const productId = new mongoose.Types.ObjectId(item.product);
-            const product = await this.productRepo.productFindById(productId);
-            if (!product || product.variants[0].stockQuantity < item.quantity) {
-                throw new Error(`Insufficient stock for product: ${product?.name}`);
-            }
-        }
+        
+    
 
-        const checkoutData = { ...data }; // add any details if want - abhishek 
+        const checkoutData:CheckoutCreateDTO = {
+            user:new mongoose.Types.ObjectId(data.userId),
+            amount:data.amount,
+            paymentMethod:data.paymentMethod,
+            orderPlacedAt:new Date(data.time),
+            deliveredAt:new Date(new Date(data.time).getTime() + 7 * 24 * 60 * 60 * 1000),
+            cart:cart._id as mongoose.Types.ObjectId,
+            items:cart.items,
+            currency:data.currency
+        }; // add any details if want - abhishek 
+        checkoutData.cart=cart._id as mongoose.Types.ObjectId
+        // Set deliveredAt to 7 days after the provided time in data.time
+       checkoutData.deliveredAt = new Date(new Date(data.time).getTime() + 3 * 24 * 60 * 60 * 1000);
+
         const checkoutResult = await this.checkoutRepo.createCheckout(checkoutData);
-
-
+      let otherOptions={}
+ 
         // Check payment method
         switch (data.paymentMethod) {
             case 'COD':
@@ -48,8 +55,9 @@ export class CheckoutInteractor implements ICheckoutInteractor {
     
             case 'Razorpay':
                 // For Razorpay payment
-                const razorpayOptions = {}; // Add any specific options for Razorpay if needed
-                const razorpayResponse = await this.paymentGateway.initiatePayment(checkoutResult.amount, checkoutResult.currency, razorpayOptions);
+                const razorpayOptions = {razorpay_id:'asdfasd'}; // Add any specific options for Razorpay if needed
+                 otherOptions={}
+                const razorpayResponse = await this.paymentGateway.initiatePayment(checkoutResult.amount, checkoutResult.currency, razorpayOptions,otherOptions);
                 if (!razorpayResponse) {
                     throw new Error('Razorpay payment initiation failed');
                 }
@@ -58,8 +66,9 @@ export class CheckoutInteractor implements ICheckoutInteractor {
     
             case 'Stripe':
                 // For Stripe payment
-                const stripeOptions = {}; // Add any specific options for Stripe if needed
-                const stripeResponse = await this.paymentGateway.initiatePayment(checkoutResult.amount, checkoutResult.currency, stripeOptions);
+                const stripeOptions = {stripe_id:data.stripe_id}; // Add any specific options for Stripe if needed
+                 otherOptions={products:data.products,order:checkoutResult}
+                const stripeResponse = await this.paymentGateway.initiatePayment(checkoutResult.amount, checkoutResult.currency, stripeOptions,otherOptions);
                 if (!stripeResponse) {
                     throw new Error('Stripe payment initiation failed');
                 }
@@ -76,7 +85,7 @@ export class CheckoutInteractor implements ICheckoutInteractor {
         // Store payment information in the checkout record if needed (not implemented here)
 
         // Clear cart after successful checkout
-        await this.cartRepo.clearCart(data.userId);
+        // await this.cartRepo.clearCart(data.user.toString());
 
         // Reduce product quantities
         // for (const item of cart.items) {
