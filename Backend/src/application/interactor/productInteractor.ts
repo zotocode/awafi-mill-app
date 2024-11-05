@@ -166,8 +166,9 @@ export class ProductInteractor implements IProductInteractor {
   }
 
   // Retrieve all listed products
-  async getAllListedProducts(page:number,limit:number): Promise<ProductResponseDTO> {
-    const ProductResponse = await this.productRepo.findListedAllProducts(page,limit);
+  async getAllListedProducts(page:number,limit:number,userId?:string | null): Promise<ProductResponseDTO> {
+    const ProductResponse = await this.productRepo.findListedAllProducts(page,limit,userId);
+     console.log("ProduuctResponse",ProductResponse)
     const products= ProductResponse.products.map((p) => this.mapEntityToDto(p));
       return  {products:products,totalPages:ProductResponse.totalPages}
   }
@@ -179,21 +180,21 @@ export class ProductInteractor implements IProductInteractor {
   }
 
   // Filter by category
-  async fetchByCategoryAndName(page:number,limit:number,filter:any): Promise<ProductResponseDTO> {
+  async fetchByCategoryAndName(page:number,limit:number,filter:any,userId?:string | null): Promise<ProductResponseDTO> {
     const ProductResponse = await this.productRepo.fetchByCategoryAndName(page, limit,filter);
     const products= ProductResponse.products.map((p) => this.mapEntityToDto(p));
     return  {products:products,totalPages:ProductResponse.totalPages}
   }
   // liste products under sub category using maincategory id------
 
-  async listProductsBySubcategories(page:number,limit:number,mainCatId:any): Promise<any> {
+  async listProductsBySubcategories(page:number,limit:number,mainCatId:any,userId?:string | null): Promise<any> {
     const products = await this.productRepo.listProductsBySubcategories(page, limit,mainCatId);
    
     return products
   }
 
   // Retrieve a product by ID
-  async getProductById(id: mongoose.Types.ObjectId): Promise<ProductDTO | null> {
+  async getProductById(id: mongoose.Types.ObjectId,userId?:string | null): Promise<ProductDTO | null> {
     const product = await this.productRepo.productFindById(id);
     return product ? this.mapEntityToDto(product) : null;
   }

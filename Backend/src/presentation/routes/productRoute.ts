@@ -11,6 +11,7 @@ import { CategoryRepository } from "../../infrastructure/repositories/categoryRe
 import CategoryModel from "../../infrastructure/model/categoryModel";
 import SubCategoryModel from "../../infrastructure/model/subCategoryModel";
 import { SubCategoryRepository } from "../../infrastructure/repositories/subCategoryRepository";
+import { optionalAuth } from "../middleware/OptionalAuth";
 
 const productRepo = new ProductRepository(ProductModel);
 const categoryRepo = new CategoryRepository(CategoryModel);
@@ -48,9 +49,9 @@ productRoutes.put("/product/:id", productController.updateProduct.bind(productCo
 
 
 // User product routes
-productRoutes.get("/product/filter", productController.FilterProducts.bind(productController));
-productRoutes.get("/product/listed", productController.getAllListedProducts.bind(productController));
-productRoutes.get("/product/:id", productController.getProductById.bind(productController));
-productRoutes.get("/product/subCategory/:mainCatId", productController.listProductsBySubcategories.bind(productController));
+productRoutes.get("/product/filter",optionalAuth, productController.FilterProductsForUser.bind(productController));
+productRoutes.get("/product/listed",optionalAuth, productController.getAllListedProductsForUser.bind(productController));
+productRoutes.get("/product/:id",optionalAuth, productController.getProductByIdForUser.bind(productController));
+productRoutes.get("/product/subCategory/:mainCatId",optionalAuth, productController.listProductsBySubcategoriesForUser.bind(productController));
 
 export default productRoutes;

@@ -7,7 +7,7 @@ import { useApi } from './axiosConfig'
         try {
           return await this.axiosInstance.post('/api/admin/login',{email,password});
         } catch (error: unknown) {
-         
+            console.log("error,e",error)
           return error;
         }
       }
