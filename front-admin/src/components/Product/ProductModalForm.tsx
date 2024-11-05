@@ -5,7 +5,6 @@ import categoryapi from "../../api/categoryapi";
 import subcategoryapi from "../../api/subcategoryapi";
 import { toast } from "react-toastify";
 import productapi from "../../api/productapi";
-import { z } from "zod";
 
 interface ModalFormProps {
   isOpen: boolean;
@@ -165,7 +164,7 @@ const AddProductModal: React.FC<ModalFormProps> = ({
     }
 
     // Validate variants
-    const variantErrors = variants.map((variant, index) => {
+    const variantErrors = variants.map((variant) => {
       const variantError: any = {};
 
       // Check weight

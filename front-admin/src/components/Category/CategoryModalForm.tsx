@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import CategoryApi from '../../api/categoryapi';
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+
 
 interface CategoryModalFormProps {
   isOpen: boolean;

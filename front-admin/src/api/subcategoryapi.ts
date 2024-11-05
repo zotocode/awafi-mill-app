@@ -1,5 +1,5 @@
 import { useApi } from './axiosConfig'
-import { creatingCategory, creatingSubCategory } from '../types/categoryType';
+import { creatingSubCategory } from '../types/categoryType';
 
 class SubCategoryApi{
     axiosInstance :any=useApi()
