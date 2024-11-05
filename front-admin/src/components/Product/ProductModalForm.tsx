@@ -537,7 +537,7 @@ const AddProductModal: React.FC<ModalFormProps> = ({
                         <div className="flex flex-col">
                           <input
                             type="text"
-                            placeholder="In Price"
+                            placeholder="In Price (AED)"
                             className={`mt-1 block border ${
                               errors.variants && errors.variants[index]?.inPrice
                                 ? "border-red-500"
