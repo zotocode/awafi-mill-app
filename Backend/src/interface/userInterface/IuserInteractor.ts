@@ -14,4 +14,5 @@ export interface IUserInteractor{
     forgotPassword(email:string):Promise<any>
     verifyFogotOtp(email:string,userOtp:string):Promise<any>
     updateNewPassword(email:string,otp:string,newPassword:string):Promise<any>
+    getUserAddress(id:string):Promise<any>
 }

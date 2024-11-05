@@ -48,6 +48,7 @@ userRoute.post('/edit-address',verifyToken,userController.updateUserAddress.bind
 userRoute.post('/forgot-password',userController.forgotUserPassword.bind(userController))
 userRoute.post('/forgot-otpVeify',userController.forgotOtpVerify.bind(userController))
 userRoute.post('/forgot-setPassword',userController.forgotNewpasswordSet.bind(userController))
+userRoute.get('/user-address',verifyToken, userController.getAddress.bind(userController));
 
 
 

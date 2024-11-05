@@ -248,4 +248,18 @@ async updateNewPassword(email: string, otp: string, newPassword: string): Promis
   }
 }
 
+async getUserAddress(id: string): Promise<any> {
+  try {
+    const result = await this.addressRepo.getAddress(id);
+    if (!result.status) {
+      return { status: false, message: result.message };
+    }
+    return { status: true, message: "User address retrieved successfully", data: result.data };
+  } catch (error) {
+    console.error("Error in getUserAddress:", error);
+    return { status: false, message: "An error occurred while retrieving the user address" };
+  }
+}
+
+
 }

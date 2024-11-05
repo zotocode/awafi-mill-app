@@ -235,6 +235,35 @@ export class UserController {
       return res.status(500).json({ status: false, message: "An internal server error occurred" });
     }
   }
+
+
+  async getAddress(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = req.user?.id;
+      if (!id) {
+        return res.status(400).json({ message: "User ID not found in token" });
+      }
+      const userEditAddress = await this.userInteractor.getUserAddress(id); 
+      if (userEditAddress.status) {
+        return res.status(200).json({
+          status: true,
+          message: userEditAddress.message,
+          data: userEditAddress.data,
+        });
+      } else {
+        return res.status(404).json({
+          status: false,
+          message: userEditAddress.message,
+        });
+      }
+    } catch (error) {
+      console.error("Error in getAddress controller:", error);
+      return res.status(500).json({
+        status: false,
+        message: "An internal error occurred while fetching the address",
+      });
+    }
+  }
   
 
 }
