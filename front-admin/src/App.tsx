@@ -1,4 +1,4 @@
-import React from "react";
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./state/store";
@@ -33,7 +33,7 @@ function App() {
           />
 
           {/* Protected Routes */}
-          <Route element={<ProtectedRoute />}>
+          {/* <Route element={<ProtectedRoute />}> */}
             <Route element={<DefaultLayout />}>
 
               <Route path="/dashboard" element={<DashboardPage />} />
@@ -49,7 +49,7 @@ function App() {
               <Route path="/categories/sub" element={<SubCategoryManagementPage />} />
               <Route path="/banner" element={<Banner />} />
               <Route path="/sales-report" element={<SalesReport />} />
-            </Route>
+            {/* </Route> */}
           </Route>
         </Routes>
       </Router>

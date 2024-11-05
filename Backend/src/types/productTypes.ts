@@ -32,7 +32,7 @@ export default interface Product  {
 
 
 export type ProductResponse={
-  products:IProductSchema[],
+  products:any[],
   totalPages:number
 }
 export type ProductResponseDTO={

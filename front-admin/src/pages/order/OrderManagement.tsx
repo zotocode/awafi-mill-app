@@ -123,46 +123,25 @@ const OrderManagementPage = () => {
     const availableStatuses = getAvailableStatuses(typedRow.orderStatus);
     const isProcessingToShipped = typedRow.orderStatus === 'processing';
     
-    const [localTrackingId, setLocalTrackingId] = useState('');
-    
-    const handleStatusChangeWithTracking = async (newStatus: OrderStatus) => {
-      if (newStatus === 'shipped' && !localTrackingId.trim()) {
-        alert('Please enter a tracking ID');
-        return;
-      }
-      await handleStatusChange(
-        typedRow._id.toString(), 
-        newStatus, 
-        newStatus === 'shipped' ? localTrackingId : undefined
-      );
-    };
-
     return (
       <div className="flex items-center gap-3">
         {isProcessingToShipped ? (
           <div className="flex items-center gap-2">
             <input
               type="text"
-              value={localTrackingId}
-              onChange={(e) => {
-                console.log('Tracking ID changed:', e.target.value);
-                setLocalTrackingId(e.target.value);
-                setTrackingId(e.target.value);
-              }}
+              value={trackingId}
+              onChange={(e) => setTrackingId(e.target.value)}
               placeholder="Enter Tracking ID"
               className="px-3 py-1.5 text-sm border rounded-lg"
             />
             <button
               onClick={() => {
-                console.log('Shipping confirmation clicked', {
-                  orderId: typedRow._id.toString(),
-                  trackingId: localTrackingId
-                });
-                handleStatusChange(typedRow._id.toString(), 'shipped');
+                handleStatusChange(typedRow._id.toString(), 'shipped', trackingId);
+                setTrackingId('');
               }}
-              disabled={!localTrackingId.trim()}
+              disabled={!trackingId.trim()}
               className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors
-                ${localTrackingId.trim() 
+                ${trackingId.trim() 
                   ? 'bg-blue-600 text-white hover:bg-blue-700' 
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
             >
@@ -175,7 +154,7 @@ const OrderManagementPage = () => {
             onChange={(e) => {
               const newStatus = e.target.value as OrderStatus;
               console.log('Status change selected:', newStatus);
-              handleStatusChangeWithTracking(newStatus);
+              handleStatusChange(typedRow._id.toString(), newStatus);
             }}
             className="rounded-lg px-3 py-1.5 text-sm border border-gray-300 bg-white text-gray-700
                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent

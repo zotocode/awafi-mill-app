@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import{ useEffect, useState } from "react";
 import { TableColumn } from '../../components/Tables/Table';
 import Table from "../../components/Tables/Table";
 import SubCategoryModalForm from "../../components/Category/SubCategoryModalForm";

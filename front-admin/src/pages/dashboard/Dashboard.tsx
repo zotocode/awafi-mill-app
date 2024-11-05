@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import CardDataStats from '../../components/CardDataStats';
 import ChartOne from '../../components/Charts/ChartOne';
 import ChartTwo from '../../components/Charts/ChartTwo';
@@ -96,7 +96,11 @@ const Dashboard = () => {
   }, []);
 
   if (loading) {
-    return <LoadingSpinner />
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-100/75">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   if (error) {

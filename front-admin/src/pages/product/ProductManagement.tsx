@@ -13,7 +13,7 @@ import {
   Eye,
   ChevronDown,
 } from "lucide-react";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../../components/Search/SearchBar";
 import { debounce } from 'lodash'; // Make sure to install lodash if not already installed
@@ -32,6 +32,7 @@ const ProductManagement: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Modify fetchProducts to use searchByName when there's a search term
   const fetchProducts = useCallback(async (page: number, limit: number, search: string = '') => {
@@ -241,39 +242,55 @@ const ProductManagement: React.FC = () => {
     },
   ];
 
+  // Add click outside handler
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <>
       <div className="flex flex-col gap-10 w-full">
         <div className="flex w-full justify-between mb-4">
-          <div className="relative">
+          <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               type="button"
-              className="text-white bg-black hover:bg-[#8e8f91] hover:text-black-2 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center inline-flex items-center"
+              className="text-white bg-black hover:bg-[#2d2e2e]  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center justify-between w-44"
             >
               Bulk Actions
-              <ChevronDown className="w-4 h-4 ml-2" />
+              <ChevronDown className={`w-4 h-4 ml-2 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
             {isDropdownOpen && (
-              <div className="absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-                <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
+              <div className="absolute z-10 mt-2 w-44 bg-white rounded-lg shadow-lg border border-gray-200 transition-all duration-200 ease-in-out">
+                <ul className="py-1">
                   <li>
-                    <a
-                      href="#"
-                      onClick={() => navigate("/bulk-upload")}
-                      className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                    <button
+                      onClick={() => {
+                        navigate("/bulk-upload");
+                        setIsDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-150"
                     >
                       Bulk Upload
-                    </a>
+                    </button>
                   </li>
                   <li>
-                    <a
-                      href="#"
-                      onClick={handleBulkDownload}
-                      className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                    <button
+                      onClick={() => {
+                        handleBulkDownload();
+                        setIsDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-150"
                     >
                       Bulk Download
-                    </a>
+                    </button>
                   </li>
                 </ul>
               </div>
@@ -290,7 +307,7 @@ const ProductManagement: React.FC = () => {
           <button
             onClick={() => setModal(true)}
             type="button"
-            className="text-white bg-black hover:bg-[#8e8f91] hover:text-black-2 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            className="text-white bg-black hover:bg-[#2d2e2e] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
             Add Product
           </button>
