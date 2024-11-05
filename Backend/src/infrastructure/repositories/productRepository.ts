@@ -116,12 +116,109 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
     }
   }
 
-  async findListedAllProducts(page:number,limit:number): Promise<ProductResponse> {
-    const totalProducts = await this.model.countDocuments();
-     const skip = (page - 1) * limit;
-    const products= await this.model.find({ isListed: true, isDelete: false }).skip(skip).limit(limit).populate('category').populate('subCategory').exec();
-    return {products:products,totalPages: Math.ceil(totalProducts / limit)}
+  async findListedAllProducts(
+    page: number,
+    limit: number,
+    userId?: string | null
+  ): Promise<ProductResponse> {
+    const skip = (page - 1) * limit;
+  
+    // Base match criteria
+    const matchCriteria = { isListed: true, isDelete: false };
+  
+    // Aggregation pipeline
+    const pipeline: any[] = [
+      { $match: matchCriteria },
+      {
+        $lookup: {
+          from: 'categories', // The name of the category collection
+          localField: 'category',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      { $unwind: '$category' },
+      {
+        $lookup: {
+          from: 'subcategories', // The name of the subcategory collection
+          localField: 'subCategory',
+          foreignField: '_id',
+          as: 'subCategory',
+        },
+      },
+      { $unwind: '$subCategory' },
+      { $skip: skip },
+      { $limit: limit },
+    ];
+  
+    if (userId) {
+      
+      pipeline.push(
+        {
+          $lookup: {
+            from: 'wishlists',
+            let: { productId: '$_id', userId: { $toObjectId: userId } },
+            pipeline: [
+              { $match: { $expr: { $eq: ['$user', '$$userId'] } } },
+              { $unwind: '$items' },
+              { $match: { $expr: { $eq: ['$items.productId', '$$productId'] } } },
+              { $project: { _id: 1 } },
+            ],
+            as: 'wishlistStatus',
+          },
+        },
+        {
+          $lookup: {
+            from: 'carts',
+            let: { productId: '$_id', userId: { $toObjectId: userId } },
+            pipeline: [
+              { $match: { $expr: { $eq: ['$user', '$$userId'] } } },
+              { $unwind: '$items' },
+              { $match: { $expr: { $eq: ['$items.product', '$$productId'] } } },
+              { $project: { _id: 1 } },
+            ],
+            as: 'cartStatus',
+          },
+        },
+        {
+          $addFields: {
+            isWishlisted: { $cond: { if: { $gt: [{ $size: '$wishlistStatus' }, 0] }, then: true, else: false } },
+            isInCart: { $cond: { if: { $gt: [{ $size: '$cartStatus' }, 0] }, then: true, else: false } },
+          },
+        },
+        { $project: { wishlistStatus: 0, cartStatus: 0 } } // Clean up intermediate fields
+      );
+    } else {
+      // If no user ID is provided, set defaults to false
+      pipeline.push(
+        {
+          $addFields: {
+            isWishlisted: false,
+            isInCart: false,
+          },
+        }
+      );
+    }
+  
+    // Execute the aggregate query
+    const products = await this.model.aggregate(pipeline);
+  console.log("aggregte",products)
+    // Calculate total products only once without pagination
+    const totalProducts = await this.model.countDocuments(matchCriteria);
+    
+    return {
+      products: products.map((product) => ({
+        _id: product._id,
+        name: product.name,
+        isWishlisted: product.isWishlisted,
+        isInCart: product.isInCart,
+        Images: product.Images,
+      })),
+      totalPages: Math.ceil(totalProducts / limit),
+    };
   }
+  
+  
 
   async findProductsBySpelling(page: number, limit: number, name: string): Promise<ProductResponse> {
     const totalProducts = await this.model.countDocuments({
@@ -240,7 +337,7 @@ export class ProductRepository extends BaseRepository<IProductSchema> implements
 
   async findByName(name: string): Promise<IProductSchema | null> {
    
-    return await this.model.findOne({ name: name });
+    return await this.model.findOne({ name:name });
   }
   async findByNameAndVariant(query:{name:string,weight:string}): Promise<boolean>{
     

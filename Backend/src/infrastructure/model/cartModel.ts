@@ -7,13 +7,14 @@ const userCartSchema = new mongoose.Schema({
   items: [
     {
       product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
-      variant: { type: mongoose.Schema.Types.ObjectId, ref: "Variant", required: true },
+      variant: { type: mongoose.Schema.Types.ObjectId, ref: "Product.variants", required: true }, // Reference to the variant ID
       quantity: { type: Number, required: true, default: 1 }
     }
   ]
 }, {
   timestamps: true
 });
+
 export const CartModel: Model<IUserCart> = mongoose.model<IUserCart>('Cart', userCartSchema);
 export default userCartSchema;
 

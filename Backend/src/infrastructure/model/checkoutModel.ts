@@ -11,18 +11,18 @@ const checkoutSchema = new mongoose.Schema({
     quantity: { type: Number, required: true }
   }],
   paymentMethod: { type: String, enum: ['COD', 'Razorpay', 'Stripe'], required: true },
-  transactionId: { type: String, required: false }, 
+  transactionId: { type: String, required: true }, 
   amount: { type: Number, required: true },
   currency: { type: String, default: 'INR' },
 
   shippingAddress: {
-    fullName: { type: String, required: false },
-    addressLine1: { type: String, required: false },
-    addressLine2: { type: String ,required:false},
-    city: { type: String, required: false },
-    postalCode: { type: String, required: false },
-    country: { type: String, required: false },
-    phone: { type: String, required: false }
+    fullName: { type: String, required: true },
+    addressLine1: { type: String, required: true },
+    addressLine2: { type: String ,required:true},
+    city: { type: String, required: true },
+    postalCode: { type: String, required: true },
+    country: { type: String, required: true },
+    phone: { type: String, required: true }
   },
   billingAddress: {
     fullName: { type: String, required: false },

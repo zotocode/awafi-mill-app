@@ -17,7 +17,7 @@ export class CartInteractor implements ICartInteractor {
   }
 
   async getCartByUserId(userId: string): Promise<CartDTO | null> {
-    const cart = await this.cartRepo.findCartByUser(userId);
+    const cart = await this.cartRepo.findCartByUser(userId)
     return cart ? this.mapToDTO(cart) : null;
   }
 

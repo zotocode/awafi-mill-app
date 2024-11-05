@@ -31,10 +31,12 @@ export class CartController {
   async getCartByUserId(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.id; 
+
       if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
         return;
       }
+
       const cart = await this.cartInteractor.getCartByUserId(userId);
       if (cart) {
         res.status(200).json(cart);
