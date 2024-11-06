@@ -4,10 +4,11 @@ import { Ijwt } from "../../interface/serviceInterface/IjwtInterface";
 import ICheckoutRepo from "../../interface/checkoutInterface/IcheckoutRepo";
 import { UserResponse,UserDTO,UserActionResponse } from "../../domain/dtos/AdminDto";
 import { RevenueSummary,OrderSummary } from "../../domain/dtos/CheckoutDTO";
+import envConfig from "../../config/env";
 
 
-let email =  process.env.ADMIN_EMAIL
-let password = process.env.ADMIN_PASSWORD
+let email =  envConfig.ADMIN_EMAIL
+let password = envConfig.ADMIN_PASSWORD
  
 export class AdminInteractor implements IadminInteractor {
   private userRepository: IUserRepo;
@@ -21,11 +22,11 @@ export class AdminInteractor implements IadminInteractor {
  
  async logIn(data: any): Promise<any> {
      if(data.email === email && password === data.password){
-         console.log("true");
+       
          const accessToken = this.jwt.generateToken({ id: data.email }, "30d");
          return { success: true, message: "Login successful", data: accessToken }; 
      }else{
-        console.log("false");
+    
         return { success: false, message: "Invalid credentials" };
      }
      
