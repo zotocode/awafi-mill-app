@@ -74,5 +74,31 @@ export class AddressRepo
     }
   }
 
+  async getAddress(userId: string) {
+    try {
+      const result = await this.model
+  .findOne({ userId })
+  .select("addressLine1 addressLine2 city postalCode country -_id");
+
+  
+      if (!result) {
+        return {
+          status: false,
+          message: "Address not found",
+        };
+      }
+      return {
+        status: true,
+        data: result,
+      };
+    } catch (error) {
+      console.error("Error fetching address:", error);
+      return {
+        status: false,
+        message: "An error occurred while fetching the address",
+      };
+    }
+  }
+  
 
 }
