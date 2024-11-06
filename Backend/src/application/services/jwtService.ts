@@ -1,6 +1,7 @@
 import { JwtPayload } from "jsonwebtoken";
 import { Ijwt } from "../../interface/serviceInterface/IjwtInterface";
 import jwt from "jsonwebtoken";
+import tokens from "razorpay/dist/types/tokens";
 
 export type jwtOutput = {
   payload: JwtPayload | null;
