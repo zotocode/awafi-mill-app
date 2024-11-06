@@ -168,7 +168,7 @@ export class ProductInteractor implements IProductInteractor {
   // Retrieve all listed products
   async getAllListedProducts(page:number,limit:number,userId?:string | null): Promise<ProductResponseDTO> {
     const ProductResponse = await this.productRepo.findListedAllProducts(page,limit,userId);
-     console.log("ProduuctResponse",ProductResponse)
+    //  console.log("ProduuctResponse",ProductResponse)
     const products= ProductResponse.products.map((p) => this.mapEntityToDto(p));
       return  {products:products,totalPages:ProductResponse.totalPages}
   }
