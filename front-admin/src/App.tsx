@@ -33,7 +33,7 @@ function App() {
           />
 
           {/* Protected Routes */}
-          {/* <Route element={<ProtectedRoute />}> */}
+          <Route element={<ProtectedRoute />}>
             <Route element={<DefaultLayout />}>
 
               <Route path="/dashboard" element={<DashboardPage />} />
@@ -49,7 +49,7 @@ function App() {
               <Route path="/categories/sub" element={<SubCategoryManagementPage />} />
               <Route path="/banner" element={<Banner />} />
               <Route path="/sales-report" element={<SalesReport />} />
-            {/* </Route> */}
+            </Route>
           </Route>
         </Routes>
       </Router>

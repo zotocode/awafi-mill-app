@@ -44,6 +44,7 @@ userRoute.patch('/edit',verifyToken, userController.editProfile.bind(userControl
 userRoute.patch('/change-password',verifyToken, userController.changePassword.bind(userController));
 
 userRoute.post('/add-address',verifyToken,userController.addUserAddress.bind(userController))
+userRoute.get('/address',verifyToken,userController.addUserAddress.bind(userController))
 userRoute.post('/edit-address',verifyToken,userController.updateUserAddress.bind(userController))
 userRoute.post('/forgot-password',userController.forgotUserPassword.bind(userController))
 userRoute.post('/forgot-otpVeify',userController.forgotOtpVerify.bind(userController))
