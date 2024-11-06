@@ -27,7 +27,6 @@ async findCartByUser(userId: string): Promise<IUserCart | null> {
   try {
     return await this.model
       .findOne({ user: userId })
-      .populate('items.product') // Populate all fields of the product
       .exec();
   } catch (error) {
     console.error("Error finding cart for user:", error);
