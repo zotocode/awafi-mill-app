@@ -16,6 +16,7 @@ import { verifyToken } from "./presentation/middleware/userAuthMiddleware";
 import reviewRoutes from "./presentation/routes/reviewRoute";
 import orderRoutes from "./presentation/routes/orderRoute";
 import subCategoryRoutes from "./presentation/routes/subCategoryRoute";
+import envConfig from "./config/env";
 
 
 const startServer = async (): Promise<void> => {
@@ -23,6 +24,7 @@ const startServer = async (): Promise<void> => {
     await connectDB();
 
     const app = express();
+    const port=envConfig.PORT
     app.use(morgan("dev"));
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
@@ -30,7 +32,7 @@ const startServer = async (): Promise<void> => {
     // CORS configuration
     app.use(
       cors({
-        origin: "http://localhost:5173",
+        origin: envConfig.Frontend_URL,
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
@@ -65,8 +67,8 @@ const startServer = async (): Promise<void> => {
     });
 
     // Start the server
-    app.listen(3000, () => {
-      console.log(`Server active on port: ${3000}`);
+    app.listen(port, () => {
+      console.log(`Server active on port: ${port}`);
     });
   } catch (error) {
     console.error("Error starting the server:", error);

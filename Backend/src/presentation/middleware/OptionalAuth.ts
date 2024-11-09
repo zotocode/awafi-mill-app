@@ -16,9 +16,10 @@ export const optionalAuth = (req: Request, res: Response, next: NextFunction) =>
     // Attach user ID to req if token is valid
     if (payload) {
       req.user = { id: payload.id };
+
     }
   }
-
+  
   // Continue to the next middleware or route handler, even if the token is missing or invalid
   next();
 };
