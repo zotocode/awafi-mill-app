@@ -21,11 +21,9 @@ const UserManagementPage = () => {
     setError(null);
     try {
       const response = await userApi.fetchAllUserData();
-      console.log(response);
+
 
       if (response.status === 200 && response.data) {
-        console.log(response.data.data);
-        
         setUsers(response.data.data);
       } else {
         throw new Error("Invalid response from API");
@@ -92,11 +90,6 @@ const UserManagementPage = () => {
         <div className="flex w-full p-5 justify-between items-center">
           <h1 className="text-2xl font-semibold">User Management</h1>
         </div>
-        {error ? (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
-            <p>{error}</p>
-          </div>
-        ) : null}
         <Table data={users} columns={userColumns} actions={userActions} />
       </div>
     </>

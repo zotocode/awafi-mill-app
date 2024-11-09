@@ -166,7 +166,7 @@ export class ProductInteractor implements IProductInteractor {
   }
 
   // Retrieve all listed products
-  async getAllListedProducts(page:number,limit:number,userId?:string | null): Promise<ProductResponseDTO> {
+  async getAllListedProducts(page:number,limit:number,userId?:mongoose.Types.ObjectId | null): Promise<ProductResponseDTO> {
     const ProductResponse = await this.productRepo.findListedAllProducts(page,limit,userId);
     //  console.log("ProduuctResponse",ProductResponse)
     const products= ProductResponse.products.map((p) => this.mapEntityToDto(p));
@@ -180,22 +180,22 @@ export class ProductInteractor implements IProductInteractor {
   }
 
   // Filter by category
-  async fetchByCategoryAndName(page:number,limit:number,filter:any,userId?:string | null): Promise<ProductResponseDTO> {
-    const ProductResponse = await this.productRepo.fetchByCategoryAndName(page, limit,filter);
+  async fetchByCategoryAndName(page:number,limit:number,filter:any,userId?:mongoose.Types.ObjectId | null): Promise<ProductResponseDTO> {
+    const ProductResponse = await this.productRepo.fetchByCategoryAndName(page, limit,filter,userId);
     const products= ProductResponse.products.map((p) => this.mapEntityToDto(p));
     return  {products:products,totalPages:ProductResponse.totalPages}
   }
   // liste products under sub category using maincategory id------
 
-  async listProductsBySubcategories(page:number,limit:number,mainCatId:any,userId?:string | null): Promise<any> {
-    const products = await this.productRepo.listProductsBySubcategories(page, limit,mainCatId);
+  async listProductsBySubcategories(page:number,limit:number,mainCatId:any,userId?:mongoose.Types.ObjectId | null): Promise<any> {
+    const products = await this.productRepo.listProductsBySubcategories(page, limit,mainCatId,userId);
    
     return products
   }
 
   // Retrieve a product by ID
-  async getProductById(id: mongoose.Types.ObjectId,userId?:string | null): Promise<ProductDTO | null> {
-    const product = await this.productRepo.productFindById(id);
+  async getProductById(id: mongoose.Types.ObjectId,userId?:mongoose.Types.ObjectId | null): Promise<ProductDTO | null> {
+    const product = await this.productRepo.productFindById(id,userId);
     return product ? this.mapEntityToDto(product) : null;
   }
 
@@ -251,6 +251,10 @@ export class ProductInteractor implements IProductInteractor {
       isListed: product.isListed,
       ean: product.ean,
       sku: product.sku,
+      inCart:product.inCart,
+      inWishlist:product.inWishlist,
+      MainCategoryData:product.MainCategoryData,
+      SubCategoryData:product.SubCategoryData
     };
   }
 }

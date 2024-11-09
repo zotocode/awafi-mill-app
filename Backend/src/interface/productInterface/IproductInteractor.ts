@@ -11,22 +11,22 @@ export default interface IProductInteractor {
    page:number,
    limit:number,
    filter:any,
-   userId?:string | null
+   userId?:mongoose.Types.ObjectId | null
   ): Promise<ProductResponseDTO>;
   listProductsBySubcategories(
    page:number,
    limit:number,
    mainCatId: mongoose.Types.ObjectId,
-   userId?:string | null
+   userId?:mongoose.Types.ObjectId | null
   ): Promise<any>;
   
   getAllProducts(page:number,limit:number): Promise<ProductResponseDTO>;
   
-  getAllListedProducts(page:number,limit:number,userId?:string | null): Promise<ProductResponseDTO>;
+  getAllListedProducts(page:number,limit:number,userId?:mongoose.Types.ObjectId | null): Promise<ProductResponseDTO>;
 
   SearchByName(page:number,limit:number,name:string): Promise<ProductResponseDTO>;
   
-  getProductById(id: mongoose.Types.ObjectId,userId?:string | null): Promise<ProductDTO | null>;
+  getProductById(id: mongoose.Types.ObjectId,userId?:mongoose.Types.ObjectId | null): Promise<ProductDTO | null>;
   
   updateProduct(
     id: mongoose.Types.ObjectId, 

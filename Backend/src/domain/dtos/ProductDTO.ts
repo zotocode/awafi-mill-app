@@ -27,7 +27,11 @@ export interface ProductDTO {
   variants: Variant[];
   isListed:boolean;
   sku:string;
-  ean:string
+  ean:string;
+  inCart?:boolean;
+  inWishlist?:boolean;
+  MainCategoryData?:any;
+  SubCategoryData?:any;
 }
 export interface ProductCreationDTO {
   name: string;

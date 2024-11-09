@@ -17,8 +17,7 @@ export class ProductController  {
     next: NextFunction
   ): Promise<void> {
     try {
-      // console.log('file',req.file)
-      // console.log('data',req.body)
+    
       const photos: any = req.files || [];
       const productData: ProductCreationDTO = req.body;
 
@@ -309,49 +308,47 @@ export class ProductController  {
 
 
   // --------------------------------------------// User product controllers------------------------------------------------
-async getAllListedProductsForUser(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  try {
-    const userId = req.user?.id || null;
-    const page = req.query.page ? Number(req.query.page) : 1;
-    const limit = req.query.limit ? Number(req.query.limit) : 10;
-
-    const products = await this.productInteractor.getAllListedProducts(
-      page,
-      limit,
-      userId
-    );
-    res.status(200).json(products);
-  } catch (error) {
-    next(error);
-  }
-}
-
-
-
-// Get a product by ID (HTTP GET)
-async getProductByIdForUser(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  try {
-    const userId = req.user?.id || null;
-    const productId = new mongoose.Types.ObjectId(req.params.id);
-    const product = await this.productInteractor.getProductById(productId,userId);
-    if (product) {
-      res.status(200).json(product);
-    } else {
-      res.status(404).json({ message: "Product not found" });
+  async getAllListedProductsForUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.id ? new mongoose.Types.ObjectId(req.user.id) : null;
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+  
+      const products = await this.productInteractor.getAllListedProducts(
+        page,
+        limit,
+        userId
+      );
+      res.status(200).json(products);
+    } catch (error) {
+      next(error);
     }
-  } catch (error) {
-    next(error);
   }
-}
-
+  
+  // Get a product by ID (HTTP GET)
+  async getProductByIdForUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.id ? new mongoose.Types.ObjectId(req.user.id) : null;
+      const productId = new mongoose.Types.ObjectId(req.params.id);
+      const product = await this.productInteractor.getProductById(productId, userId);
+      if (product) {
+        res.status(200).json(product);
+      } else {
+        res.status(404).json({ message: "Product not found" });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+  
   // Fetching products under subcategory using main category id
   async listProductsBySubcategoriesForUser(
     req: Request,
@@ -359,16 +356,17 @@ async getProductByIdForUser(
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = req.user?.id || null;
+      const userId = req.user?.id ? new mongoose.Types.ObjectId(req.user.id) : null;
       const { mainCatId } = req.params;
       const page = req.query.page ? Number(req.query.page) : 1;
       const limit = req.query.limit ? Number(req.query.limit) : 10;
   
       if (!mainCatId) {
-         res.status(400).json({ error: "Main category ID is required" });
+        res.status(400).json({ error: "Main category ID is required" });
+        return;
       }
   
-      const MainCategoryId = new mongoose.Types.ObjectId(mainCatId as string);
+      const MainCategoryId = new mongoose.Types.ObjectId(mainCatId);
   
       const products = await this.productInteractor.listProductsBySubcategories(
         page,
@@ -376,51 +374,47 @@ async getProductByIdForUser(
         MainCategoryId,
         userId
       );
-      
-      res.status(200).json(products);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-
-  async FilterProductsForUser(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const userId = req.user?.id || null;
-      const { mainCategoryId, subCategoryId,name } = req.body;
-      const page = req.query.page ? Number(req.query.page) : 1;
-      const limit = req.query.limit ? Number(req.query.limit) : 10;
-      const MainCategoryId = mainCategoryId
-        ? new mongoose.Types.ObjectId(mainCategoryId as string)
-        : null;
-      const SubCategoryId = subCategoryId
-        ? new mongoose.Types.ObjectId(subCategoryId as string)
-        : null;
-        const prodctname= name ? name as string:null
-        const filter={
-          MainCategoryId,
-          SubCategoryId,
-          prodctname
-        }
-
-      const products = await this.productInteractor.fetchByCategoryAndName(
-       page,limit,filter,userId
-      );
+  
       res.status(200).json(products);
     } catch (error) {
       next(error);
     }
   }
   
+  async FilterProductsForUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.id ? new mongoose.Types.ObjectId(req.user.id) : null;
+      const { mainCategoryId, subCategoryId, name } = req.body;
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
 
+      const MainCategoryId = mainCategoryId
+        ? new mongoose.Types.ObjectId(mainCategoryId)
+        : null;
+      const SubCategoryId = subCategoryId
+        ? new mongoose.Types.ObjectId(subCategoryId)
+        : null;
+      const productName = name ? name as string : null;
+  
+      const filter = {
+        MainCategoryId,
+        SubCategoryId,
+        productName
+      };
+ 
+      const products = await this.productInteractor.fetchByCategoryAndName(
+        page,
+        limit,
+        filter,
+        userId
+      );
+      res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
-
-
-
-
-
-

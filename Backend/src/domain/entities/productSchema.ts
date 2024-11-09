@@ -26,4 +26,8 @@ export default interface Product extends Document {
   variants: Variant[];
   createdAt?: Date;
   updatedAt?: Date;
+  inCart?:boolean;
+  inWishlist?:boolean;
+  SubCategoryData?:any;
+  MainCategoryData?:any
 }

@@ -9,6 +9,7 @@ import envConfig from "../../config/env";
 
 let email =  envConfig.ADMIN_EMAIL
 let password = envConfig.ADMIN_PASSWORD
+
  
 export class AdminInteractor implements IadminInteractor {
   private userRepository: IUserRepo;
@@ -35,7 +36,7 @@ export class AdminInteractor implements IadminInteractor {
  async usersData(): Promise<UserResponse> {
   try {
     const userData: UserDTO[] = await this.userRepository.findAll(); // Fetch users as UserDTO[]
-    console.log("userData", userData); 
+    
     return {
       status: true,
       data: userData,
