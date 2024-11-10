@@ -51,9 +51,9 @@ export class WishlistRepository extends BaseRepository<IWishlist> implements IWi
 
       // Convert to ObjectId
       const productObjectId = new Types.ObjectId(productId);
-      console.log("productObjectId: ", productObjectId);
+    
       const variantObjectId = new Types.ObjectId(variantId);
-      console.log("variantObjectId: ", variantObjectId);
+  
 
       const wishlist = await this.getOrCreateWishlist(userId);
 
@@ -61,7 +61,7 @@ export class WishlistRepository extends BaseRepository<IWishlist> implements IWi
       const existingItem = wishlist.items.find(item => 
         item.productId.equals(productObjectId) && item.variantId.equals(variantObjectId) // Use equals for ObjectId comparison
       );
-      console.log("existingItem: ", existingItem);
+
 
       if (existingItem) {
         console.warn(`Item with variant ${variantId} already exists in wishlist for user ${userId}`);

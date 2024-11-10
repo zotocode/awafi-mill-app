@@ -13,6 +13,10 @@ interface EnvConfig {
     Atlas_Url:string;
     Base_Url:string
     RAZORPAY_SECRET_KEY:string;
+    ADMIN_EMAIL:string;
+    ADMIN_PASSWORD:string;
+    PORT:string;
+    Frontend_URL:string;
     // STRIPE_PUBLIC_KEY: string
 }
 
@@ -26,7 +30,11 @@ const envConfig: EnvConfig = {
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
     Atlas_Url:process.env.Atlas_Url as string,
     Base_Url:process.env.Base_Url as string,
-    RAZORPAY_SECRET_KEY:process.env.RAZORPAY_SECRET_KEY as string
+    RAZORPAY_SECRET_KEY:process.env.RAZORPAY_SECRET_KEY as string,
+    ADMIN_EMAIL:process.env.ADMIN_EMAIL as string,
+    ADMIN_PASSWORD:process.env.ADMIN_PASSWORD as string,
+    PORT:process.env.PORT as string,
+    Frontend_URL:process.env.Frontend_URL as string
     // STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY as string
 };
 

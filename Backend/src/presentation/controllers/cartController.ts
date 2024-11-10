@@ -38,6 +38,10 @@ export class CartController {
       }
 
       const cart = await this.cartInteractor.getCartByUserId(userId);
+     if(cart==null)
+     {
+      res.status(204 ).json({message:"cart is null"});
+     }
       if (cart) {
         res.status(200).json(cart);
       } else {
