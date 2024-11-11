@@ -11,7 +11,7 @@ const checkoutSchema = new mongoose.Schema({
     quantity: { type: Number, required: true }
   }],
   paymentMethod: { type: String, enum: ['COD', 'Razorpay', 'Stripe'], required: true },
-  transactionId: { type: String, required: true }, 
+  transactionId: { type: String, required: false }, 
   amount: { type: Number, required: true },
   currency: { type: String, default: 'INR' },
 

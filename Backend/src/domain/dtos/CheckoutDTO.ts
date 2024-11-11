@@ -27,7 +27,6 @@ export interface CheckoutDTO {
   currency: string;
   paymentMethod: 'COD' | 'Razorpay' | 'Stripe';
   time: Date;
-  products: ProductItemDTO[];
   shippingAddress: ShippingAddressDTO;
   transactionId: string;
   paymentStatus: 'pending' | 'completed' | 'failed';
@@ -46,10 +45,9 @@ export interface CheckoutCreateDTO {
     product: mongoose.Types.ObjectId; 
     variant: mongoose.Types.ObjectId; 
     quantity: number; 
+
   }[];
   shippingAddress: ShippingAddressDTO;
-  transactionId: string;
-  paymentStatus: 'pending' | 'completed' | 'failed';
 }
 
 // Order Summary for summarizing order data

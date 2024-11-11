@@ -72,8 +72,8 @@ const UpdateProductPage: React.FC = () => {
           const product = productResponse.data;
           setName(product.name);
           setDescriptions(product.descriptions || [{ header: "", content: "" }]);
-          setCategory(product.category || null);
-          setSubCategory(product.subCategory || null);
+          setCategory(product.MainCategoryData[0] || null);
+          setSubCategory(product.SubCategoryData[0] || null);
           // Convert numeric values to strings when setting variants
           setVariants(product.variants?.map((variant: any) => ({
             weight: variant.weight || "",

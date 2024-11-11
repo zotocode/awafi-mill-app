@@ -189,6 +189,33 @@ export class ProductRepository
   async findByName(name: string): Promise<IProductSchema | null> {
     return await this.model.findOne({ name: name });
   }
+  async findByIdAndVariantId(
+    productId: mongoose.Types.ObjectId,
+    variantId: mongoose.Types.ObjectId
+  ): Promise<IProductSchema | null> {
+    const products = await this.model.aggregate([
+      { 
+        $match: { 
+          _id: productId 
+        } 
+      },
+      {
+        $addFields: {
+          variants: {
+            $filter: {
+              input: "$variants",
+              as: "variant",
+              cond: { $eq: ["$$variant._id", variantId] }
+            }
+          }
+        }
+      }
+    ]);
+  
+    // Return the first item in the array or an empty array if no products were found
+    return products[0] as IProductSchema || null;
+  }
+  
   async findByNameAndVariant(query: {
     name: string;
     weight: string;
