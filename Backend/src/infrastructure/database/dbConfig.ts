@@ -10,7 +10,7 @@ export const connectDB = async (): Promise<void> => {
     if (err instanceof Error) {
       console.error(`Database connection error: ${err.message}`);
     } else {
-      console.error(`Unknown database connection error:, ${err}`);
+      console.error(`Unknown database connection error:,${err}`);
     }
     process.exit(1); // Exit the process if the connection fails
   }
