@@ -54,6 +54,7 @@ export class UserController {
   async otpVerify(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, otp } = req.body;
+      console.log("req.body: ", req.body);
       const result = await this.userInteractor.verifyOtp(email, otp);
 
       // Handle the response based on the result of OTP verification

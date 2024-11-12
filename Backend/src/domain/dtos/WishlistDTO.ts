@@ -1,3 +1,4 @@
+import { ObjectId } from "mongoose";
 // src/domain/dtos/WishlistDTO.ts
 
 export interface WishlistDTO {
@@ -18,4 +19,16 @@ export interface RemoveFromWishlistDTO {
     userId: string;
     productId: string;
     variantId: string; 
+}
+
+
+export interface IWishlistReturnDTO {
+  productId: ObjectId;
+  variantId: ObjectId;
+  name: string;
+  weight: string;
+  inPrice: number;
+  outPrice: number;
+  stockQuantity: number;
+  rating: number;
 }
