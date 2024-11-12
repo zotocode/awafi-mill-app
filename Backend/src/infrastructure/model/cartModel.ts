@@ -3,7 +3,7 @@ import mongoose, { Model } from "mongoose";
 import { IUserCart } from "../../domain/entities/userCartSchema";
 
 const userCartSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true ,unique: true},
   items: [
     {
       product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
