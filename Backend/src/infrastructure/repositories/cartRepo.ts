@@ -22,18 +22,45 @@ export class CartRepository extends BaseRepository<IUserCart> implements ICartRe
     }
   }
 
-// Repository method
-async findCartByUser(userId: string): Promise<IUserCart | null> {
-  try {
-    return await this.model
-      .findOne({ user: userId })
-      .exec();
-  } catch (error) {
-    console.error("Error finding cart for user:", error);
-    throw new Error("Could not find cart for the user. Please check the user ID.");
-  }
-}
-
+  // return await this.model
+  //   .findOne({ user: userId })
+  //   .exec();
+  // Repository method
+  // @ts-ignore
+  async findCartByUser(userId: string): Promise<IUserCart | null> {
+    try {
+      let cart = await this.model.findOne({ user: userId })
+        .populate('items.product')
+        .exec();
+        if (!cart) {
+          return null;
+        }
+        const transformedCart = cart.items.map(item => {
+          const product = item.product as any;  // Casting to `any` for easier access to nested fields
+          const variant = product.variants.find((v: any) => v._id.toString() === item.variant.toString());
+    
+          return {
+            productId: product._id.toString(),
+            variantId: item.variant.toString(),
+            name: product.name,
+            quantity: item.quantity,
+            weight: variant ? variant.weight : null,
+            inPrice: variant ? variant.inPrice : null,
+            outPrice: variant ? variant.outPrice : null,
+            images: product.images[0], 
+            stockQuantity: variant ? variant.stockQuantity : null,
+            rating: product.rating || 0 
+          };
+        });
+    
+        // console.log("Transformed cart:", transformedCart);
+        // @ts-ignore
+        return transformedCart;
+      } catch (error) {
+        console.error("Error finding cart for user:", error);
+        throw new Error("Could not find cart for the user. Please check the user ID.");
+      }
+    }
 
   async checkProductAvailability(productId: string, variantId: string, quantity: number): Promise<boolean> {
     try {
@@ -75,29 +102,29 @@ async findCartByUser(userId: string): Promise<IUserCart | null> {
       if (!userId || !productId || !variantId || quantity === undefined) {
         throw new Error("Invalid input parameters: userId, productId, variantId, and quantity must be provided.");
       }
-  
+
       // Check product availability
       const isAvailable = await this.checkProductAvailability(productId, variantId, quantity);
       if (!isAvailable) {
         throw new Error("Insufficient product stock.");
       }
-  
+
       let cart = await this.findCartByUser(userId);
-      
+
       // If the cart doesn't exist, create a new one
       if (!cart) {
         cart = await this.createCart({ userId, items: [] });
       }
-  
+
       // Check if the item already exists in the cart
-      const existingItemIndex = cart.items.findIndex(item => 
+      const existingItemIndex = cart.items.findIndex(item =>
         item.product.toString() === productId && item.variant.toString() === variantId
       );
-  
+
       if (existingItemIndex >= 0) {
         // If it exists, update the quantity
-        cart.items[existingItemIndex].quantity += quantity;
-  
+        cart.items[existingItemIndex].quantity += Number(quantity);
+
         return await this.model.findOneAndUpdate(
           { user: userId },
           { items: cart.items }, // Update the entire items array
@@ -116,7 +143,7 @@ async findCartByUser(userId: string): Promise<IUserCart | null> {
       throw new Error("Could not add item to cart. Please check product details and try again.");
     }
   }
-  
+
 
   async updateItemQuantity(userId: string, productId: string, variantId: string, quantity: number): Promise<IUserCart | null> {
     try {
@@ -155,25 +182,25 @@ async findCartByUser(userId: string): Promise<IUserCart | null> {
       throw new Error("Could not remove item from cart. Please check the item details.");
     }
   }
-  
 
-async findByCartId(cartId: mongoose.Types.ObjectId): Promise<IUserCart | null> {
-  try {
-    const cart = await this.model.findById(cartId)
-      .populate('items.product')
-      .populate('items.variant')
-      .exec();
-    
-    if (!cart) {
-      throw new Error(`Cart not found with ID: ${cartId}`);
+
+  async findByCartId(cartId: mongoose.Types.ObjectId): Promise<IUserCart | null> {
+    try {
+      const cart = await this.model.findById(cartId)
+        .populate('items.product')
+        .populate('items.variant')
+        .exec();
+
+      if (!cart) {
+        throw new Error(`Cart not found with ID: ${cartId}`);
+      }
+
+      return cart;
+    } catch (error) {
+      console.error("Error finding cart by ID:", error);
+      throw new Error("Could not find cart. Please check the cart ID and try again.");
     }
-    
-    return cart;
-  } catch (error) {
-    console.error("Error finding cart by ID:", error);
-    throw new Error("Could not find cart. Please check the cart ID and try again.");
   }
-}
   async clearCart(userId: string): Promise<IUserCart | null> {
     try {
       const clearedCart = await this.model.findOneAndDelete({ user: userId }).exec();
@@ -189,4 +216,3 @@ async findByCartId(cartId: mongoose.Types.ObjectId): Promise<IUserCart | null> {
     }
   }
 }
- 

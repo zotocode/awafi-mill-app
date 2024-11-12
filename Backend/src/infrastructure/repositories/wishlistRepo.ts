@@ -39,31 +39,31 @@ export class WishlistRepository extends BaseRepository<IWishlist> implements IWi
   async findWishlistByUser(userId: string): Promise<IWishlistReturnDTO | null> {
     try {
       this.validateObjectId(userId, 'User');
-  
+
       const wishlist = await this.model.findOne({ user: userId });
       if (!wishlist) {
-         //DEBUG
-      //@ts-ignore
+        //DEBUG
+        //@ts-ignore
         return this.getOrCreateWishlist(userId);
       }
 
       const productDetailsList = [];
-  
+
       for (const item of wishlist.items) {
         const { productId, variantId } = item;
-  
+
         const productDetails = await ProductModel.findOne(
           {
-            _id: productId, 
-            "variants._id": variantId 
+            _id: productId,
+            "variants._id": variantId
           },
           {
-            "name": 1, 
-            "variants.$": 1 ,
+            "name": 1,
+            "variants.$": 1,
             "images": 1
           }
         );
-  
+
         if (productDetails) {
           const productData = {
             productId: productDetails._id,
@@ -74,20 +74,20 @@ export class WishlistRepository extends BaseRepository<IWishlist> implements IWi
             outPrice: productDetails.variants[0].outPrice,
             images: productDetails.images[0],
             stockQuantity: productDetails.variants[0].stockQuantity,
-            rating: 0 
+            rating: 0
           };
-  
-          
+
+
           productDetailsList.push(productData);
         }
       }
-  
-     
+
+
       for (const item of productDetailsList) {
-        
+
         const reviews = await ReviewModel.find({ product: item.productId });
-  
-       
+
+
         if (reviews.length > 0) {
           const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
           item.rating = totalRating / reviews.length; // Calculate average rating
@@ -95,10 +95,10 @@ export class WishlistRepository extends BaseRepository<IWishlist> implements IWi
           item.rating = 0;
         }
       }
-  
-      
+
+
       // console.log("wishlist: ", productDetailsList);
-      console.log("productDetailsList: ", productDetailsList);
+      // console.log("productDetailsList: ", productDetailsList);
       //DEBUG
       //@ts-ignore
       return productDetailsList;
@@ -107,7 +107,7 @@ export class WishlistRepository extends BaseRepository<IWishlist> implements IWi
       throw new Error(`Error finding wishlist with product details: ${error.message}`);
     }
   }
-  
+
 
 
 

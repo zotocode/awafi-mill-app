@@ -18,7 +18,9 @@ export class CartInteractor implements ICartInteractor {
 
   async getCartByUserId(userId: string): Promise<CartDTO | null> {
     const cart = await this.cartRepo.findCartByUser(userId)
-    return cart ? this.mapToDTO(cart) : null;
+    //@ts-ignore
+    return cart ? cart : null;
+    // return cart ? this.mapToDTO(cart) : null;
   }
 
   async addItemToCart(data: AddToCartDTO): Promise<CartDTO | null> {
