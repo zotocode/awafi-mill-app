@@ -25,6 +25,7 @@ export interface RemoveFromWishlistDTO {
 export interface IWishlistReturnDTO {
   productId: ObjectId;
   variantId: ObjectId;
+  images: string[];
   name: string;
   weight: string;
   inPrice: number;
