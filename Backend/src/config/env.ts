@@ -33,7 +33,7 @@ const envConfig: EnvConfig = {
     RAZORPAY_SECRET_KEY:process.env.RAZORPAY_SECRET_KEY as string,
     ADMIN_EMAIL:process.env.ADMIN_EMAIL as string,
     ADMIN_PASSWORD:process.env.ADMIN_PASSWORD as string,
-    PORT:process.env.PORT as string,
+    PORT:process.env.PORT as string || "3000",
     Frontend_URL:process.env.Frontend_URL as string
     // STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY as string
 };

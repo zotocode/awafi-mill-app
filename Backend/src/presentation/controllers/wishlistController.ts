@@ -15,15 +15,15 @@ export class WishlistController {
   // Get a wishlist by user ID (HTTP GET)
   async getWishlistByUserId(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-
       const userId = req.user?.id;
+      console.log("userId: ", userId);
       if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
         return;
       }
       const wishlist = await this.wishlistInteractor.getWishlistByUserId(userId);
       if (wishlist) {
-        res.status(200).json(wishlist);
+        res.status(200).json({data:wishlist});
       } else {
         res.status(404).json({ message: "Wishlist not found" });
       }
