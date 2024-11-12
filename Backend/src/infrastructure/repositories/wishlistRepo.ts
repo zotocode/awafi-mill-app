@@ -59,7 +59,8 @@ export class WishlistRepository extends BaseRepository<IWishlist> implements IWi
           },
           {
             "name": 1, 
-            "variants.$": 1 
+            "variants.$": 1 ,
+            "images": 1
           }
         );
   
@@ -71,6 +72,7 @@ export class WishlistRepository extends BaseRepository<IWishlist> implements IWi
             weight: productDetails.variants[0].weight,
             inPrice: productDetails.variants[0].inPrice,
             outPrice: productDetails.variants[0].outPrice,
+            images: productDetails.images[0],
             stockQuantity: productDetails.variants[0].stockQuantity,
             rating: 0 
           };
@@ -96,6 +98,7 @@ export class WishlistRepository extends BaseRepository<IWishlist> implements IWi
   
       
       // console.log("wishlist: ", productDetailsList);
+      console.log("productDetailsList: ", productDetailsList);
       //DEBUG
       //@ts-ignore
       return productDetailsList;
