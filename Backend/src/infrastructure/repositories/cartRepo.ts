@@ -102,29 +102,34 @@ export class CartRepository extends BaseRepository<IUserCart> implements ICartRe
       if (!userId || !productId || !variantId || quantity === undefined) {
         throw new Error("Invalid input parameters: userId, productId, variantId, and quantity must be provided.");
       }
-
+  
       // Check product availability
       const isAvailable = await this.checkProductAvailability(productId, variantId, quantity);
       if (!isAvailable) {
         throw new Error("Insufficient product stock.");
       }
-
+  
       let cart = await this.findCartByUser(userId);
-
+  
       // If the cart doesn't exist, create a new one
       if (!cart) {
         cart = await this.createCart({ userId, items: [] });
       }
-
+  
+      // Ensure items array is initialized
+      if (!cart.items) {
+        cart.items = [];
+      }
+  
       // Check if the item already exists in the cart
       const existingItemIndex = cart.items.findIndex(item =>
         item.product.toString() === productId && item.variant.toString() === variantId
       );
-
+  
       if (existingItemIndex >= 0) {
         // If it exists, update the quantity
         cart.items[existingItemIndex].quantity += Number(quantity);
-
+  
         return await this.model.findOneAndUpdate(
           { user: userId },
           { items: cart.items }, // Update the entire items array
@@ -132,9 +137,11 @@ export class CartRepository extends BaseRepository<IUserCart> implements ICartRe
         ).exec();
       } else {
         // If it doesn't exist, add the new item
+        //@ts-ignore
+        cart.items.push({ product: productId, variant: variantId, quantity });
         return await this.model.findOneAndUpdate(
           { user: userId },
-          { $addToSet: { items: { product: productId, variant: variantId, quantity } } },
+          { items: cart.items },
           { new: true }
         ).exec();
       }
@@ -143,6 +150,8 @@ export class CartRepository extends BaseRepository<IUserCart> implements ICartRe
       throw new Error("Could not add item to cart. Please check product details and try again.");
     }
   }
+  
+  
 
 
   async updateItemQuantity(userId: string, productId: string, variantId: string, quantity: number): Promise<IUserCart | null> {
@@ -164,24 +173,43 @@ export class CartRepository extends BaseRepository<IUserCart> implements ICartRe
     }
   }
 
+
   async removeItemFromCart(userId: string, productId: string, variantId: string): Promise<IUserCart | null> {
     try {
-      const updatedCart = await this.model.findOneAndUpdate(
-        { user: userId },
-        { $pull: { items: { product: productId, variant: variantId } } },
-        { new: true }
-      ).exec();
-
-      if (!updatedCart) {
+      // Convert IDs to ObjectId to ensure compatibility with schema
+      const userObjectId = new mongoose.Types.ObjectId(userId);
+      const productObjectId = new mongoose.Types.ObjectId(productId);
+      const variantObjectId = new mongoose.Types.ObjectId(variantId);
+  
+      // Find the user's cart
+      const cart = await this.model.findOne({ user: userObjectId });
+      if (!cart) {
+        console.error("Cart not found for user.");
         throw new Error("Cart item not found.");
       }
-
+  
+      // Filter out the matching item manually
+      const updatedItems = cart.items.filter(
+        item => !(item.product.equals(productObjectId) && item.variant.equals(variantObjectId))
+      );
+  
+      // Check if item was actually removed
+      if (updatedItems.length === cart.items.length) {
+        console.error("Item to remove not found in cart.");
+        throw new Error("Item not found in cart.");
+      }
+  
+      // Update the cart with the filtered items array
+      cart.items = updatedItems;
+      const updatedCart = await cart.save();
+  
       return updatedCart;
     } catch (error) {
       console.error("Error removing item from cart:", error);
       throw new Error("Could not remove item from cart. Please check the item details.");
     }
   }
+  
 
 
   async findByCartId(cartId: mongoose.Types.ObjectId): Promise<IUserCart | null> {
