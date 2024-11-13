@@ -23,3 +23,19 @@ export interface RemoveFromCartDTO {
     productId: string;
     variantId: string;
 }
+
+interface IProductDetails {
+    productId: string;
+    variantId: string;
+    name: string;
+    weight: string;
+    quantity: number;
+    inPrice: number;
+    outPrice: number;
+    images: string;
+    stockQuantity: number;
+    rating: number;
+  }
+  
+ export type IUserCartReturnDTO = IProductDetails[];
+  

@@ -48,6 +48,9 @@ export interface CheckoutCreateDTO {
 
   }[];
   shippingAddress: ShippingAddressDTO;
+  transactionId:string;
+  paymentStatus:"pending" | "completed" | "failed"
+  
 }
 
 // Order Summary for summarizing order data

@@ -10,6 +10,7 @@ interface OrderPreviewModalProps {
 
 const OrderPreviewModal: React.FC<OrderPreviewModalProps> = ({ order, isOpen, onClose }) => {
   if (!order) return null;
+  console.log("order",order)
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">

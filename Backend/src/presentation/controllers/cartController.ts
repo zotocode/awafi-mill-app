@@ -30,7 +30,7 @@ export class CartController {
   // Get a cart by user ID (HTTP GET)
   async getCartByUserId(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = req.user?.id; 
+      const userId = req.user?.id;
 
       if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
@@ -38,12 +38,11 @@ export class CartController {
       }
 
       const cart = await this.cartInteractor.getCartByUserId(userId);
-     if(cart==null)
-     {
-      res.status(204 ).json({message:"cart is null"});
-     }
+      if (cart == null) {
+        res.status(204).json({ message: "cart is null" });
+      }
       if (cart) {
-        res.status(200).json(cart);
+        res.status(200).json({ data: cart });
       } else {
         res.status(404).json({ message: "Cart not found" });
       }
@@ -67,7 +66,7 @@ export class CartController {
         quantity: req.body.quantity,
       };
       console.log(itemData);
-      
+
       const updatedCart = await this.cartInteractor.addItemToCart(itemData);
       res.status(200).json(updatedCart);
     } catch (error) {
@@ -99,6 +98,7 @@ export class CartController {
   // Remove item from cart (HTTP POST)
   async removeItemFromCart(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      
       const userId = req.user?.id;
       if (!userId) {
         res.status(401).json({ message: "Unauthorized" });

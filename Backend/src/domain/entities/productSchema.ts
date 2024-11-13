@@ -6,7 +6,11 @@ interface Description {
 }
 
 interface Variant {
+<<<<<<< HEAD
   _id?:mongoose.Types.ObjectId
+=======
+  _id?: mongoose.Types.ObjectId;
+>>>>>>> upstream/develop
   weight: string;
   inPrice: number;
   outPrice: number;

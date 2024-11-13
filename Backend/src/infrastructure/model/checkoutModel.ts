@@ -4,11 +4,11 @@ import { ICheckout } from "../../domain/entities/checkoutSchema";
 // Checkout schema
 const checkoutSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  cart: { type: mongoose.Schema.Types.ObjectId, ref: "Cart", required: true },
+  cart: { type: mongoose.Schema.Types.ObjectId, ref: "Cart", required: false },
   items: [{
-    product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
-    variant: { type: mongoose.Schema.Types.ObjectId, ref: "Variant", required: true },
-    quantity: { type: Number, required: true }
+    product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: false },
+    variant: { type: mongoose.Schema.Types.ObjectId, ref: "Variant", required: false },
+    quantity: { type: Number, required: false }
   }],
   paymentMethod: { type: String, enum: ['COD', 'Razorpay', 'Stripe'], required: true },
   transactionId: { type: String, required: false }, 

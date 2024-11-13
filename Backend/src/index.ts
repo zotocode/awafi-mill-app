@@ -19,6 +19,7 @@ import subCategoryRoutes from "./presentation/routes/subCategoryRoute";
 import envConfig from "./config/env";
 
 
+
 const startServer = async (): Promise<void> => {
   try {
     await connectDB();
@@ -47,12 +48,15 @@ const startServer = async (): Promise<void> => {
     app.use('/api/cart', verifyToken, cartRoutes)
     app.use('/api/review', verifyToken, reviewRoutes)
     app.use('/api/wishlist', verifyToken, wishlistRoutes)
-    app.use('/api/categories', categoryRoute);
+    app.use('/api/categories', categoryRoute); 
     app.use('/api/sub-categories', subCategoryRoutes);
     app.use('/api/banner', bannerRoutes);
     app.use('/api/checkout',verifyToken, checkoutRoutes);
 
-
+    app.get('/test', (req: Request, res: Response) => {
+      res.send("hai");
+    });
+    
 
 
 
@@ -80,4 +84,4 @@ startServer();
 
 
 
-// ts-node-dev --respawn --transpile-only src
+// ts-node-dev --respawn --transpile-only src 

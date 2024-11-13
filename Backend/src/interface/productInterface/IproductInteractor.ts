@@ -19,6 +19,12 @@ export default interface IProductInteractor {
    mainCatId: mongoose.Types.ObjectId,
    userId?:mongoose.Types.ObjectId | null
   ): Promise<any>;
+  listProductsByMaincategories(
+   page:number,
+   limit:number,
+   mainCatId: mongoose.Types.ObjectId,
+   userId?:mongoose.Types.ObjectId | null
+  ): Promise<any>;
   
   getAllProducts(page:number,limit:number): Promise<ProductResponseDTO>;
   

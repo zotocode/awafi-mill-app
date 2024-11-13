@@ -51,7 +51,8 @@ productRoutes.put("/product/:id", productController.updateProduct.bind(productCo
 // User product routes
 productRoutes.get("/product/filter",optionalAuth, productController.FilterProductsForUser.bind(productController));
 productRoutes.get("/product/listed",optionalAuth, productController.getAllListedProductsForUser.bind(productController));
+productRoutes.get("/product/subCategory/:subCatId",optionalAuth, productController.listProductsBySubCategoryForUser.bind(productController));
 productRoutes.get("/product/:id",optionalAuth, productController.getProductByIdForUser.bind(productController));
-productRoutes.get("/product/subCategory/:mainCatId",optionalAuth, productController.listProductsBySubcategoriesForUser.bind(productController));
+productRoutes.get("/product/mainCategory/:mainCatId",optionalAuth, productController.listProductsByMainCategoryForUser.bind(productController));
 
 export default productRoutes;

@@ -6,6 +6,7 @@ class OrderApi {
   async getAllOrders() {
     try {
       const response = await this.axiosInstance.get('/api/orders/order/admin');
+      
       return response;
     } catch (error) {
       console.error('Failed to fetch orders:', error);

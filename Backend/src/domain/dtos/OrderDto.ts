@@ -82,6 +82,8 @@ export interface CreateOrderDTO {
     createdAt: Date;
     updatedAt: Date;
     trackingId?:string;
+    userDetails?:any;
+    productDetails?:any;
   }
   
   export interface UpdateOrderStatusDTO {

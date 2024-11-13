@@ -16,15 +16,14 @@ export class StripePaymentGateway implements IPaymentGateway {
 
         // Calculate the total amount in cents for Stripe
         const totalAmount = items.reduce((total: number, item: any) => {
-            return total + (item.inPrice * item.quantity * 100); // Convert to cents
+            return total + (item.price * item.quantity * 100); // Convert to cents
         }, 0);
 
         // Create metadata with product details
         const productMetadata = items.map((item: any, index: number) => ({
             [`product_${index + 1}_name`]: `${item.name} - ${item.weight}`,
             [`product_${index + 1}_quantity`]: item.quantity,
-            [`product_${index + 1}_inPrice`]: item.inPrice,
-            [`product_${index + 1}_outPrice`]: item.outPrice,
+            [`product_${index + 1}_price`]: item.price,
         })).reduce((acc: any, curr: any) => ({ ...acc, ...curr }), {}); // Flatten to a single object
 
         try {
@@ -64,14 +63,14 @@ export class StripePaymentGateway implements IPaymentGateway {
                     phone: shippingAddress.phone
                 },
             });
-            console.log("Payment intent created successfully:", paymentIntent.id);
+            console.log("Payment intent created successfully:", paymentIntent);
 
             // Return paymentIntent details, ephemeral key, and publishable key
             return {
-                paymentIntent:paymentIntent.id,
-                ephemeralKey:ephemeralKey.id,
+                paymentIntent: paymentIntent.id,
+                ephemeralKey: ephemeralKey.id,
                 publishableKey: envConfig.STRIPE_PUBLIC_KEY,
-                customer:customer.id
+                customer: customer.id
             };
 
         } catch (error: any) {

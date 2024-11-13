@@ -17,9 +17,11 @@ export class WishlistInteractor implements IWishlistInteractor {
 
   async getWishlistByUserId(userId: string): Promise<WishlistDTO | null> {
     const wishlist = await this.wishlistRepo.findWishlistByUser(userId);
-    return wishlist ? this.mapToDTO(wishlist) : null;
+    //DEBUG
+    //@ts-ignore
+    return wishlist
+    // return wishlist ? this.mapToDTO(wishlist) : null;
   }
-
   async addItemToWishlist(data: AddToWishlistDTO): Promise<WishlistDTO | null> {
     const updatedWishlist = await this.wishlistRepo.addItemToWishlist(data.userId, data.productId, data.variantId);
     return updatedWishlist ? this.mapToDTO(updatedWishlist) : null;

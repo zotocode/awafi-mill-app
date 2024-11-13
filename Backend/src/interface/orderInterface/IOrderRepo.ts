@@ -5,7 +5,6 @@ export default interface IOrderRepository {
   create(data: CreateOrderDTO): Promise<ICheckout>;
   
   findAll(params: {
-    status?: string;
     page: number;
     limit: number;
   }): Promise<{
