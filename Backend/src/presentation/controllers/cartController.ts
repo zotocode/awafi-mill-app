@@ -98,6 +98,7 @@ export class CartController {
   // Remove item from cart (HTTP POST)
   async removeItemFromCart(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      
       const userId = req.user?.id;
       if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
