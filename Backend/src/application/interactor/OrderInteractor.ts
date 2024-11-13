@@ -17,7 +17,6 @@ export class OrderInteractor implements IOrderInteractor {
   }
 
   async getOrders(params: {
-    status?: string;
     page: number;
     limit: number;
   }): Promise<{
@@ -98,7 +97,9 @@ export class OrderInteractor implements IOrderInteractor {
       currency: order.currency || 'USD',
       discountAmount: order.discountAmount || 0,
       paymentStatus:order.paymentStatus,
-      trackingId:order.trackingId || ''
+      trackingId:order.trackingId || '',
+      userDetails:order.userDetails,
+      productDetails:order.productDetails
     };
   }
 } 

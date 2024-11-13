@@ -39,12 +39,14 @@ const productSchema = new Schema<Product>({
   ],
   variants: [
     {
+      _id: { type: mongoose.Schema.Types.ObjectId, default: () => new mongoose.Types.ObjectId() },
       weight: { type: String, required: false },
       inPrice: { type: Number, required: false },
       outPrice: { type: Number, required: false },
       stockQuantity: { type: Number, required: false }
     }
   ]
+  
 }, { timestamps: true });
 
 // Export the Product model

@@ -189,6 +189,33 @@ export class ProductRepository
   async findByName(name: string): Promise<IProductSchema | null> {
     return await this.model.findOne({ name: name });
   }
+  async findByIdAndVariantId(
+    productId: mongoose.Types.ObjectId,
+    variantId: mongoose.Types.ObjectId
+  ): Promise<IProductSchema | null> {
+    const products = await this.model.aggregate([
+      { 
+        $match: { 
+          _id: productId 
+        } 
+      },
+      {
+        $addFields: {
+          variants: {
+            $filter: {
+              input: "$variants",
+              as: "variant",
+              cond: { $eq: ["$$variant._id", variantId] }
+            }
+          }
+        }
+      }
+    ]);
+  
+    // Return the first item in the array or an empty array if no products were found
+    return products[0] as IProductSchema || null;
+  }
+  
   async findByNameAndVariant(query: {
     name: string;
     weight: string;
@@ -600,9 +627,123 @@ export class ProductRepository
 
     return product[0] || null;
   }
-
-
-async listProductsBySubcategories(
+  
+  async listProductsBySubcategories(
+    page: number,
+    limit: number,
+    subCategoryId: mongoose.Types.ObjectId,
+    userId?: mongoose.Types.ObjectId | null
+  ): Promise<any> {
+    const skip = (page - 1) * limit;
+  
+    const products = await this.model.aggregate([
+      {
+        $match: { subCategory: subCategoryId },
+      },
+      {
+        $lookup: {
+          from: "carts",
+          let: { productId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$user", userId] },
+                    {
+                      $anyElementTrue: {
+                        $map: {
+                          input: "$items",
+                          as: "item",
+                          in: { $eq: ["$$item.product", "$$productId"] },
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "cartItems",
+        },
+      },
+      {
+        $lookup: {
+          from: "wishlists",
+          let: { productId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$user", userId] },
+                    {
+                      $anyElementTrue: {
+                        $map: {
+                          input: "$items",
+                          as: "item",
+                          in: { $eq: ["$$item.product", "$$productId"] },
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "wishlistItems",
+        },
+      },
+      {
+        $addFields: {
+          inCart: {
+            $cond: {
+              if: { $gt: [userId, null] },
+              then: { $gt: [{ $size: "$cartItems" }, 0] },
+              else: false,
+            },
+          },
+          inWishlist: {
+            $cond: {
+              if: { $gt: [userId, null] },
+              then: { $gt: [{ $size: "$wishlistItems" }, 0] },
+              else: false,
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'maincategories',
+          localField: 'category',
+          foreignField: '_id',
+          as: 'MainCategoryData'
+        }
+      },
+      {
+        $lookup: {
+          from: 'subcategories', 
+          localField: 'subCategory',
+          foreignField: '_id',
+          as: 'SubCategoryData'
+        }
+      },
+      {
+        $project: {
+          category: 0,
+          subCategory: 0,
+          cartItems: 0,
+          wishlistItems: 0
+        }
+      },
+      { $skip: skip },
+      { $limit: limit },
+    ]);
+  
+    return products;
+  }
+  
+async listProductsBySubcategoriesUsingMainCategory(
   page: number,
   limit: number,
   mainCatId: mongoose.Types.ObjectId,
@@ -720,7 +861,7 @@ async listProductsBySubcategories(
       { $limit: limit }, // Limit results per page
     ]);
 
-    console.log("Grouped Products:", groupedProducts);
+   
     return groupedProducts;
   } catch (error) {
     console.error("Error listing products by subcategories:", error);

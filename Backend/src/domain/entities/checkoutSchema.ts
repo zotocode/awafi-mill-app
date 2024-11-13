@@ -48,4 +48,6 @@ export interface ICheckout extends Document {
   deliveredAt?: Date;
   createdAt: Date;
   updatedAt: Date;
+  userDetails?:any;
+  productDetails?:any
 }

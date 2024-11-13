@@ -13,13 +13,13 @@ export class CheckoutInteractor implements ICheckoutInteractor {
     private cartRepo: ICartRepo;
     private checkoutRepo: ICheckoutRepo;
     private productRepo: IproductRepo; // Declare productRepo
-    private paymentGateway: IPaymentGateway; // Payment gateway dependency
+ 
 
-    constructor(cartRepo: ICartRepo, checkoutRepo: ICheckoutRepo, productRepo: IproductRepo, paymentGateway: IPaymentGateway) {
+    constructor(cartRepo: ICartRepo, checkoutRepo: ICheckoutRepo, productRepo: IproductRepo) {
         this.cartRepo = cartRepo;
         this.checkoutRepo = checkoutRepo;
         this.productRepo = productRepo; // Initialize productRepo
-        this.paymentGateway = paymentGateway; // Initialize payment gateway
+       
     }
 
     async  getSecretKey(paymentMethod:'Razorpay'| 'Stripe'):Promise<{secretKey:string}>

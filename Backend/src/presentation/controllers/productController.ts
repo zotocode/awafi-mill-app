@@ -350,7 +350,7 @@ export class ProductController  {
   }
   
   // Fetching products under subcategory using main category id
-  async listProductsBySubcategoriesForUser(
+  async listProductsByMainCategoryForUser(
     req: Request,
     res: Response,
     next: NextFunction
@@ -367,6 +367,36 @@ export class ProductController  {
       }
   
       const MainCategoryId = new mongoose.Types.ObjectId(mainCatId);
+  
+      const products = await this.productInteractor.listProductsByMaincategories(
+        page,
+        limit,
+        MainCategoryId,
+        userId
+      );
+  
+      res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async listProductsBySubCategoryForUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.id ? new mongoose.Types.ObjectId(req.user.id) : null;
+      const { subCatId } = req.params;
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+  
+      if (!subCatId) {
+        res.status(400).json({ error: "Sub category ID is required" });
+        return;
+      }
+  
+      const MainCategoryId = new mongoose.Types.ObjectId(subCatId);
   
       const products = await this.productInteractor.listProductsBySubcategories(
         page,

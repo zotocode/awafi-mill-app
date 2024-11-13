@@ -1,76 +1,88 @@
-// infrastructure/paymentGateways/StripeGateway.ts
 import Stripe from 'stripe';
+import envConfig from "../../config/env"; // Ensure you have Stripe keys in envConfig
 import { IPaymentGateway } from './IPaymentGateway';
-import envConfig from '../../config/env';
 
-export class StripeGateway implements IPaymentGateway {
-  private stripe: Stripe;
+export class StripePaymentGateway implements IPaymentGateway {
+    private stripe: Stripe;
 
-  constructor() {
-    this.stripe = new Stripe(envConfig.STRIPE_SECRET_KEY || '', {
-        // @ts-ignore
-      apiVersion: '2020-08-27',
-    });
-  }
-
-  async initiatePayment(
-    amount: number,
-    currency: string,
-    stripeOptions?: { stripe_id: string },
-    otherOptions?: { products: { name: string; quantity: number }[], successUrl?: string, cancelUrl?: string }
-  ): Promise<any> {
-    console.log("initiate payment is working ");
-    try {
-      const lineItems = otherOptions?.products.map((product) => ({
-        price_data: {
-          currency: currency || 'usd',
-          product_data: {
-            name: product.name,
-            // Remove the variant field as it's not supported
-          },
-          unit_amount: amount, // Amount per item; adjust this if each product has a different price
-        },
-        quantity: product.quantity, // Keep quantity here
-      }));
-  
-      const session = await this.stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        line_items: lineItems,
-        mode: 'payment',
-        shipping_address_collection:{
-           allowed_countries:['IN','US','BR']
-        },
-        success_url: otherOptions?.successUrl || `${envConfig.Base_Url}/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: otherOptions?.cancelUrl || `${envConfig.Base_Url}/cancel`,
-      });
-
-      console.log("session data",session)
-    
-      return {
-        success: true,
-        data: session,
-        gatewayReference: session.id,
-      };
-    } catch (error: any) {
-  
-      return {
-        success: false,
-        data: null,
-        error: error.message || 'Failed to create payment session',
-      };
+    constructor() {
+        this.stripe = new Stripe(envConfig.STRIPE_SECRET_KEY as string, {
+            apiVersion: '2024-09-30.acacia',
+        });
     }
-  }
-  
 
-  async verifyPayment(paymentId: string, signature: string): Promise<boolean> {
-    try {
-      // Here you would implement Stripe's webhook signature verification
-      // using stripe.webhooks.constructEvent()
-      return true;
-    } catch (error: any) {
-      console.error('Payment verification failed:', error.message);
-      return false;
+    async initiatePayment(paymentData: any) {
+        const { items, shippingAddress } = paymentData;
+
+        // Calculate the total amount in cents for Stripe
+        const totalAmount = items.reduce((total: number, item: any) => {
+            return total + (item.price * item.quantity * 100); // Convert to cents
+        }, 0);
+
+        // Create metadata with product details
+        const productMetadata = items.map((item: any, index: number) => ({
+            [`product_${index + 1}_name`]: `${item.name} - ${item.weight}`,
+            [`product_${index + 1}_quantity`]: item.quantity,
+            [`product_${index + 1}_price`]: item.price,
+        })).reduce((acc: any, curr: any) => ({ ...acc, ...curr }), {}); // Flatten to a single object
+
+        try {
+            console.log("Initiating Stripe customer and ephemeral key creation...");
+
+            // Create a Stripe customer
+            const customer = await this.stripe.customers.create();
+            console.log("Customer created successfully:", customer.id);
+
+            // Create an ephemeral key for the customer
+            const ephemeralKey = await this.stripe.ephemeralKeys.create(
+                { customer: customer.id },
+                { apiVersion: '2024-09-30.acacia' }
+            );
+            console.log("Ephemeral key created successfully:", ephemeralKey.id);
+
+            // Create a PaymentIntent for the transaction
+            const paymentIntent = await this.stripe.paymentIntents.create({
+                amount: totalAmount,
+                currency: 'usd',
+                description: 'Order payment',
+                metadata: {
+                    ...productMetadata,
+                    customerName: shippingAddress.fullName,
+                    customerPhone: shippingAddress.phone,
+                    shippingAddress: `${shippingAddress.addressLine1}, ${shippingAddress.addressLine2}, ${shippingAddress.city}, ${shippingAddress.postalCode}, ${shippingAddress.country}`
+                },
+                shipping: {
+                    name: shippingAddress.fullName,
+                    address: {
+                        line1: shippingAddress.addressLine1,
+                        line2: shippingAddress.addressLine2,
+                        city: shippingAddress.city,
+                        postal_code: shippingAddress.postalCode,
+                        country: shippingAddress.country
+                    },
+                    phone: shippingAddress.phone
+                },
+            });
+            console.log("Payment intent created successfully:", paymentIntent);
+
+            // Return paymentIntent details, ephemeral key, and publishable key
+            return {
+                paymentIntent: paymentIntent.id,
+                ephemeralKey: ephemeralKey.id,
+                publishableKey: envConfig.STRIPE_PUBLIC_KEY,
+                customer: customer.id
+            };
+
+        } catch (error: any) {
+            console.error("Stripe payment initiation error:", error);
+            
+            // Handle Stripe-specific errors
+            if (error instanceof Stripe.errors.StripeError) {
+                throw new Error(`Stripe error: ${error.message}`);
+            }
+
+            // Handle network or unexpected errors
+            throw new Error(`An unexpected error occurred during payment initiation: ${error.message}`);
+        }
     }
-  }
 }
-

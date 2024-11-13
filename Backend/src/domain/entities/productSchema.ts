@@ -6,7 +6,7 @@ interface Description {
 }
 
 interface Variant {
-  _id?: mongoose.Types.ObjectId;
+  _id?:mongoose.Types.ObjectId
   weight: string;
   inPrice: number;
   outPrice: number;

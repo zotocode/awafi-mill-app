@@ -187,8 +187,13 @@ export class ProductInteractor implements IProductInteractor {
   }
   // liste products under sub category using maincategory id------
 
-  async listProductsBySubcategories(page:number,limit:number,mainCatId:any,userId?:mongoose.Types.ObjectId | null): Promise<any> {
-    const products = await this.productRepo.listProductsBySubcategories(page, limit,mainCatId,userId);
+  async listProductsByMaincategories(page:number,limit:number,mainCatId:any,userId?:mongoose.Types.ObjectId | null): Promise<any> {
+    const products = await this.productRepo.listProductsBySubcategoriesUsingMainCategory(page, limit,mainCatId,userId);
+   
+    return products
+  }
+  async listProductsBySubcategories(page:number,limit:number,subCatId:any,userId?:mongoose.Types.ObjectId | null): Promise<any> {
+    const products = await this.productRepo.listProductsBySubcategories(page, limit,subCatId,userId);
    
     return products
   }

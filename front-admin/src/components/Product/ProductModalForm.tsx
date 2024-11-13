@@ -80,6 +80,8 @@ const AddProductModal: React.FC<ModalFormProps> = ({
 
   const resetForm = () => {
     setName("");
+    setSku("")
+    setEan("")
     setDescriptions([{ header: "", content: "" }]);
     setCategory(null);
     setSubCategory(null);
