@@ -26,6 +26,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
     try {
       const response = await AuthApi.adminAuth(email, password);
+      console.log("credentials",email,password)
+      console.log("response",response)
       if (response.status === 200 && response.data.status) {
         // Store token in local storage
         localStorage.setItem('authToken', response.data.token);
