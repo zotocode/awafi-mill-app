@@ -70,6 +70,7 @@ export class CartController {
       const updatedCart = await this.cartInteractor.addItemToCart(itemData);
       res.status(200).json(updatedCart);
     } catch (error) {
+      console.log("error: ", error);
       next(error);
     }
   }
