@@ -8,7 +8,14 @@ const checkoutSchema = new mongoose.Schema({
   items: [{
     product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: false },
     variant: { type: mongoose.Schema.Types.ObjectId, ref: "Variant", required: false },
-    quantity: { type: Number, required: false }
+    quantity: { type: Number, required: false },
+    name: { type: String, required: true },
+    weight: { type: String, required: true },
+    inPrice: { type: Number, required: true },
+    outPrice: { type: Number, required: true },
+    images: { type: String, required: true },
+    stockQuantity: { type: Number, required: true },
+    rating: { type: Number, default: 0 }
   }],
   paymentMethod: { type: String, enum: ['COD', 'Razorpay', 'Stripe'], required: true },
   transactionId: { type: String, required: false }, 
