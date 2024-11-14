@@ -6,7 +6,7 @@ import { BaseRepository } from "./baseRepository";
 import ICartRepo from "../../interface/cartInterface/IcartRepo";
 import { ProductModel } from "../model/producModel"; // Adjust the import based on your project structure
 import mongoose from "mongoose";
-// Cart repository extending the base repository
+import { CartModel } from "../model/cartModel";
 export class CartRepository extends BaseRepository<IUserCart> implements ICartRepo {
   constructor(model: Model<IUserCart>) {
     super(model);
@@ -96,60 +96,60 @@ export class CartRepository extends BaseRepository<IUserCart> implements ICartRe
     }
   }
 
-  async addItemToCart(userId: string, productId: string, variantId: string, quantity: number): Promise<IUserCart | null> {
+
+  async addItemToCart(
+    userId: string,
+    productId: string,
+    variantId: string,
+    quantity: number
+  ): Promise<IUserCart | null> {
     try {
       // Validate input
       if (!userId || !productId || !variantId || quantity === undefined) {
-        throw new Error("Invalid input parameters: userId, productId, variantId, and quantity must be provided.");
+        throw new Error("Invalid input parameters.");
       }
   
-      // Check product availability
+      // Check product availability (your existing logic)
       const isAvailable = await this.checkProductAvailability(productId, variantId, quantity);
       if (!isAvailable) {
         throw new Error("Insufficient product stock.");
       }
   
-      let cart = await this.findCartByUser(userId);
+      // Check if the product already exists in the cart
+      const cart = await CartModel.findOne({
+        user: new Types.ObjectId(userId),
+        'items.product': new Types.ObjectId(productId),
+        'items.variant': new Types.ObjectId(variantId),
+      });
   
-      // If the cart doesn't exist, create a new one
-      if (!cart) {
-        cart = await this.createCart({ userId, items: [] });
+      if (cart) {
+        console.log("cart: ", cart);
+      // If product already exists, throw an error
+        throw new Error("Product already in cart.");
       }
   
-      // Ensure items array is initialized
-      if (!cart.items) {
-        cart.items = [];
-      }
-  
-      // Check if the item already exists in the cart
-      const existingItemIndex = cart.items.findIndex(item =>
-        item.product.toString() === productId && item.variant.toString() === variantId
+      // If the product does not exist, add it to the cart
+      const updatedCart = await CartModel.findOneAndUpdate(
+        { user: new Types.ObjectId(userId) },
+        {
+          $push: {
+            items: {
+              product: new Types.ObjectId(productId),
+              variant: new Types.ObjectId(variantId),
+              quantity,
+            },
+          },
+        },
+        { new: true, upsert: true }  // Create a new cart if it doesn't exist
       );
   
-      if (existingItemIndex >= 0) {
-        // If it exists, update the quantity
-        cart.items[existingItemIndex].quantity += Number(quantity);
-  
-        return await this.model.findOneAndUpdate(
-          { user: userId },
-          { items: cart.items }, // Update the entire items array
-          { new: true }
-        ).exec();
-      } else {
-        // If it doesn't exist, add the new item
-        //@ts-ignore
-        cart.items.push({ product: productId, variant: variantId, quantity });
-        return await this.model.findOneAndUpdate(
-          { user: userId },
-          { items: cart.items },
-          { new: true }
-        ).exec();
-      }
+      return updatedCart;
     } catch (error) {
       console.error("Error adding item to cart:", error);
-      throw new Error("Could not add item to cart. Please check product details and try again.");
+      throw new Error("Could not add item to cart.");
     }
   }
+  
   
   
 
