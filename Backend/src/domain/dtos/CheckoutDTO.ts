@@ -42,9 +42,16 @@ export interface CheckoutCreateDTO {
   deliveredAt: Date;
   cart: mongoose.Types.ObjectId;
   items: { 
-    product: mongoose.Types.ObjectId; 
-    variant: mongoose.Types.ObjectId; 
-    quantity: number; 
+    productId: string;
+    variantId: string;
+    name: string;
+    quantity: number;
+    weight: string;
+    inPrice: number;
+    outPrice: number;
+    images: string;
+    stockQuantity: number;
+    rating: number;
 
   }[];
   shippingAddress: ShippingAddressDTO;

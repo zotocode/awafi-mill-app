@@ -25,7 +25,6 @@ export class CheckoutInteractor implements ICheckoutInteractor {
     async  getSecretKey(paymentMethod:'Razorpay'| 'Stripe'):Promise<{secretKey:string}>
     {
 
-        console.log("payment method",paymentMethod)
         if(paymentMethod==="Razorpay")
         {
             return {secretKey:envConfig.RAZORPAY_SECRET_KEY as string}
@@ -39,8 +38,9 @@ export class CheckoutInteractor implements ICheckoutInteractor {
     }
     async processCheckout(data: CheckoutDTO): Promise<any> {
         // Find the user's cart
-        const cart: IUserCart | null = await this.cartRepo.findCartByUser(data.userId);
-        if (!cart) throw new Error("Cart not found");
+        const cartItems: any | null = await this.cartRepo.findCartByUser(data.userId);
+        console.log(cartItems)
+        if (!cartItems) throw new Error("Cart not found");
     
         // Prepare the checkout data to be saved
         const checkoutData: CheckoutCreateDTO = {
@@ -49,8 +49,8 @@ export class CheckoutInteractor implements ICheckoutInteractor {
             paymentMethod: data.paymentMethod,
             orderPlacedAt: new Date(data.time),
             deliveredAt: new Date(new Date(data.time).getTime() + 3 * 24 * 60 * 60 * 1000), // 3 days after order time
-            cart: cart._id as mongoose.Types.ObjectId,
-            items: cart.items,
+            cart: cartItems._id as mongoose.Types.ObjectId ,
+            items: cartItems,
             currency: data.currency,
             shippingAddress: data.shippingAddress,  // Add shipping address
             transactionId: data.transactionId,      // Add transaction ID
@@ -59,7 +59,7 @@ export class CheckoutInteractor implements ICheckoutInteractor {
     
         // Save the checkout data in the database
         const checkoutResult = await this.checkoutRepo.createCheckout(checkoutData);
-    
+   
         // Clear the cart after successful checkout
         await this.cartRepo.clearCart(data.userId);
     
