@@ -5,7 +5,7 @@ import { useApi } from './axiosConfig'
     axiosInstance :any=useApi()
     async adminAuth(email:string,password:string): Promise<any> {
         try {
-          return await this.axiosInstance.post('/admin/login',{email,password});
+          return await this.axiosInstance.post('/api/admin/login',{email,password});
         } catch (error: unknown) {
             console.log("error,e",error)
           return error;

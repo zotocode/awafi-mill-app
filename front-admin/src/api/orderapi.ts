@@ -5,7 +5,7 @@ class OrderApi {
 
   async getAllOrders() {
     try {
-      const response = await this.axiosInstance.get('/orders/order/admin');
+      const response = await this.axiosInstance.get('/api/orders/order/admin');
       
       return response;
     } catch (error) {
@@ -16,7 +16,7 @@ class OrderApi {
 
   async getOrderById(orderId: string) {
     try {
-      const response = await this.axiosInstance.get(`/orders/order/admin/${orderId}`);
+      const response = await this.axiosInstance.get(`/api/orders/order/admin/${orderId}`);
       return response;
     } catch (error) {
       console.error('Failed to fetch order details:', error);
@@ -26,7 +26,7 @@ class OrderApi {
 
   async updateOrderStatus(orderId: string, status: string ,trackingId ?:string,reason?:string) {
     try {
-      const response = await this.axiosInstance.patch(`/orders/order/admin/${orderId}/status`, {
+      const response = await this.axiosInstance.patch(`/api/orders/order/admin/${orderId}/status`, {
         orderStatus:status,trackingId,reason
       });
       return response;
@@ -38,7 +38,7 @@ class OrderApi {
 
   async cancelOrder(orderId: string) {
     try {
-      const response = await this.axiosInstance.delete(`/orders/order/admin/${orderId}`);
+      const response = await this.axiosInstance.delete(`/api/orders/order/admin/${orderId}`);
       return response;
     } catch (error) {
       console.error('Failed to cancel order:', error);

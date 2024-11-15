@@ -41,7 +41,7 @@ export const uploadImages = multer({
   limits: { fileSize: 50000000 }, // Limit file size to 50 MB
   fileFilter: (req, file, cb) => {
     // Accept only certain file types (e.g., images)
-    const filetypes = /jpeg|jpg|png|gif/; // Allowed file extensions
+    const filetypes = /jpeg|jpg|png|gif|webp/;  // Allowed file extensions
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = filetypes.test(file.mimetype);
 
