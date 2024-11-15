@@ -5,7 +5,7 @@ class BannerApi {
 
   async addOfferBanner(formData: FormData): Promise<any> {
     try {
-      const response = await this.axiosInstance.post('api/banner/offerBanner', formData, {
+      const response = await this.axiosInstance.post('/banner/offerBanner', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -22,7 +22,7 @@ class BannerApi {
   // Other methods (addWelcomeBanner, addCollectionBanner) can follow the same pattern
   async fetchBanners():Promise<any>{
     try{
-    const responce = await this.axiosInstance.get('api/banner/allBanners')
+    const responce = await this.axiosInstance.get('/banner/allBanners')
     return responce
     }catch(error){
       console.log(error)
@@ -32,7 +32,7 @@ class BannerApi {
 
   async unlistBanners(row:any):Promise<any>{
     try{
-      const responce = await this.axiosInstance.post('api/banner/unlistBanner',row)
+      const responce = await this.axiosInstance.post('/banner/unlistBanner',row)
       return responce
       }catch(error){
         console.log(error)
@@ -42,7 +42,7 @@ class BannerApi {
 
   async deleteBanners(row:any):Promise<any>{
     try{
-      const responce = await this.axiosInstance.post('api/banner/deleteBanner',row)
+      const responce = await this.axiosInstance.post('/banner/deleteBanner',row)
       return responce
       }catch(error){
         console.log(error)     

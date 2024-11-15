@@ -5,7 +5,7 @@ class SalesApi {
 
   async generateSalesReport(reportType:string, startDate:string, endDate:string) {
     try {
-      const response = await this.axiosInstance.get('/api/admin/sales-report', {
+      const response = await this.axiosInstance.get('/admin/sales-report', {
         params: {
           reportType,
           startDate: startDate || null,
