@@ -16,7 +16,7 @@ export class WishlistController {
   async getWishlistByUserId(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.id;
-      console.log("userId: ", userId);
+
       if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
         return;
