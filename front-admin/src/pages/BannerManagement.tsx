@@ -4,7 +4,6 @@ import ConfirmationDialog from "../components/ConfirmationDialog";
 import {
   Plus,
   Image as ImageIcon,
-  Calendar,
   X,
   FileQuestion,
   ChevronLeft,

@@ -22,7 +22,6 @@ interface CategoryModalFormProps {
 const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
   isOpen,
   onClose,
-  onSuccess,
   category,
 }) => {
   const [name, setName] = useState("");
