@@ -18,6 +18,14 @@ export class UserRepo extends BaseRepository<IuserDocument> implements IUserRepo
       throw error;
     }
   }
+  async findUserByMobile(phone: number): Promise<IuserDocument | null> {
+    try {
+      return await this.model.findOne({ phone });
+    } catch (error) {
+      console.error("Error finding user:", error);
+      throw error;
+    }
+  }
 
 
   async findUser(id: string): Promise<IuserDocument | null> {

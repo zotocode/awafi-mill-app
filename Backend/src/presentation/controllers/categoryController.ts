@@ -95,8 +95,10 @@ export class CategoryController {
         updatedData.photo=photo.path
       }
       
-      const updatedCategory = await this.categoryInteractor.updateCategory(categoryId, updatedData);
-
+      const updatedCategory:any = await this.categoryInteractor.updateCategory(categoryId, updatedData);
+      if (updatedCategory?.status) {
+        res.status(updatedCategory.status).json({ message: updatedCategory.message });
+      }
       if (updatedCategory) {
         res.status(200).json(updatedCategory);
       } else {

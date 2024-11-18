@@ -62,6 +62,11 @@ export class UserInteractor implements IUserInteractor {
     }
     
     const registeredUser = await this.userRepository.findUserEmail(email)
+    const registeredMobile =await this.userRepository.findUserByMobile(phone)
+    if(registeredMobile)
+    {
+      return {success:false,message:"user in this phone number already exists"}
+    }
     if(registeredUser){
       return { success: false, message: "User already present" };
     }
