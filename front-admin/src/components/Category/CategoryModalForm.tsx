@@ -96,27 +96,22 @@ const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
         formData.append('photo', photo); // Add the photo file if selected
       }
 
-   
+      let response;
       if (category) {
-        const response = await CategoryApi.updateCategory(category._id, formData);
-  
-        if(response.status==200)
-  
-          {toast.success(`Category ${category } updated successfully`);}
-      
+        response = await CategoryApi.updateCategory(category._id, formData);
       } else {
-       const response = await CategoryApi.addCategory(formData);
-        if(response.status==200)
-          {
-            toast.success(`Category created successfully`);
-          }
+        response = await CategoryApi.addCategory(formData);
       }
-  
-    
+
+      if (response.data) {
+        onSuccess(response.data);
+        toast.success(`Category ${category ? 'updated' : 'created'} successfully`);
+      }
+
       onClose(); // Close the modal after successful operation
-    } catch (error:any) {
- 
-      toast.error(error.response.data.message);
+    } catch (error) {
+      console.error('Error submitting category:', error);
+      toast.error(`Failed to ${category ? 'update' : 'create'} category. Please try again.`);
     } finally {
       setIsSubmitting(false);
     }

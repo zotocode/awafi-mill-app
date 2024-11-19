@@ -22,6 +22,7 @@ interface CategoryModalFormProps {
 const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
   isOpen,
   onClose,
+  onSuccess,
   category,
 }) => {
   const [name, setName] = useState("");
@@ -91,33 +92,30 @@ const SubCategoryModalForm: React.FC<CategoryModalFormProps> = ({
 
     setIsSubmitting(true);
     try {
-   
+      let response;
       if (category) {
-       const response = await subcategoryapi.updateCategory(category._id, {
+        response = await subcategoryapi.updateCategory(category._id, {
           name,
           description,
           mainCategory,
         });
-        if(response.status==200)
-  
-          {toast.success(`Category ${category } updated successfully`);}
       } else {
-      const  response = await subcategoryapi.addCategory({
+        response = await subcategoryapi.addCategory({
           name,
           description,
           mainCategory,
         });
-        if(response.status==200)
-          {
-            toast.success(`Category created successfully`);
-          }
       }
 
-    
+      if (response.data) {
+        onSuccess(response.data);
+        toast.success(`Category ${category ? "updated" : "created"} successfully`);
+      }
       ResetForm()
       onClose();
-    } catch (error:any) {
-      toast.error(error.response.data.message);
+    } catch (error) {
+      console.error("Error submitting category:", error);
+      toast.error(`Failed to ${category ? "update" : "create"} category. Please try again.`);
     } finally {
       setIsSubmitting(false);
     }
