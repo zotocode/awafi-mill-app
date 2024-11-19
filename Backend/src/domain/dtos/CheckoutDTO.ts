@@ -40,7 +40,6 @@ export interface CheckoutCreateDTO {
   paymentMethod: 'COD' | 'Razorpay' | 'Stripe';
   orderPlacedAt: Date;
   deliveredAt: Date;
-  cart: mongoose.Types.ObjectId;
   items: { 
     productId: string;
     variantId: string;

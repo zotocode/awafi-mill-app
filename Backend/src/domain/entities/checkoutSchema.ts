@@ -8,8 +8,16 @@ export interface ICheckout extends Document {
   transactionId:string;
   orderPlacedAt:Date;
   items: { 
-    product: mongoose.Types.ObjectId; 
-    quantity: number; 
+    productId: string;
+    variantId: string;
+    name: string;
+    quantity: number;
+    weight: string;
+    inPrice: number;
+    outPrice: number;
+    images: string;
+    stockQuantity: number;
+    rating: number;
   }[];
   paymentMethod: 'COD' | 'Razorpay' | 'Stripe';
   amount: number;

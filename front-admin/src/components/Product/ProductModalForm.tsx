@@ -159,10 +159,10 @@ const AddProductModal: React.FC<ModalFormProps> = ({
   const handleRemoveVariant = (index: number) =>
     setVariants(variants.filter((_, i) => i !== index));
 
-  const validateWeight = (value: string) => {
-    const weightRegex = /^(\d+(\.\d+)?)\s*(gram|piece|mg|stick|g|kg|ml|l)s?$/i;
-    return weightRegex.test(value);
-  };
+  // const validateWeight = (value: string) => {
+  //   const weightRegex = /^(\d+(\.\d+)?)\s*(gram|piece|mg|stick|g|kg|ml|l)s?$/i;
+  //   return weightRegex.test(value);
+  // };
 
   const validateForm = () => {
     const errors: any = {};

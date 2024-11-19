@@ -3,8 +3,6 @@ import ICartRepo from "../../interface/cartInterface/IcartRepo";
 import ICheckoutRepo from "../../interface/checkoutInterface/IcheckoutRepo";
 import ICheckoutInteractor from "../../interface/checkoutInterface/IcheckoutInteractor";
 import { CheckoutDTO ,CheckoutCreateDTO} from "../../domain/dtos/CheckoutDTO";
-import { IUserCart } from "../../domain/entities/userCartSchema";
-import { IPaymentGateway } from "../../infrastructure/paymentGateways/IPaymentGateway";
 import { IproductRepo } from "../../interface/productInterface/IproductRepo"; // Import IproductRepo
 import mongoose from "mongoose";
 import envConfig from "../../config/env";
@@ -39,7 +37,7 @@ export class CheckoutInteractor implements ICheckoutInteractor {
     async processCheckout(data: CheckoutDTO): Promise<any> {
         // Find the user's cart
         const cartItems: any | null = await this.cartRepo.findCartByUser(data.userId);
-        console.log(cartItems)
+       
         if (!cartItems) throw new Error("Cart not found");
     
         // Prepare the checkout data to be saved
@@ -49,7 +47,6 @@ export class CheckoutInteractor implements ICheckoutInteractor {
             paymentMethod: data.paymentMethod,
             orderPlacedAt: new Date(data.time),
             deliveredAt: new Date(new Date(data.time).getTime() + 3 * 24 * 60 * 60 * 1000), // 3 days after order time
-            cart: cartItems._id as mongoose.Types.ObjectId ,
             items: cartItems,
             currency: data.currency,
             shippingAddress: data.shippingAddress,  // Add shipping address
