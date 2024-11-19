@@ -1,7 +1,7 @@
 import express from 'express'
 import DashboardController from '../controllers/dashboardController'
 import DashboardInteractor from '../../application/interactor/dashboardInteractor'
-import CheckoutRepository from '../../infrastructure/repositories/checkoutRepo'
+import CheckoutRepository from '../../infrastructure/repositories/dashboardRepository'
 import { CheckoutModel } from '../../infrastructure/model/checkoutModel'
 
 const dashboardRoute=express.Router()

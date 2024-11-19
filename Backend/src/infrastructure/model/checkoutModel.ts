@@ -73,7 +73,7 @@ const checkoutSchema = new mongoose.Schema({
   cancellationReason: { type: String, requiered:false }, 
   trackingId:{type:String,required:false},
   // Tracking timestamps
-  paymentCompletedAt: { type: Date ,required:true},
+  paymentCompletedAt: { type: Date ,required:false},
   orderPlacedAt:{type:Date,required:true},
   deliveredAt: { type: Date ,required:true}
 }, {

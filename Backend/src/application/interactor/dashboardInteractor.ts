@@ -1,12 +1,13 @@
 import { RevenueSummary, OrderSummary } from "../../domain/dtos/CheckoutDTO";
 import ICheckoutRepo from "../../interface/checkoutInterface/IcheckoutRepo";
 import { IDashboardInteractor } from "../../interface/dashboardInterface/IdashboardInteractor";
+import IDashboardRepository from "../../interface/dashboardInterface/IDashboardRepo";
 
 
 class DashboardInteractor implements IDashboardInteractor {
-  private chekoutRepository: ICheckoutRepo;
+  private chekoutRepository: IDashboardRepository;
 
-  constructor(chekoutRepository: ICheckoutRepo) {
+  constructor(chekoutRepository: IDashboardRepository) {
     this.chekoutRepository = chekoutRepository;
   }
 
@@ -22,6 +23,7 @@ class DashboardInteractor implements IDashboardInteractor {
   async totalRevenue(period?: string): Promise<any> {
     try {
       const result = await this.chekoutRepository.viewRevenue(period as 'day' | 'month' | 'year');
+
       return result;
     } catch (error) {
       console.log(error);

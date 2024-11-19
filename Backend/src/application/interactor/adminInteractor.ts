@@ -13,11 +13,10 @@ let password = envConfig.ADMIN_PASSWORD
 export class AdminInteractor implements IadminInteractor {
   private userRepository: IUserRepo;
   private jwt: Ijwt;
-  private checkoutRepo: ICheckoutRepo;
-  constructor(userRepository: IUserRepo ,jwt: Ijwt,checkoutRepo: ICheckoutRepo) {
+  constructor(userRepository: IUserRepo ,jwt: Ijwt) {
     this.userRepository = userRepository;
     this.jwt = jwt;
-    this.checkoutRepo = checkoutRepo;
+  
   }
  
  async logIn(data: any): Promise<any> {

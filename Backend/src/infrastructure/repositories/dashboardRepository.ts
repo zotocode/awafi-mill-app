@@ -9,7 +9,7 @@ import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth,
 
 
 
-export class CheckoutRepository extends BaseRepository<ICheckout> implements ICheckoutRepo {
+export class DashboardRepository extends BaseRepository<ICheckout> implements DashboardRepository {
   constructor(model: Model<ICheckout>) {
     super(model);
   }
@@ -252,4 +252,4 @@ console.log("Simple Query Results:", simpleQuery);
   
 }
 
-export default CheckoutRepository
+export default DashboardRepository
