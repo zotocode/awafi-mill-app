@@ -259,7 +259,9 @@ export class ProductInteractor implements IProductInteractor {
       inCart:product.inCart,
       inWishlist:product.inWishlist,
       MainCategoryData:product.MainCategoryData,
-      SubCategoryData:product.SubCategoryData
+      SubCategoryData:product.SubCategoryData,
+      averageRating:product.averageRating,
+      totalReviews:product.totalReviews
     };
   }
 }
