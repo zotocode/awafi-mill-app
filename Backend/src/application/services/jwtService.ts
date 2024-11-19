@@ -33,12 +33,5 @@ export class JWT implements Ijwt {
     }
   }
 
-verifyRefreshToken(token: string): JwtPayload | null {
-    try {
-      const decoded = jwt.verify(token, "JWT_PUBLIC_KEY" ) as JwtPayload;
-      return decoded;
-    } catch (error: any) {
-      return null;
-    }
-  }
+
 }

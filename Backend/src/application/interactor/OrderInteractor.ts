@@ -82,11 +82,8 @@ export class OrderInteractor implements IOrderInteractor {
       _id: order._id,
       user: order.user,
       transactionId:order.transactionId  || '',
-      items: order.items.map((item: {product:mongoose.Types.ObjectId,quantity:number}) => ({
-        product: item.product,
-        quantity: item.quantity
-      })),
       amount: order.amount,
+      items:order.items,
       cancellationReason:order.cancellationReason || '',
       orderStatus: order.orderStatus,
       shippingAddress: order.shippingAddress,

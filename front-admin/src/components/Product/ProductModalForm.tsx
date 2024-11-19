@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Product, Description, Variant } from "../../types/productTypes";
-import { Category } from "../../types/categoryType";
 import categoryapi from "../../api/categoryapi";
-import subcategoryapi from "../../api/subcategoryapi";
-import { toast } from "react-toastify";
 import productapi from "../../api/productapi";
+import subcategoryapi from "../../api/subcategoryapi";
+import { Category } from "../../types/categoryType";
+import { Product, Description, Variant } from "../../types/productTypes";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 interface ModalFormProps {
   isOpen: boolean;
@@ -18,8 +18,8 @@ const AddProductModal: React.FC<ModalFormProps> = ({
   onProductAdd,
 }) => {
   const [name, setName] = useState("");
-  const [sku, setSku] = useState(""); // New state for SKU
-  const [ean, setEan] = useState(""); // New state for EAN
+  const [sku, setSku] = useState("");
+  const [ean, setEan] = useState("");
   const [descriptions, setDescriptions] = useState<Description[]>([
     { header: "", content: "" },
   ]);
@@ -27,6 +27,7 @@ const AddProductModal: React.FC<ModalFormProps> = ({
   const [category, setCategory] = useState<Category | null>(null);
   const [subCategories, setSubCategories] = useState<Category[]>([]);
   const [images, setImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [subCategory, setSubCategory] = useState<Category | null>(null);
   const [variants, setVariants] = useState<Variant[]>([
     { weight: "", inPrice: "", outPrice: "", stockQuantity: "" },
@@ -42,7 +43,6 @@ const AddProductModal: React.FC<ModalFormProps> = ({
           setCategories(response.data.data);
         }
       } catch (error) {
-
         toast.error("Failed to fetch categories");
       }
     }
@@ -80,13 +80,14 @@ const AddProductModal: React.FC<ModalFormProps> = ({
 
   const resetForm = () => {
     setName("");
-    setSku("")
-    setEan("")
+    setSku("");
+    setEan("");
     setDescriptions([{ header: "", content: "" }]);
     setCategory(null);
     setSubCategory(null);
     setVariants([{ weight: "", inPrice: "", outPrice: "", stockQuantity: "" }]);
     setImages([]);
+    setImagePreviews([]);
     setErrors({});
   };
 
@@ -101,18 +102,44 @@ const AddProductModal: React.FC<ModalFormProps> = ({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files;
     if (selectedFiles) {
-      const validImages = Array.from(selectedFiles).filter(
-        (file) => file.type.startsWith("image/") && file.size <= 5 * 1024 * 1024
-      );
+      const validImages: File[] = [];
+      const validPreviews: string[] = [];
 
+      Array.from(selectedFiles).forEach((file) => {
+        // Check file type and size
+        if (
+          file.type.startsWith("image/") &&
+          file.size <= 5 * 1024 * 1024 // 5MB limit
+        ) {
+          validImages.push(file);
+          validPreviews.push(URL.createObjectURL(file));
+        }
+      });
+
+      // Check for invalid files
       if (validImages.length !== selectedFiles.length) {
-        toast.error("Invalid file(s): Only images under 2MB are allowed.");
+        toast.error(
+          "Some files were invalid. Only images under 5MB are allowed."
+        );
+      }
+
+      // Limit to 5 images maximum
+      if (validImages.length > 5) {
+        toast.error("Maximum of 5 images allowed");
+        validImages.splice(5);
+        validPreviews.splice(5);
       }
 
       setImages(validImages);
+      setImagePreviews(validPreviews);
     }
   };
-
+  const removeImage = (indexToRemove: number) => {
+    setImages(images.filter((_, index) => index !== indexToRemove));
+    setImagePreviews(
+      imagePreviews.filter((_, index) => index !== indexToRemove)
+    );
+  };
   const handleDescriptionChange = (
     index: number,
     field: "header" | "content",
@@ -132,10 +159,10 @@ const AddProductModal: React.FC<ModalFormProps> = ({
   const handleRemoveVariant = (index: number) =>
     setVariants(variants.filter((_, i) => i !== index));
 
-  const validateWeight = (value: string) => {
-    const weightRegex = /^(\d+(\.\d+)?)\s*(gram|piece|mg|stick|g|kg|ml|l)s?$/i;
-    return weightRegex.test(value);
-  };
+  // const validateWeight = (value: string) => {
+  //   const weightRegex = /^(\d+(\.\d+)?)\s*(gram|piece|mg|stick|g|kg|ml|l)s?$/i;
+  //   return weightRegex.test(value);
+  // };
 
   const validateForm = () => {
     const errors: any = {};
@@ -155,6 +182,11 @@ const AddProductModal: React.FC<ModalFormProps> = ({
       errors.ean = "EAN is required.";
     }
 
+    // Validate images
+    if (images.length === 0) {
+      errors.images = "At least one product image is required.";
+    }
+
     // Validate category selection
     if (!category) {
       errors.category = "Category is required.";
@@ -165,18 +197,23 @@ const AddProductModal: React.FC<ModalFormProps> = ({
       errors.descriptions = "Each description must have a header and content.";
     }
 
-    // Validate variants
+    // Validate variants (previous validation logic remains the same)
     const variantErrors = variants.map((variant) => {
       const variantError: any = {};
 
-      // Check weight
+      // Weight validation
       if (!variant.weight) {
         variantError.weight = "Weight is required.";
-      } else if (!validateWeight(variant.weight)) {
-        variantError.weight = 'Invalid weight format. Please use a number followed by a unit (e.g., 100 grams, 5 pieces, 500 mg, 2 sticks)';
+      } else if (
+        !/^(\d+(\.\d+)?)\s*(gram|piece|mg|stick|g|kg|ml|l)s?$/i.test(
+          variant.weight
+        )
+      ) {
+        variantError.weight =
+          "Invalid weight format. Use a number followed by a unit (e.g., 100 grams, 5 pieces)";
       }
 
-      // Check inPrice
+      // In Price validation
       if (
         !variant.inPrice ||
         isNaN(Number(variant.inPrice)) ||
@@ -185,7 +222,7 @@ const AddProductModal: React.FC<ModalFormProps> = ({
         variantError.inPrice = "In Price must be a positive number.";
       }
 
-      // Check outPrice
+      // Out Price validation
       if (
         !variant.outPrice ||
         isNaN(Number(variant.outPrice)) ||
@@ -194,7 +231,7 @@ const AddProductModal: React.FC<ModalFormProps> = ({
         variantError.outPrice = "Out Price must be a positive number.";
       }
 
-      // Check stock quantity
+      // Stock Quantity validation
       if (
         !variant.stockQuantity ||
         isNaN(Number(variant.stockQuantity)) ||
@@ -213,7 +250,7 @@ const AddProductModal: React.FC<ModalFormProps> = ({
     }
 
     setErrors(errors);
-    return Object.keys(errors).length === 0; // Return true if no errors
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -246,9 +283,18 @@ const AddProductModal: React.FC<ModalFormProps> = ({
 
     variants.forEach((variant, index) => {
       formData.append(`variants[${index}][weight]`, variant.weight || "");
-      formData.append(`variants[${index}][inPrice]`, variant.inPrice.toString());
-      formData.append(`variants[${index}][outPrice]`, variant.outPrice.toString());
-      formData.append(`variants[${index}][stockQuantity]`, variant.stockQuantity.toString());
+      formData.append(
+        `variants[${index}][inPrice]`,
+        variant.inPrice.toString()
+      );
+      formData.append(
+        `variants[${index}][outPrice]`,
+        variant.outPrice.toString()
+      );
+      formData.append(
+        `variants[${index}][stockQuantity]`,
+        variant.stockQuantity.toString()
+      );
     });
 
     images.forEach((image) => {
@@ -269,6 +315,33 @@ const AddProductModal: React.FC<ModalFormProps> = ({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Render image previews section
+  const renderImagePreviews = () => {
+    return (
+      <div className="mt-2">
+        <div className="flex flex-wrap gap-3">
+          {imagePreviews.map((preview, index) => (
+            <div key={index} className="relative">
+              <img
+                src={preview}
+                alt={`Preview ${index + 1}`}
+                className="w-24 h-24 object-cover rounded-md"
+              />
+              <button
+                type="button"
+                onClick={() => removeImage(index)}
+                className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+              >
+                X
+              </button>
+            </div>
+          ))}
+        </div>
+        
+      </div>
+    );
   };
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -317,8 +390,10 @@ const AddProductModal: React.FC<ModalFormProps> = ({
               <span className="sr-only">Close modal</span>
             </button>
           </div>
+        
           <div className="p-6 space-y-6">
             <form onSubmit={handleSubmit}>
+            <div className="flex-1 "> {renderImagePreviews()}</div>
               <div className="grid grid-cols-1 gap-4">
                 <div className="flex flex-row space-x-4">
                   <div className="flex-1">
@@ -340,7 +415,7 @@ const AddProductModal: React.FC<ModalFormProps> = ({
 
                   <div className="flex-1">
                     <label className="block text-sm font-medium text-gray-700">
-                      Images (Max 2MB)
+                      Images (Max 5, 5MB each)
                     </label>
                     <input
                       type="file"
@@ -349,6 +424,10 @@ const AddProductModal: React.FC<ModalFormProps> = ({
                       onChange={handleImageChange}
                       className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                     />
+                    {errors.images && (
+          <p className="mt-1 text-sm text-red-600">{errors.images}</p>
+        )}
+                   
                   </div>
                 </div>
 
@@ -639,7 +718,6 @@ const AddProductModal: React.FC<ModalFormProps> = ({
                     Add Variant
                   </button>
                 </div>
-
 
                 <button
                   type="submit"

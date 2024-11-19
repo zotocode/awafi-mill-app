@@ -8,7 +8,7 @@ import {
   Package,
   AlertCircle
 } from "lucide-react";
-import OrderPreviewModal from '../../components/Modals/Order/OrderPreviewModal';
+import OrderPreviewModal from '../../components/Modals/OrderPreviewModal';
 import { Alert, AlertDescription } from '../../components/Alerts/Alert';
 
 const OrderManagementPage = () => {

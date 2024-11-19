@@ -1,5 +1,5 @@
 import { Dialog } from '@headlessui/react';
-import { OrderType } from '../../../types/orderTypes';
+import { OrderType } from '../../types/orderTypes';
 import { X } from 'lucide-react';
 
 interface OrderPreviewModalProps {

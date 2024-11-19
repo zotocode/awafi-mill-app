@@ -32,6 +32,8 @@ export interface ProductDTO {
   inWishlist?:boolean;
   MainCategoryData?:any;
   SubCategoryData?:any;
+  averageRating?:number
+  totalReviews?:number
 }
 export interface ProductCreationDTO {
   name: string;

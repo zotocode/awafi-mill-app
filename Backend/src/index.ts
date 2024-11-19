@@ -34,7 +34,7 @@ const startServer = async (): Promise<void> => {
     app.use(
       cors({
         origin: envConfig.Frontend_URL,
-        methods: ["GET", "POST", "PUT", "DELETE"],
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
       })

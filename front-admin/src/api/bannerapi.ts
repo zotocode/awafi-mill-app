@@ -10,7 +10,7 @@ class BannerApi {
           'Content-Type': 'multipart/form-data',
         },
       });
-      console.log(response.data,"response.data");
+      console.log("response",response);
       
       return response.data
     } catch (error) {

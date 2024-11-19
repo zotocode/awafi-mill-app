@@ -17,7 +17,13 @@ const descriptionSchema = z.object({
 });
 
 const variantSchema = z.object({
-  weight: z.string().min(1, "Weight is required"),
+  weight: z
+  .string()
+  .min(1, "Weight is required")
+  .refine(
+    (value) => /^(\d+(\.\d+)?)\s*(gram|piece|mg|stick|g|kg|ml|l)s?$/i.test(value),
+    "Weight must be in a valid format (e.g., 10 g, 2 kg, 500 ml)."
+  ),
   inPrice: z.string().regex(/^\d+(\.\d{1,2})?$/, "Invalid price format"),
   outPrice: z.string().regex(/^\d+(\.\d{1,2})?$/, "Invalid price format"),
   stockQuantity: z.string().regex(/^\d+$/, "Stock quantity must be a positive integer"),

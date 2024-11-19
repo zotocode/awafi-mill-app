@@ -29,7 +29,7 @@ export class UserInteractor implements IUserInteractor {
     this.addressRepo = addressRepo;
   }
 
-  //=-========================================login===============
+  //=-========================================================================login===========================================================
   async login(email: string, password: string): Promise<UserInteractorResp> {
     try {
       const userData = await this.userRepository.findUserEmail(email);
@@ -62,6 +62,11 @@ export class UserInteractor implements IUserInteractor {
     }
     
     const registeredUser = await this.userRepository.findUserEmail(email)
+    const registeredMobile =await this.userRepository.findUserByMobile(phone)
+    if(registeredMobile)
+    {
+      return {success:false,message:"user in this phone number already exists"}
+    }
     if(registeredUser){
       return { success: false, message: "User already present" };
     }

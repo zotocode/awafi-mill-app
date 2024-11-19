@@ -4,12 +4,9 @@ import { creatingSubCategory } from '../types/categoryType';
 class SubCategoryApi{
     axiosInstance :any=useApi()
     async addCategory(data:creatingSubCategory): Promise<any> {
-        try {
+       
           return await this.axiosInstance.post('/api/sub-categories/category/sub/admin',data);
-        } catch (error: unknown) {
-         
-          return error;
-        }
+     
       }
     async fetchAllCategories(page:number,limit:number): Promise<any> {
         try {
@@ -44,13 +41,9 @@ class SubCategoryApi{
         }
       }
     async updateCategory(id:string,data:any): Promise<any> {
-        try {
-    
+     
           return await this.axiosInstance.put(`/api/sub-categories/category/sub/admin/${id}`,data);
-        } catch (error: unknown) {
-         
-          return error;
-        }
+       
       }
     async lisitingAndUnlisting(id:string,action:string): Promise<any> {
         try {
