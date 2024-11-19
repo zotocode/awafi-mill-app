@@ -5,7 +5,7 @@ class DashboardApi {
 
   async fetchTotalViews(): Promise<any> {
     try {
-      const response = await this.axiosInstance.get('api/admin/dashboard-total-orders');
+      const response = await this.axiosInstance.get('api/dashboard/orders');
       console.log(response.data);
       
       return response.data; // Ensure your backend sends { total, rate }
@@ -15,9 +15,9 @@ class DashboardApi {
     }
   }
 
-  async fetchTotalRevenue(period:string): Promise<any> {
+  async fetchTotalRevenue(period:'month' | 'year' |'day'): Promise<any> {
     try {
-      const response = await this.axiosInstance.get(`api/admin/dashboard-total-revenue?period=${period}`);
+      const response = await this.axiosInstance.get(`api/dashboard/revenue?period=${period}`);
       return response.data; 
     } catch (error) {
       console.error('Failed to fetch total profit', error);

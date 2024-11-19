@@ -17,6 +17,7 @@ import reviewRoutes from "./presentation/routes/reviewRoute";
 import orderRoutes from "./presentation/routes/orderRoute";
 import subCategoryRoutes from "./presentation/routes/subCategoryRoute";
 import envConfig from "./config/env";
+import dashboardRoute from "./presentation/routes/dashboardRoute";
 
 
 
@@ -43,6 +44,7 @@ const startServer = async (): Promise<void> => {
 
     app.use('/api/user', userRoute);
     app.use('/api/admin', adminRoute)
+    app.use('/api/dashboard', dashboardRoute)
     app.use('/api/orders', orderRoutes)
     app.use('/api/products', productRoute);
     app.use('/api/cart', verifyToken, cartRoutes)

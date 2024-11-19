@@ -24,9 +24,7 @@ adminRoute.get('/allUser',adminController.allUsers.bind(adminController))
 adminRoute.post('/blockUser',adminController.blockUser.bind(adminController))
 adminRoute.post('/unblockUser',adminController.unblockUser.bind(adminController))
 //dash data
-adminRoute.get('/dashboard-total-orders',adminController.dashTotalOrders.bind(adminController))
-adminRoute.get('/dashboard-total-revenue',adminController.dashTotalRevenue.bind(adminController))
-adminRoute.get('/sales-report',adminController.salesReport.bind(adminController))
+
 
 
 

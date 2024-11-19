@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import CardDataStats from '../../components/CardDataStats';
 import ChartOne from '../../components/Charts/ChartOne';
-import ChartTwo from '../../components/Charts/ChartTwo';
-import ChartThree from '../../components/Charts/ChartThree';
-import adminDashBoard from '../../api/adminDashBoard'; 
+import adminDashBoard from '../../api/dashboardapi'; 
 import LoadingSpinner from '../../components/Spinner/LoadingSpinner';
 
 const Dashboard = () => {
@@ -18,15 +16,15 @@ const Dashboard = () => {
       delivered: { count: 0, amount: 0 },
     },
   });
+  const [totalRevenue,setTotalRevenue]=useState<number>(0)
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      setError(null); // Clear previous errors before a new request
+      setError(null);
 
       // Fetch total views (actual data)
       const viewsData = await adminDashBoard.fetchTotalViews();
@@ -91,9 +89,12 @@ const Dashboard = () => {
 
   if (error) {
     return (
-      <div>
+      <div className="p-4 bg-black text-white">
         <p>{error}</p>
-        <button onClick={fetchDashboardData} className="retry-button">
+        <button 
+          onClick={fetchDashboardData} 
+          className="mt-4 px-4 py-2 bg-white text-black rounded hover:bg-gray-200"
+        >
           Retry
         </button>
       </div>
@@ -104,13 +105,30 @@ const Dashboard = () => {
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
         {/* Order Status Cards */}
-        <CardDataStats title="Shipped Orders" total={dashboardData.orderStatusCounts.shipped.count.toString()} />
-        <CardDataStats title="Processing Orders" total={dashboardData.orderStatusCounts.processing.count.toString()} />
-        <CardDataStats title="Delivered Orders" total={dashboardData.orderStatusCounts.delivered.count.toString()} />
+        <CardDataStats 
+          title="Shipped Orders" 
+          total={dashboardData.orderStatusCounts.shipped.count.toString()} 
+          icon="shipped"
+        />
+        <CardDataStats 
+          title="Processing Orders" 
+          total={dashboardData.orderStatusCounts.processing.count.toString()} 
+          icon="processing"
+        />
+        <CardDataStats 
+          title="Delivered Orders" 
+          total={dashboardData.orderStatusCounts.delivered.count.toString()} 
+          icon="delivered"
+        />
+        <CardDataStats 
+          title="Total Revenue" 
+          total={`$${totalRevenue}`} 
+          icon="revenue"
+          // rate={`${dashboardData.totalProfit.rate}%`}
+          // levelUp
+        />
       </div>
-      <ChartOne />
-      <ChartTwo />
-      <ChartThree />
+      <ChartOne revenue={setTotalRevenue} />
     </>
   );
 };
