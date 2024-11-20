@@ -7,6 +7,7 @@ import subcategoryapi from "../../api/subcategoryapi";
 import productapi from "../../api/productapi";
 import { toast } from "react-toastify";
 import { z } from "zod"; // Add this import for validation
+import ConfirmationDialog from "../../components/ConfirmationDialog";
 
 const MAX_IMAGES = 5;
 
@@ -60,6 +61,9 @@ const UpdateProductPage: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sku, setSku] = useState("");
   const [ean, setEan] = useState("");
+  const [showDialog, setshowDialog] = useState(false);
+  const[index,setIndex]=useState<number | null>(null)
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -174,6 +178,35 @@ const UpdateProductPage: React.FC = () => {
     }
   };
 
+
+  const handleImageDelete = async (index: number) => {
+    console.log("ind",index)
+    setIndex(index)
+    setshowDialog(true);
+  };
+  
+  const confirmImageDeletion = async () => {
+    if (typeof index === "number") {
+
+    const response = await productapi.deletImage(id!, index);
+    if (response.status === 200) {
+      const newImages = [...images];
+      newImages[index] = '';
+      setImages(newImages);
+      toast.success("Image deleted successfully");
+    } else {
+      toast.error("Failed to delete image");
+    }
+  }
+  else{
+    toast.error("index not found")
+  }
+  setshowDialog(false);
+    
+  };
+  
+
+
   const handleAddDescription = () => {
     setDescriptions([...descriptions, { header: "", content: "" }]);
   };
@@ -272,87 +305,97 @@ const UpdateProductPage: React.FC = () => {
     <div className="flex flex-col gap-10 w-full">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Update Product</h1>
       <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-700">Images</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {images.map((image, index) => (
-               <div key={index} className="flex flex-col items-center">
-               <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden bg-gray-50">
-                 {image ? (
-                   typeof image === "string" ? (
-                     <img
-                       src={image}
-                       id={`image-${index}`}
-                       alt={`Product ${index + 1}`}
-                       className="w-full h-full object-cover"
-                     />
-                   ) : (
-                     <img
-                       src={URL.createObjectURL(image)}
-                       id={`image-${index}`}
-                       alt={`Product ${index + 1}`}
-                       className="w-full h-full object-cover"
-                     />
-                   )
-                 ) : (
-                   <span className="text-gray-400">No image</span>
-                 )}
-               </div>
-               <input
-                 type="file"
-                 accept="image/*"
-                 onChange={(e) => handleImageChange(index, e.target.files?.[0] || null)}
-                 className="hidden"
-                 id={`image-input-${index}`}
-               />
-               <label
-                 htmlFor={`image-input-${index}`}
-                 className="mt-3 cursor-pointer text-sm font-medium text-indigo-600 hover:text-indigo-800"
-               >
-                 {image ? 'Change' : 'Add Image'}
-               </label>
-               {image instanceof File && (
-                  <div className="mt-2">
-                    <button
-                      type="button"
-                      onClick={() => handleImageUpload(index)}
-                      className="text-xs font-medium text-green-600 hover:text-green-800"
-                      disabled={imageLoading[index]} // Disable if loading
-                    >
-                      {imageLoading[index] ? (
-                        <span className="flex items-center">
-                          <svg
-                            className="animate-spin h-4 w-4 text-green-600"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                            ></path>
-                          </svg>
-                          <span className="ml-2">Uploading...</span>
-                        </span>
-                      ) : (
-                        'Upload'
-                      )}
-                    </button>
-                  </div>
-                )}
-             </div>
-            ))}
-          </div>
+      <div className="bg-white shadow-lg rounded-lg p-6">
+  <h2 className="text-2xl font-semibold mb-6 text-gray-700">Images</h2>
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+    {images.map((image, index) => (
+      <div key={index} className="flex flex-col items-center">
+        <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden bg-gray-50">
+          {image ? (
+            typeof image === "string" ? (
+              <img
+                src={image}
+                id={`image-${index}`}
+                alt={`Product ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <img
+                src={URL.createObjectURL(image)}
+                id={`image-${index}`}
+                alt={`Product ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+            )
+          ) : (
+            <span className="text-gray-400">No image</span>
+          )}
         </div>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => handleImageChange(index, e.target.files?.[0] || null)}
+          className="hidden"
+          id={`image-input-${index}`}
+        />
+        <label
+          htmlFor={`image-input-${index}`}
+          className="mt-3 cursor-pointer text-sm font-medium text-indigo-600 hover:text-indigo-800"
+        >
+          {image ? 'Change' : 'Add Image'}
+        </label>
+        {image instanceof File && (
+          <div className="mt-2">
+            <button
+              type="button"
+              onClick={() => handleImageUpload(index)}
+              className="text-xs font-medium text-green-600 hover:text-green-800"
+              disabled={imageLoading[index]} // Disable if loading
+            >
+              {imageLoading[index] ? (
+                <span className="flex items-center">
+                  <svg
+                    className="animate-spin h-4 w-4 text-green-600"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    ></path>
+                  </svg>
+                  <span className="ml-2">Uploading...</span>
+                </span>
+              ) : (
+                'Upload'
+              )}
+            </button>
+          </div>
+        )}
+        {/* Delete Button */}
+        {image &&
+        <button
+          type="button"
+          onClick={() => handleImageDelete(index)}
+          className="mt-2 text-xs font-medium text-red-600 hover:text-red-800"
+        >
+          Delete
+        </button>} 
+      </div>
+    ))}
+  </div>
+</div>
+
 
         <div className="bg-white shadow-lg rounded-lg p-6">
   <h2 className="text-2xl font-semibold mb-6 text-gray-700">Basic Information</h2>
@@ -631,6 +674,17 @@ const UpdateProductPage: React.FC = () => {
           </button>
         </div>
       </form>
+      {showDialog && (
+  <ConfirmationDialog
+    message="Are you sure you want to delete this image?"
+    confirmButtonLabel="Yes"
+    cancelButtonLabel="No"
+    onConfirm={confirmImageDeletion}
+    onCancel={() => {setshowDialog(false)}}
+  />
+)}
+
+    
     </div>
  );
 };

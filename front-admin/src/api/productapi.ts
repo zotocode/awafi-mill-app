@@ -36,6 +36,14 @@ class ProductApi{
           return error;
         }
       }
+    async deletImage(productId:string,index:number): Promise<any> {
+        try {
+          return await this.axiosInstance.delete(`/api/products/product/delete-img/admin?productId=${productId}&index=${index}`);
+        } catch (error: unknown) {
+         
+          return error;
+        }
+      }
       async bulkDownload(): Promise<any> {
         try {
           return await this.axiosInstance.get(`/api/products/product/bulk/download/admin`, {
