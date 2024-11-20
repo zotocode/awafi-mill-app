@@ -205,6 +205,7 @@ const SubCategoryManagementPage = () => {
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               isSearching={isSearching}
+              title="Serch by sub category name"
             />
           </div>
 

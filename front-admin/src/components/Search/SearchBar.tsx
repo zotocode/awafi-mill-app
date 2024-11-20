@@ -4,12 +4,14 @@ interface SearchBarProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   isSearching?: boolean;
+  title:string
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ 
   searchTerm,
   setSearchTerm,
-  isSearching = false 
+  isSearching = false ,
+  title
 }) => {
   const clearSearch = () => {
     setSearchTerm('');
@@ -26,7 +28,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full p-2 pl-10 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-300 focus:border-blue-500 focus:outline-none"
-          placeholder="Search by category name..."
+          placeholder={title}
         />
         {searchTerm && (
           <button

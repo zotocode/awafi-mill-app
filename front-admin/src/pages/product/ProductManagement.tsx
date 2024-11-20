@@ -301,6 +301,7 @@ const ProductManagement: React.FC = () => {
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               isSearching={isSearching}
+              title="Serch by product name"
             />
           </div>
 

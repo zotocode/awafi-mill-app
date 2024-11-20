@@ -204,6 +204,7 @@ const MainCategoryManagementPage = () => {
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               isSearching={isSearching}
+              title="Serch by main category name"
             />
           </div>
           <button
