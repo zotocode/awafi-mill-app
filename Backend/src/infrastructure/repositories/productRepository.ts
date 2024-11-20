@@ -261,6 +261,15 @@ export class ProductRepository
       { $set: { [`images.${index}`]: photo } }
     );
   }
+  async deleteImage(
+    id: mongoose.Types.ObjectId,
+    index: number,
+  ): Promise<any | null> {
+    return await this.model.updateOne(
+      { _id: id },
+      { $set: { [`images.${index}`]: '' } }
+    );
+  }
 
   async updateVariantQuantity(
     productId: mongoose.Types.ObjectId,

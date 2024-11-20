@@ -117,6 +117,34 @@ export class ProductController  {
       next(error);
     }
   }
+  async deleteImage(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { productId, index } = req.query;
+
+      if (typeof productId !== "string" || typeof index !== "string") {
+        throw new Error("Invalid productId or index");
+      }
+
+      const currentIndex = parseInt(index, 10);
+      if (isNaN(currentIndex)) {
+        throw new Error("Index must be a valid number");
+      }
+
+      const productObjectId = new mongoose.Types.ObjectId(productId);
+
+      const products = await this.productInteractor.deleteImage(
+        productObjectId,
+        currentIndex,
+      );
+      res.status(200).json({success:products});
+    } catch (error) {
+      next(error);
+    }
+  }
 
   // Get all products (HTTP GET)
   async getAllProducts(

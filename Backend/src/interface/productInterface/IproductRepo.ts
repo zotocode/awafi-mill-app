@@ -20,6 +20,7 @@ export interface IproductRepo {
   listProductsBySubcategoriesUsingMainCategory(page:number,limit:number,mainCatId:mongoose.Types.ObjectId,userId?:mongoose.Types.ObjectId | null): Promise<ProductDTO[] | null>;
   listProductsBySubcategories(page:number,limit:number,mainCatId:mongoose.Types.ObjectId,userId?:mongoose.Types.ObjectId | null): Promise<ProductDTO[] | null>;
   updateImage(id: mongoose.Types.ObjectId, index: number, imageUrl: string): Promise<{ modifiedCount: number }>;
+  deleteImage(id: mongoose.Types.ObjectId, index: number): Promise<{ modifiedCount: number }>;
   deleteProduct(id: mongoose.Types.ObjectId): Promise<boolean>;
   updateListing(id: mongoose.Types.ObjectId, data: { isListed: boolean }): Promise<{ modifiedCount: number }>;
   isListedProduct(id: mongoose.Types.ObjectId): Promise<Product | null>; // Change return type to boolean
