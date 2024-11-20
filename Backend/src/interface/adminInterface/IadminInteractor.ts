@@ -6,7 +6,5 @@ export interface IadminInteractor{
     usersData():Promise<UserResponse>
     blockUser(data:string):Promise<UserActionResponse>
     unblockUser(data:string):Promise<UserActionResponse>
-    totalOrders():Promise<OrderSummary[]>
-    totalRevenue(period:string|undefined):Promise<RevenueSummary[]>
-    salesReport(reportType:string|undefined,startDate:string|undefined,endDate:string|undefined):Promise<any>
+   
 }

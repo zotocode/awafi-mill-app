@@ -24,7 +24,7 @@ export interface RemoveFromCartDTO {
     variantId: string;
 }
 
-interface IProductDetails {
+export interface IProductDetails {
     productId: string;
     variantId: string;
     name: string;

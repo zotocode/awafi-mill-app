@@ -4,10 +4,9 @@ import { ICheckout } from "../../domain/entities/checkoutSchema";
 // Checkout schema
 const checkoutSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  cart: { type: mongoose.Schema.Types.ObjectId, ref: "Cart", required: false },
   items: [{
-    product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: false },
-    variant: { type: mongoose.Schema.Types.ObjectId, ref: "Variant", required: false },
+    productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: false },
+    variantId: { type: mongoose.Schema.Types.ObjectId, ref: "Variant", required: false },
     quantity: { type: Number, required: false },
     name: { type: String, required: true },
     weight: { type: String, required: true },

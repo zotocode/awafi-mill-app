@@ -1,4 +1,4 @@
-import { Model, Types, isValidObjectId } from "mongoose";
+import mongoose, { Model, Types, isValidObjectId } from "mongoose";
 import { CreateOrderDTO, UpdateOrderStatusDTO } from "../../domain/dtos/OrderDto";
 import { ICheckout } from "../../domain/entities/checkoutSchema";
 import { BaseRepository } from "./baseRepository";
@@ -34,10 +34,7 @@ export class OrderRepository extends BaseRepository<ICheckout> implements IOrder
     }
   }
 
-  async findAll(params: {
-    page: number;
-    limit: number;
-  }): Promise<{
+  async findAll(params: { page: number; limit: number }): Promise<{
     orders: ICheckout[];
     total: number;
     page: number;
@@ -60,38 +57,21 @@ export class OrderRepository extends BaseRepository<ICheckout> implements IOrder
             }
           },
           {
-            $lookup: {
-              from: 'carts',
-              let: { cartId: "$cart" },
-              pipeline: [
-                { $match: { $expr: { $eq: ["$_id", "$$cartId"] } } },
-                { $project: { _id: 0 } } // exclude cart ID
-              ],
-              as: 'cartDetails'
-            }
-          },
-          {
-            $lookup: {
-              from: 'products',
-              let: { productIds: "$items.product", variantId: "$items.variant" },
-              pipeline: [
-                { $match: { $expr: { $in: ["$_id", "$$productIds"] } } },
-                {
-                  $project: {
-                    name: 1, // Include product name
-                    description: 1, // Include description if needed
-                    images: 1,
-                    variants: {
-                      $filter: {
-                        input: "$variants",
-                        as: "variant",
-                        cond: { $eq: ["$$variant._id", "$$variantId"] } // Only include the specified variant
-                      }
-                    }
-                  }
-                }
-              ],
-              as: 'productDetails'
+            $project: {
+              _id: 1,
+              user: 1,
+              trackingId: 1,        // Make sure trackingId is included in the projection
+              orderStatus: 1,
+              paymentStatus: 1,
+              amount: 1,
+              currency: 1,
+              items: 1,
+              shippingAddress: 1,
+              paymentMethod: 1,
+              createdAt: 1,
+              updatedAt: 1,
+              discountAmount: 1,
+              userDetails: { $arrayElemAt: ["$userDetails", 0] }  // Flatten userDetails array
             }
           },
           { $sort: { createdAt: -1 } },
@@ -108,11 +88,11 @@ export class OrderRepository extends BaseRepository<ICheckout> implements IOrder
   }
   
 
-  async findByOrderId(orderId: string): Promise<ICheckout | null> {
+  async findByOrderId(orderId: mongoose.Types.ObjectId): Promise<ICheckout | null> {
     try {
-      const orderObjectId = this.validateAndConvertId(orderId, 'Order');
+     
       return await this.model
-        .findById(orderObjectId)
+        .findById(orderId)
         // .populate('user')
         .exec();
     } catch (error) {
@@ -140,7 +120,7 @@ export class OrderRepository extends BaseRepository<ICheckout> implements IOrder
     }
   }
 
-  async cancel(orderId: string): Promise<boolean> {
+  async cancelOrder(orderId: string,reason:string): Promise<boolean> {
     try {
       const orderObjectId = this.validateAndConvertId(orderId, 'Order');
       const result = await this.model.findOneAndUpdate(
@@ -151,11 +131,12 @@ export class OrderRepository extends BaseRepository<ICheckout> implements IOrder
         {
           $set: {
             orderStatus: 'cancelled',
+            cancellationReason: reason,
             updatedAt: new Date()
           }
         }
       ).exec();
-
+    
       return !!result;
     } catch (error) {
       throw new Error(`Error cancelling order: ${error instanceof Error ? error.message : String(error)}`);

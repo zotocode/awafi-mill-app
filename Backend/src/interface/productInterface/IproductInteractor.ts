@@ -50,5 +50,9 @@ export default interface IProductInteractor {
     index: number, 
     file: string
   ): Promise<any>;
+  deleteImage(
+    id: mongoose.Types.ObjectId, 
+    index: number, 
+  ): Promise<boolean>;
 }
 

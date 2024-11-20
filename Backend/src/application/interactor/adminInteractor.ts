@@ -3,7 +3,6 @@ import { IUserRepo } from "../../interface/userInterface/IuserRepo";
 import { Ijwt } from "../../interface/serviceInterface/IjwtInterface";
 import ICheckoutRepo from "../../interface/checkoutInterface/IcheckoutRepo";
 import { UserResponse,UserDTO,UserActionResponse } from "../../domain/dtos/AdminDto";
-import { RevenueSummary,OrderSummary } from "../../domain/dtos/CheckoutDTO";
 import envConfig from "../../config/env";
 
 
@@ -14,11 +13,10 @@ let password = envConfig.ADMIN_PASSWORD
 export class AdminInteractor implements IadminInteractor {
   private userRepository: IUserRepo;
   private jwt: Ijwt;
-  private checkoutRepo: ICheckoutRepo;
-  constructor(userRepository: IUserRepo ,jwt: Ijwt,checkoutRepo: ICheckoutRepo) {
+  constructor(userRepository: IUserRepo ,jwt: Ijwt) {
     this.userRepository = userRepository;
     this.jwt = jwt;
-    this.checkoutRepo = checkoutRepo;
+  
   }
  
  async logIn(data: any): Promise<any> {
@@ -92,52 +90,5 @@ export class AdminInteractor implements IadminInteractor {
   }
 
 
-  async totalOrders(): Promise<OrderSummary[]> {
-    try {
-      const result = await this.checkoutRepo.viewAllorders();
-      return result; 
-    } catch (err) {
-      throw err; 
-    }
-  }
-
-
-  async totalRevenue(period:string | undefined):Promise<RevenueSummary[]>{
-       try{
-        const result = await this.checkoutRepo.viewRevenue(period);
-        return result
-       }catch(error){
-        console.log(error);
-        throw error
-       }
-  }
-
-  async salesReport(
-    reportType: 'day' | 'week' | 'month' | 'year' | undefined,
-    startDate: string | undefined,
-    endDate: string | undefined
-  ): Promise<any> {
-    try {
-      console.log('====================================');
-      console.log('Generating sales report with parameters:', { reportType, startDate, endDate });
-      console.log('====================================');
-      
-      // Ensure that all necessary parameters are provided
-      if (!reportType || !startDate || !endDate) {
-        throw new Error("Missing required parameters for generating sales report.");
-      }
-  
-      // Call the repository method to generate the report
-      const result = await this.checkoutRepo.generateProductSalesReport(startDate, endDate, reportType);
-   console.log("result",result);
-   
-      // Handle or return the result as needed
-      return result;
-      
-    } catch (error) {
-      console.error('Error generating sales report:', error);
-      // Optionally rethrow the error or handle it as needed
-      throw error; 
-    }
-  }
+ 
 }

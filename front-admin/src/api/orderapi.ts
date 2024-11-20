@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { useApi } from './axiosConfig';
 
 class OrderApi {
@@ -36,9 +37,9 @@ class OrderApi {
     }
   }
 
-  async cancelOrder(orderId: string) {
+  async cancelOrder(orderId: mongoose.Types.ObjectId,reason:string) {
     try {
-      const response = await this.axiosInstance.delete(`/api/orders/order/admin/${orderId}`);
+      const response = await this.axiosInstance.patch(`/api/orders/order/admin/${orderId}`,{reason});
       return response;
     } catch (error) {
       console.error('Failed to cancel order:', error);

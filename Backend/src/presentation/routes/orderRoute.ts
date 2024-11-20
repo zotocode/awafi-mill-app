@@ -32,11 +32,12 @@ orderRoutes.patch(
 verifyAdminToken,
   orderController.updateOrderStatus.bind(orderController)
 );
-orderRoutes.delete(
+orderRoutes.patch(
   "/order/admin/:id", 
 verifyAdminToken,
   orderController.cancelOrder.bind(orderController)
 );
+
 
 // User routes
 orderRoutes.post(

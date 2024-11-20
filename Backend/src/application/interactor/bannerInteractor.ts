@@ -47,6 +47,7 @@ export class BannerInteractor implements IBannerInteractor {
         { upsert: true, new: true } // Upsert and return the updated document
       );
 
+ 
       // Filter the result to only include listed banners
       const filteredBanners = banner[bannerField]
         .filter((banner) => banner.listed) // Only include banners where listed is true
@@ -100,7 +101,7 @@ export class BannerInteractor implements IBannerInteractor {
         };
       });
 
-      console.log(filteredBanners, "filtered banner");
+  
 
       return filteredBanners;
     } catch (error) {

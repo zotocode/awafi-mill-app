@@ -261,6 +261,15 @@ export class ProductRepository
       { $set: { [`images.${index}`]: photo } }
     );
   }
+  async deleteImage(
+    id: mongoose.Types.ObjectId,
+    index: number,
+  ): Promise<any | null> {
+    return await this.model.updateOne(
+      { _id: id },
+      { $set: { [`images.${index}`]: '' } }
+    );
+  }
 
   async updateVariantQuantity(
     productId: mongoose.Types.ObjectId,
@@ -328,7 +337,7 @@ export class ProductRepository
     const skip = (page - 1) * limit;
     const filterCriteria = { isListed: true, isDelete: false };
     const totalProducts = await this.model.countDocuments(filterCriteria);
-
+  
     const products = await this.model.aggregate([
       { $match: filterCriteria },
       {
@@ -386,6 +395,14 @@ export class ProductRepository
         },
       },
       {
+        $lookup: {
+          from: "reviews", // Reference the reviews collection
+          localField: "_id", // Match the product ID
+          foreignField: "product", // Field in the reviews collection
+          as: "reviews", // Name of the field to hold the reviews
+        },
+      },
+      {
         $addFields: {
           inCart: {
             $cond: {
@@ -401,18 +418,31 @@ export class ProductRepository
               else: false,
             },
           },
+          averageRating: {
+            $cond: {
+              if: { $gt: [{ $size: "$reviews" }, 0] }, // If there are reviews
+              then: {
+                $avg: "$reviews.rating", // Calculate the average rating
+              },
+              else: 0.0, // No reviews, average is 0
+            },
+          },
+          totalReviews: { $size: "$reviews" }, // Total number of reviews
         },
       },
-      { $project: { cartItems: 0, wishlistItems: 0 } },
+      { $project: { cartItems: 0, wishlistItems: 0, reviews: 0 } }, // Exclude unnecessary fields
       { $skip: skip },
       { $limit: limit },
     ]);
 
+  
+  
     return {
       products,
       totalPages: Math.ceil(totalProducts / limit),
     };
   }
+  
 
 
   async fetchByCategoryAndName(
@@ -421,23 +451,22 @@ export class ProductRepository
     filter: any,
     userId?: mongoose.Types.ObjectId | null
   ): Promise<ProductResponse> {
- 
     const queryFilter: any = { isListed: true };
     if (filter.prodctname) {
       queryFilter.name = { $regex: filter.prodctname, $options: "i" };
     }
-
+  
     if (filter.MainCategoryId) {
       queryFilter.category = filter.MainCategoryId;
     }
-
+  
     if (filter.SubCategoryId) {
       queryFilter.subCategory = filter.SubCategoryId;
     }
-
+  
     const skip = (page - 1) * limit;
     const totalProducts = await this.model.countDocuments(queryFilter);
-
+  
     const products = await this.model.aggregate([
       { $match: queryFilter },
       {
@@ -495,33 +524,52 @@ export class ProductRepository
         },
       },
       {
+        $lookup: {
+          from: "reviews", // Reference the reviews collection
+          localField: "_id", // Match the product ID
+          foreignField: "product", // Field in the reviews collection
+          as: "reviews", // Name of the field to hold the reviews
+        },
+      },
+      {
         $addFields: {
           inCart: {
             $cond: {
-              if: { $gt: [userId, null] },
+              if: { $gt: [userId, null] }, // Check if userId is not null
               then: { $gt: [{ $size: "$cartItems" }, 0] },
               else: false,
             },
           },
           inWishlist: {
             $cond: {
-              if: { $gt: [userId, null] },
+              if: { $gt: [userId, null] }, // Check if userId is not null
               then: { $gt: [{ $size: "$wishlistItems" }, 0] },
               else: false,
             },
           },
+          averageRating: {
+            $cond: {
+              if: { $gt: [{ $size: "$reviews" }, 0] }, // If there are reviews
+              then: {
+                $avg: "$reviews.rating", // Calculate the average rating
+              },
+              else: 0.0, // No reviews, average is 0
+            },
+          },
+          totalReviews: { $size: "$reviews" }, // Total number of reviews
         },
       },
-      { $project: { cartItems: 0, wishlistItems: 0 } },
+      { $project: { cartItems: 0, wishlistItems: 0, reviews: 0 } }, // Exclude unnecessary fields
       { $skip: skip },
       { $limit: limit },
     ]);
-
+  
     return {
       products: products,
       totalPages: Math.ceil(totalProducts / limit),
     };
   }
+  
   
   async productFindById(
     id: mongoose.Types.ObjectId,
@@ -584,6 +632,14 @@ export class ProductRepository
         },
       },
       {
+        $lookup: {
+          from: "reviews", // Reference the reviews collection
+          localField: "_id", // Match the product ID
+          foreignField: "product", // Field in the reviews collection
+          as: "reviews", // Name of the field to hold the reviews
+        },
+      },
+      {
         $addFields: {
           inCart: {
             $cond: {
@@ -599,34 +655,46 @@ export class ProductRepository
               else: false,
             },
           },
+          averageRating: {
+            $cond: {
+              if: { $gt: [{ $size: "$reviews" }, 0] }, // If reviews exist
+              then: { $avg: "$reviews.rating" }, // Calculate average rating
+              else: 0.0, // Default average rating to 0 if no reviews
+            },
+          },
+          totalReviews: { $size: "$reviews" }, // Total count of reviews
         },
       },
       {
-        $lookup:{
-          from:'maincategories',
-          localField:'category',
-          foreignField:'_id',
-          as:'MainCategoryData'
-        }
+        $lookup: {
+          from: "maincategories",
+          localField: "category",
+          foreignField: "_id",
+          as: "MainCategoryData",
+        },
       },
       {
         $lookup: {
-          from: 'subcategories', 
-          localField: 'subCategory',
-          foreignField: '_id',
-          as: 'SubCategoryData'
-        }
-      }
-      ,
+          from: "subcategories",
+          localField: "subCategory",
+          foreignField: "_id",
+          as: "SubCategoryData",
+        },
+      },
       {
-        $project:{category:0,subCategory:0,cartItems: 0, wishlistItems: 0}
-      }
-
-     
+        $project: {
+          category: 0,
+          subCategory: 0,
+          cartItems: 0,
+          wishlistItems: 0,
+          reviews: 0, // Exclude raw reviews data from the result
+        },
+      },
     ]);
-
+  
     return product[0] || null;
   }
+  
   
   async listProductsBySubcategories(
     page: number,
@@ -695,6 +763,14 @@ export class ProductRepository
         },
       },
       {
+        $lookup: {
+          from: "reviews", // Replace with your reviews collection name
+          localField: "_id",
+          foreignField: "product",
+          as: "reviews",
+        },
+      },
+      {
         $addFields: {
           inCart: {
             $cond: {
@@ -710,31 +786,40 @@ export class ProductRepository
               else: false,
             },
           },
+          averageRating: {
+            $cond: {
+              if: { $gt: [{ $size: "$reviews" }, 0] }, // If reviews exist
+              then: { $avg: "$reviews.rating" }, // Calculate average rating
+              else: 0.0, // Default to 0 if no reviews
+            },
+          },
+          totalReviews: { $size: "$reviews" }, // Total number of reviews
         },
       },
       {
         $lookup: {
-          from: 'maincategories',
-          localField: 'category',
-          foreignField: '_id',
-          as: 'MainCategoryData'
-        }
+          from: "maincategories",
+          localField: "category",
+          foreignField: "_id",
+          as: "MainCategoryData",
+        },
       },
       {
         $lookup: {
-          from: 'subcategories', 
-          localField: 'subCategory',
-          foreignField: '_id',
-          as: 'SubCategoryData'
-        }
+          from: "subcategories",
+          localField: "subCategory",
+          foreignField: "_id",
+          as: "SubCategoryData",
+        },
       },
       {
         $project: {
           category: 0,
           subCategory: 0,
           cartItems: 0,
-          wishlistItems: 0
-        }
+          wishlistItems: 0,
+          reviews: 0, // Optionally remove detailed review data to avoid excessive payload
+        },
       },
       { $skip: skip },
       { $limit: limit },
@@ -743,131 +828,148 @@ export class ProductRepository
     return products;
   }
   
-async listProductsBySubcategoriesUsingMainCategory(
-  page: number,
-  limit: number,
-  mainCatId: mongoose.Types.ObjectId,
-  userId?: mongoose.Types.ObjectId | null
-): Promise<any> {
-  try {
-    const skip = (page - 1) * limit;
-
-    const groupedProducts = await ProductModel.aggregate([
-      {
-        $match: {
-          category: mainCatId,
-          isListed: true,
-        },
-      },
-      {
-        $lookup: {
-          from: "carts",
-          let: { productId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$user", userId] },
-                    {
-                      $anyElementTrue: {
-                        $map: {
-                          input: "$items",
-                          as: "item",
-                          in: { $eq: ["$$item.product", "$$productId"] },
-                        },
-                      },
-                    },
-                  ],
-                },
-              },
-            },
-          ],
-          as: "cartItems",
-        },
-      },
-      {
-        $lookup: {
-          from: "wishlists",
-          let: { productId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$user", userId] },
-                    {
-                      $anyElementTrue: {
-                        $map: {
-                          input: "$items",
-                          as: "item",
-                          in: { $eq: ["$$item.productId", "$$productId"] },
-                        },
-                      },
-                    },
-                  ],
-                },
-              },
-            },
-          ],
-          as: "wishlistItems",
-        },
-      },
-      {
-        $addFields: {
-          inCart: {
-            $cond: {
-              if: { $ne: [userId, null] },
-              then: { $gt: [{ $size: "$cartItems" }, 0] },
-              else: false,
-            },
-          },
-          inWishlist: {
-            $cond: {
-              if: { $ne: [userId, null] },
-              then: { $gt: [{ $size: "$wishlistItems" }, 0] },
-              else: false,
-            },
+  
+  async listProductsBySubcategoriesUsingMainCategory(
+    page: number,
+    limit: number,
+    mainCatId: mongoose.Types.ObjectId,
+    userId?: mongoose.Types.ObjectId | null
+  ): Promise<any> {
+    try {
+      const skip = (page - 1) * limit;
+  
+      const groupedProducts = await ProductModel.aggregate([
+        {
+          $match: {
+            category: mainCatId,
+            isListed: true,
           },
         },
-      },
-      {
-        $group: {
-          _id: "$subCategory",
-          products: { $push: "$$ROOT" }, // Push all fields for each product in this subcategory
+        {
+          $lookup: {
+            from: "carts",
+            let: { productId: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ["$user", userId] },
+                      {
+                        $anyElementTrue: {
+                          $map: {
+                            input: "$items",
+                            as: "item",
+                            in: { $eq: ["$$item.product", "$$productId"] },
+                          },
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+            as: "cartItems",
+          },
         },
-      },
-      {
-        $lookup: {
-          from: "subcategories", // Replace with your subcategory collection name
-          localField: "_id",
-          foreignField: "_id",
-          as: "subCategoryDetails",
+        {
+          $lookup: {
+            from: "wishlists",
+            let: { productId: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ["$user", userId] },
+                      {
+                        $anyElementTrue: {
+                          $map: {
+                            input: "$items",
+                            as: "item",
+                            in: { $eq: ["$$item.product", "$$productId"] },
+                          },
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+            as: "wishlistItems",
+          },
         },
-      },
-      {
-        $unwind: {
-          path: "$subCategoryDetails", // Unwind to make subcategory details an object, not an array
-          preserveNullAndEmptyArrays: true, // Keep products with no matching subcategory
+        {
+          $lookup: {
+            from: "reviews", // Replace with your reviews collection name
+            localField: "_id",
+            foreignField: "product",
+            as: "reviews",
+          },
         },
-      },
-      {
-        $project: {
-          subCategory: "$subCategoryDetails.name",
-          products: { $slice: ["$products", skip, limit] }, // Apply limit after skipping
+        {
+          $addFields: {
+            inCart: {
+              $cond: {
+                if: { $ne: [userId, null] },
+                then: { $gt: [{ $size: "$cartItems" }, 0] },
+                else: false,
+              },
+            },
+            inWishlist: {
+              $cond: {
+                if: { $ne: [userId, null] },
+                then: { $gt: [{ $size: "$wishlistItems" }, 0] },
+                else: false,
+              },
+            },
+            averageRating: {
+              $cond: {
+                if: { $gt: [{ $size: "$reviews" }, 0] }, // If reviews exist
+                then: { $avg: "$reviews.rating" }, // Calculate average rating
+                else: 0.0, // Default to 0 if no reviews
+              },
+            },
+            totalReviews: { $size: "$reviews" }, // Total number of reviews
+          },
         },
-      },
-      { $skip: skip }, // Skip to the required page
-      { $limit: limit }, // Limit results per page
-    ]);
-
-   
-    return groupedProducts;
-  } catch (error) {
-    console.error("Error listing products by subcategories:", error);
-    throw error;
+        {
+          $group: {
+            _id: "$subCategory",
+            products: { $push: "$$ROOT" }, // Push all fields for each product in this subcategory
+          },
+        },
+        {
+          $lookup: {
+            from: "subcategories", // Replace with your subcategory collection name
+            localField: "_id",
+            foreignField: "_id",
+            as: "subCategoryDetails",
+          },
+        },
+        {
+          $unwind: {
+            path: "$subCategoryDetails", // Unwind to make subcategory details an object, not an array
+            preserveNullAndEmptyArrays: true, // Keep products with no matching subcategory
+          },
+        },
+        {
+          $project: {
+            subCategory: "$subCategoryDetails.name",
+            products: { $slice: ["$products", skip, limit] }, // Apply limit after skipping
+          },
+        },
+        { $skip: skip }, // Skip to the required page
+        { $limit: limit }, // Limit results per page
+      ]);
+  
+      return groupedProducts;
+    } catch (error) {
+      console.error("Error listing products by subcategories:", error);
+      throw error;
+    }
   }
-}
+  
 
 
 }

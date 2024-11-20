@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
-import adminDashBoard from '../../api/adminDashBoard';
+import adminDashBoard from '../../api/dashboardapi';
 
 interface RevenueData {
+  period: string | { year?: string };
   totalRevenue: number;
   count: number;
-  day: number;
 }
 
-const ChartOne: React.FC = () => {
+interface Props {
+  revenue: (revenue: number) => void; // Function that takes a number and updates revenue
+}
+
+const ChartOne: React.FC<Props> = ({ revenue }) => {
   const [state, setState] = useState<{
     series: {
       name: string;
@@ -27,6 +31,60 @@ const ChartOne: React.FC = () => {
       },
     ],
   });
+
+  const [period, setPeriod] = useState<'day' | 'month' | 'year'>('day');
+
+  const fetchData = async (period: 'day' | 'month' | 'year') => {
+    try {
+      const response = await adminDashBoard.fetchTotalRevenue(period);
+      const chartData: RevenueData[] = response.data;
+
+      // Update the revenue in the parent component
+      revenue(response.totalRevenue);
+
+      let processedData: { x: string; y: number; count: number }[] = [];
+
+      switch (period) {
+        case 'day':
+        case 'month':
+          processedData = chartData.map((item) => ({
+            x: item.period as string,
+            y: item.totalRevenue,
+            count: item.count,
+          }));
+          break;
+
+        case 'year':
+          processedData = chartData.map((item) => ({
+            x: typeof item.period === 'object' ? item.period.year || '' : item.period,
+            y: item.totalRevenue,
+            count: item.count,
+          }));
+          break;
+      }
+
+      setState({
+        series: [
+          { name: 'Total Revenue', data: processedData.map((item) => item.y) },
+          { name: 'Order Count', data: processedData.map((item) => item.count) },
+        ],
+      });
+
+      setOptions((prevOptions) => ({
+        ...prevOptions,
+        xaxis: {
+          ...prevOptions.xaxis,
+          categories: processedData.map((item) => item.x),
+        },
+      }));
+    } catch (error) {
+      console.error('Error fetching total revenue data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(period);
+  }, [period]);
 
   const [options, setOptions] = useState<ApexOptions>({
     legend: {
@@ -96,7 +154,7 @@ const ChartOne: React.FC = () => {
     },
     xaxis: {
       type: 'category',
-      categories: [], // Will be dynamically set based on the selected period
+      categories: [],
       axisBorder: {
         show: false,
       },
@@ -108,61 +166,6 @@ const ChartOne: React.FC = () => {
       min: 0,
     },
   });
-
-  const [period, setPeriod] = useState<'day' | 'week' | 'month'>('day');
-
-  // Function to fetch total revenue and order count data based on the selected period
-  const fetchData = async (period: 'day' | 'week' | 'month') => {
-    try {
-      const response: RevenueData[] = await adminDashBoard.fetchTotalRevenue(period);
-      const totalRevenueData = response.map((item) => ({
-        x: item.day,  // Assuming `day` refers to x-axis categories
-        y: item.totalRevenue,  // Total revenue for that day
-        count: item.count, // Count of orders for that day
-      }));
-
-      setState({
-        series: [
-          { name: 'Total Revenue', data: totalRevenueData.map((item) => item.y) },
-          { name: 'Order Count', data: totalRevenueData.map((item) => item.count) },
-        ],
-      });
-
-      // Dynamically set x-axis categories based on the period
-      setOptions((prevOptions) => ({
-        ...prevOptions,
-        xaxis: {
-          ...prevOptions.xaxis,
-          categories: totalRevenueData.map((item) => `Day ${item.x}`),
-        },
-      }));
-    } catch (error) {
-      console.error('Error fetching total revenue data:', error);
-    }
-  };
-
-  // Fetch data when the period changes
-  useEffect(() => {
-    fetchData(period);
-
-    // Adjust x-axis categories based on the selected period
-    if (period === 'day') {
-      setOptions((prevOptions) => ({
-        ...prevOptions,
-        xaxis: { categories: Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`) },
-      }));
-    } else if (period === 'week') {
-      setOptions((prevOptions) => ({
-        ...prevOptions,
-        xaxis: { categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
-      }));
-    } else if (period === 'month') {
-      setOptions((prevOptions) => ({
-        ...prevOptions,
-        xaxis: { categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] },
-      }));
-    }
-  }, [period]);
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white px-5 pt-7.5 pb-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">
@@ -179,22 +182,23 @@ const ChartOne: React.FC = () => {
           {/* Period selection buttons */}
           <div className="inline-flex items-center rounded-md bg-whiter p-1.5 dark:bg-meta-4">
             <button
-              className={`rounded bg-white py-1 px-3 text-xs font-medium text-black shadow-card dark:bg-boxdark dark:text-white ${period === 'day' ? 'bg-primary text-white' : ''}`}
+              className={`rounded py-1 px-3 text-xs font-medium text-black dark:text-white ${period === 'day' ? 'bg-primary text-white' : ''}`}
               onClick={() => setPeriod('day')}
             >
               Day
             </button>
-            <button
-              className={`rounded py-1 px-3 text-xs font-medium text-black dark:text-white ${period === 'week' ? 'bg-primary text-white' : ''}`}
-              onClick={() => setPeriod('week')}
-            >
-              Week
-            </button>
+
             <button
               className={`rounded py-1 px-3 text-xs font-medium text-black dark:text-white ${period === 'month' ? 'bg-primary text-white' : ''}`}
               onClick={() => setPeriod('month')}
             >
               Month
+            </button>
+            <button
+              className={`rounded py-1 px-3 text-xs font-medium text-black dark:text-white ${period === 'year' ? 'bg-primary text-white' : ''}`}
+              onClick={() => setPeriod('year')}
+            >
+              Year
             </button>
           </div>
         </div>
