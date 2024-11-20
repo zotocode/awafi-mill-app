@@ -14,14 +14,22 @@ interface User {
 
 const UserManagementPage = () => {
   const [users, setUsers] = useState<User[]>([]);
+<<<<<<< HEAD
+  // const [error, setError] = useState<string | null>(null);
+=======
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const [userData, setUserData] = useState<User | null>(null);
 
+>>>>>>> upstream/develop
   useEffect(() => {
     fetchUsers();
   }, []);
 
   const fetchUsers = async () => {
+<<<<<<< HEAD
+    // setError(null);
+=======
+>>>>>>> upstream/develop
     try {
       const response = await userApi.fetchAllUserData();
 
@@ -32,7 +40,12 @@ const UserManagementPage = () => {
       }
     } catch (error: any) {
       console.error("Error fetching user data:", error);
+<<<<<<< HEAD
+      // setError("Failed to fetch users");
+      // toast.error(error.message || 'An unknown error occurred');
+=======
       toast.error(error.message || 'An unknown error occurred');
+>>>>>>> upstream/develop
     }
   };
 
