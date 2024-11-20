@@ -35,12 +35,15 @@ const startServer = async (): Promise<void> => {
     // CORS configuration
     app.use(
       cors({
-        origin: envConfig.Frontend_URL,
-        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
+        origin: envConfig.Frontend_URL, // Allow only the frontend domain
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
       })
     );
+    
+    // Ensure the OPTIONS requests are handled
+    app.options("*", cors()); // Enable CORS preflight for all routes
 
 
     app.use('/api/user', userRoute);
