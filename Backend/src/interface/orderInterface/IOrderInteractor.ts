@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { CreateOrderDTO, OrderDTO, UpdateOrderStatusDTO } from "../../domain/dtos/OrderDto";
 
 export default interface IOrderInteractor {
@@ -11,9 +12,9 @@ export default interface IOrderInteractor {
     page: number;
     limit: number;
   }>;
-  getOrderById(orderId: string): Promise<OrderDTO | null>;
+  getOrderById(orderId: mongoose.Types.ObjectId): Promise<OrderDTO | null>;
   updateOrderStatus(data: UpdateOrderStatusDTO): Promise<OrderDTO | null>;
-  cancelOrder(orderId: string): Promise<boolean>;
+  cancelOrder(orderId: string,reason:string): Promise<boolean>;
   getUserOrders(params: { userId: string; status?: string; page: number; limit: number }): Promise<any>;
   getUserOrderById(orderId: string, userId: string): Promise<any>;
   cancelUserOrder(orderId: string, userId: string, cancellationReason: string): Promise<any>;

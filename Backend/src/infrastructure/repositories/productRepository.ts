@@ -415,7 +415,7 @@ export class ProductRepository
               then: {
                 $avg: "$reviews.rating", // Calculate the average rating
               },
-              else: 0, // No reviews, average is 0
+              else: 0.0, // No reviews, average is 0
             },
           },
           totalReviews: { $size: "$reviews" }, // Total number of reviews
@@ -544,7 +544,7 @@ export class ProductRepository
               then: {
                 $avg: "$reviews.rating", // Calculate the average rating
               },
-              else: 0, // No reviews, average is 0
+              else: 0.0, // No reviews, average is 0
             },
           },
           totalReviews: { $size: "$reviews" }, // Total number of reviews
@@ -650,7 +650,7 @@ export class ProductRepository
             $cond: {
               if: { $gt: [{ $size: "$reviews" }, 0] }, // If reviews exist
               then: { $avg: "$reviews.rating" }, // Calculate average rating
-              else: 0, // Default average rating to 0 if no reviews
+              else: 0.0, // Default average rating to 0 if no reviews
             },
           },
           totalReviews: { $size: "$reviews" }, // Total count of reviews
@@ -781,7 +781,7 @@ export class ProductRepository
             $cond: {
               if: { $gt: [{ $size: "$reviews" }, 0] }, // If reviews exist
               then: { $avg: "$reviews.rating" }, // Calculate average rating
-              else: 0, // Default to 0 if no reviews
+              else: 0.0, // Default to 0 if no reviews
             },
           },
           totalReviews: { $size: "$reviews" }, // Total number of reviews
@@ -918,7 +918,7 @@ export class ProductRepository
               $cond: {
                 if: { $gt: [{ $size: "$reviews" }, 0] }, // If reviews exist
                 then: { $avg: "$reviews.rating" }, // Calculate average rating
-                else: 0, // Default to 0 if no reviews
+                else: 0.0, // Default to 0 if no reviews
               },
             },
             totalReviews: { $size: "$reviews" }, // Total number of reviews
