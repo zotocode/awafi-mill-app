@@ -4,11 +4,5 @@ import { OrderSummary,RevenueSummary } from "../../domain/dtos/CheckoutDTO";
 
 export default interface ICheckoutRepo {
   createCheckout(data: CheckoutCreateDTO): Promise<ICheckout>;
-  viewAllorders():Promise<OrderSummary[]>
-  viewRevenue(period:string|undefined):Promise<RevenueSummary[]>
-  generateProductSalesReport(
-    startDate: string|undefined,
-    endDate: string|undefined,
-    interval: 'day' | 'week' | 'month' | 'year'
-  ): Promise<any>; // Specify the return type based on what the method will return
+  
 }

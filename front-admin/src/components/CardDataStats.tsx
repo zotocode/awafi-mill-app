@@ -1,4 +1,12 @@
 import React, { ReactNode } from 'react';
+import { 
+  Package, 
+  ShoppingCart, 
+  Truck, 
+  CheckCircle, 
+  BarChart, 
+  DollarSign 
+} from 'lucide-react';
 
 interface CardDataStatsProps {
   title: string;
@@ -7,6 +15,7 @@ interface CardDataStatsProps {
   levelUp?: boolean;
   levelDown?: boolean;
   children?: ReactNode;
+  icon?: 'shipped' | 'processing' | 'delivered' | 'views' | 'products' | 'revenue';
 }
 
 const CardDataStats: React.FC<CardDataStatsProps> = ({
@@ -16,31 +25,45 @@ const CardDataStats: React.FC<CardDataStatsProps> = ({
   levelUp,
   levelDown,
   children,
+  icon = 'views'
 }) => {
+  // Map icons to their respective types
+  const iconMap = {
+    shipped: <Truck className="w-6 h-6 stroke-gray-800" />,
+    processing: <ShoppingCart className="w-6 h-6 stroke-gray-800" />,
+    delivered: <CheckCircle className="w-6 h-6 stroke-gray-800" />,
+    views: <BarChart className="w-6 h-6 stroke-gray-800" />,
+    products: <Package className="w-6 h-6 stroke-gray-800" />,
+    revenue: <DollarSign className="w-6 h-6 stroke-gray-800" />
+  };
+
+  // Select the appropriate icon
+  const selectedIcon = iconMap[icon];
+
   return (
-    <div className="rounded-sm border border-stroke bg-white py-6 px-7.5 shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
-        {children}
+    <div className="rounded-sm border border-gray-300 bg-white text-gray-800 py-6 px-7.5 shadow-lg">
+      <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-gray-200">
+        {children || selectedIcon}
       </div>
 
       <div className="mt-4 flex items-end justify-between">
         <div>
-          <h4 className="text-title-md font-bold text-black dark:text-white">
+          <h4 className="text-title-md font-bold text-gray-800">
             {total}
           </h4>
-          <span className="text-sm font-medium">{title}</span>
+          <span className="text-sm font-medium text-gray-500">{title}</span>
         </div>
 
         <span
           className={`flex items-center gap-1 text-sm font-medium ${
-            levelUp && 'text-meta-3'
-          } ${levelDown && 'text-meta-5'} `}
+            levelUp ? 'text-green-500' : ''
+          } ${levelDown ? 'text-red-500' : ''}`}
         >
           {rate}
 
           {levelUp && (
             <svg
-              className="fill-meta-3"
+              className="fill-green-500"
               width="10"
               height="11"
               viewBox="0 0 10 11"
@@ -55,7 +78,7 @@ const CardDataStats: React.FC<CardDataStatsProps> = ({
           )}
           {levelDown && (
             <svg
-              className="fill-meta-5"
+              className="fill-red-500"
               width="10"
               height="11"
               viewBox="0 0 10 11"

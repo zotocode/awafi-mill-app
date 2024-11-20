@@ -44,7 +44,15 @@ export interface OrderType {
   }
   
   export type ItemsList={
-    product: mongoose.Types.ObjectId;
-    quantity:number;
+    productId: string;
+    variantId: string;
+    name: string;
+    weight: string;
+    quantity: number;
+    inPrice: number;
+    outPrice: number;
+    images: string;
+    stockQuantity: number;
+    rating: number;
    }
    export type OrderStatus ='processing' | 'shipped' | 'delivered' | 'cancelled'
