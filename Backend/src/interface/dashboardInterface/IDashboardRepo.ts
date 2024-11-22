@@ -3,6 +3,7 @@ import { OrderSummary } from "../../domain/dtos/CheckoutDTO";
 
 export interface IDashboardRepository {
   viewAllOrders(): Promise<OrderSummary[]>;
+  topSellingProduct(): Promise<OrderSummary[]>;
   viewRevenue(period?: 'day' | 'month' | 'year'): Promise<any>;
   generateProductSalesReport(
     startDate: Date,

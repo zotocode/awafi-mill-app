@@ -12,23 +12,27 @@ class DashboardInteractor implements IDashboardInteractor {
   }
 
   async totalOrders(): Promise<OrderSummary[]> {
-    try {
+
       const result = await this.chekoutRepository.viewAllOrders();
       return result;
-    } catch (err) {
-      throw err;
-    }
+
+  
+  }
+  async topSellings(): Promise<any> {
+
+   
+      const products = await this.chekoutRepository.topSellingProduct();
+
+      return {products};
+  
   }
 
   async totalRevenue(period?: string): Promise<any> {
-    try {
+  
       const result = await this.chekoutRepository.viewRevenue(period as 'day' | 'month' | 'year');
 
       return result;
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
+
   }
 
   async salesReport(
@@ -36,7 +40,7 @@ class DashboardInteractor implements IDashboardInteractor {
     startDate?: Date,
     endDate?: Date
   ): Promise<any> {
-    try {
+
       if (!reportType || !startDate || !endDate) {
         throw new Error("Missing required parameters for generating sales report.");
       }
@@ -47,10 +51,7 @@ class DashboardInteractor implements IDashboardInteractor {
         reportType
       );
       return result;
-    } catch (error) {
-      console.error('Error generating sales report:', error);
-      throw error;
-    }
+  
   }
 }
 

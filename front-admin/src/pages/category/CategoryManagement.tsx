@@ -51,6 +51,7 @@ const MainCategoryManagementPage = () => {
         response = await categoryapi.fetchAllCategories(currentPage, itemsPerPage);
       }
       if (response.status === 200) {
+        console.log("data",response.data.data)
         setCategories(response.data.data);
         setTotalPages(response.data.totalPages);
       }
@@ -61,8 +62,18 @@ const MainCategoryManagementPage = () => {
       setIsSearching(false);
     }
   };
-
   const categoryColumns: TableColumn[] = [
+    {
+      header: "Category Image",
+      accessor: "image", // Assuming the image URL is stored in the "image" field
+      render: (row: { [key: string]: any }) => (
+        <img
+          src={row.photo || "/default-image.png"} // Fallback to default if no image
+          alt={row.name}
+          className="w-10 h-10 object-cover rounded-full"
+        />
+      ),
+    },
     { header: "Category Name", accessor: "name" },
     { header: "Description", accessor: "description" },
     {
@@ -80,7 +91,26 @@ const MainCategoryManagementPage = () => {
         </span>
       ),
     },
+    {
+      header: "Priority",
+      accessor: "priority", // Assuming the priority is stored in the category object
+      render: (row: { [key: string]: any }) => (
+        <span
+          className={`px-2 py-1 rounded-full text-xs ${
+            row.priority <= 5
+              ? "bg-red-100 text-red-800" // High priority
+              : row.priority <= 10
+              ? "bg-yellow-100 text-yellow-800" // Medium priority
+              : "bg-green-100 text-green-800" // Low priority
+          }`}
+        >
+          {row.priority === 101 ? "None" : row.priority} {/* Assuming 101 means no priority */}
+        </span>
+      ),
+    },
+ 
   ];
+  
 
   const handleModalClose = () => {
     setModal(false);

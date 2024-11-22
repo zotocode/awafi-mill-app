@@ -48,6 +48,11 @@ class CategoryApi{
           );
       
       }
+    async getAvailablePriorities(): Promise<any> {
+       
+          return await this.axiosInstance.get(`/api/categories/category/availble-priorities`);
+      
+      }
     async blockCategory(id:string,action:string): Promise<any> {
         try {
     

@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-import CategoryApi from '../../api/categoryapi';
-
+import CategoryApi from "../../api/categoryapi";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 interface CategoryModalFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (newCategory: any) => any;
   category?: any;
+  
 }
 
 const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
@@ -16,43 +16,79 @@ const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
   onSuccess,
   category,
 }) => {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [photo, setPhoto] = useState<File | null>(null); // State to handle photo file
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null); // State for photo preview
-  const [errors, setErrors] = useState({ name: '', description: '', photo: '' });
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [priority, setPriority] = useState<number | "">(101);
+  const [availablePriorities, setAvailablePriorities] = useState<number[]>([]);
+  const [errors, setErrors] = useState({
+    name: "",
+    description: "",
+    photo: "",
+    priority: "",
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingPriority, setIsLoadingPriority] = useState(false); // Loading state for priority
 
   useEffect(() => {
     if (category) {
-      setName(category.name || '');
-      setDescription(category.description || '');
+      setName(category.name || "");
+      setDescription(category.description || "");
       setPhoto(null);
-      setPhotoPreview(category.photo || null); // Assuming the API provides a URL for the existing category photo
+      setPhotoPreview(category.photo || null);
+      setPriority(category.priority || 101);
     } else {
-      setName('');
-      setDescription('');
+      setName("");
+      setDescription("");
       setPhoto(null);
       setPhotoPreview(null);
+      setPriority(101);
     }
-  }, [category, onSuccess]);
+  }, [category]);
+
+  useEffect(() => {
+    const fetchAvailablePriorities = async () => {
+      try {
+        setIsLoadingPriority(true); // Set loading to true before API call
+        const response = await CategoryApi.getAvailablePriorities();
+        let priorities = response.data.priorities || [];
+        if (category && !priorities.includes(category.priority)) {
+          priorities = [category.priority, ...priorities];
+        }
+        setAvailablePriorities(priorities);
+      } catch (error) {
+        console.error("Error fetching available priorities:", error);
+        toast.error("Failed to fetch available priorities. Please try again.");
+      } finally {
+        setIsLoadingPriority(false); // Set loading to false after API call
+      }
+    };
+
+    if (isOpen) {
+      fetchAvailablePriorities();
+    }
+  }, [isOpen, category]);
 
   const validateForm = () => {
     let isValid = true;
-    const newErrors = { name: '', description: '', photo: '' };
+    const newErrors = { name: "", description: "", photo: "", priority: "" };
 
     if (!name.trim()) {
-      newErrors.name = 'Category name is required';
+      newErrors.name = "Category name is required";
       isValid = false;
     }
 
     if (!description.trim()) {
-      newErrors.description = 'Description is required';
+      newErrors.description = "Description is required";
       isValid = false;
     }
 
-    if (photo && (photo.size > 2 * 1024 * 1024 || !photo.type.startsWith('image/'))) {
-      newErrors.photo = 'Please upload a valid image file (max 2MB).';
+    if (
+      photo &&
+      (photo.size > 2 * 1024 * 1024 || !photo.type.startsWith("image/"))
+    ) {
+      newErrors.photo = "Please upload a valid image file (max 2MB).";
       isValid = false;
     }
 
@@ -66,18 +102,21 @@ const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
 
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
-        setErrors({ ...errors, photo: 'File size exceeds 2MB.' });
+        setErrors({ ...errors, photo: "File size exceeds 2MB." });
         setPhotoPreview(null);
-      } else if (!file.type.startsWith('image/')) {
-        setErrors({ ...errors, photo: 'Invalid file type. Please upload an image.' });
+      } else if (!file.type.startsWith("image/")) {
+        setErrors({
+          ...errors,
+          photo: "Invalid file type. Please upload an image.",
+        });
         setPhotoPreview(null);
       } else {
-        setPhotoPreview(URL.createObjectURL(file)); // Generate a preview URL
-        setErrors({ ...errors, photo: '' });
+        setPhotoPreview(URL.createObjectURL(file));
+        setErrors({ ...errors, photo: "" });
       }
     } else {
       setPhotoPreview(null);
-      setErrors({ ...errors, photo: 'Please select a valid image file.' });
+      setErrors({ ...errors, photo: "Please select a valid image file." });
     }
   };
 
@@ -89,11 +128,12 @@ const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
     setIsSubmitting(true);
     try {
       const formData = new FormData();
-      formData.append('name', name);
-      formData.append('description', description);
+      formData.append("name", name);
+      formData.append("description", description);
+      formData.append("priority", priority.toString());
 
       if (photo) {
-        formData.append('photo', photo); // Add the photo file if selected
+        formData.append("photo", photo);
       }
 
       let response;
@@ -105,13 +145,19 @@ const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
 
       if (response.data) {
         onSuccess(response.data);
-        toast.success(`Category ${category ? 'updated' : 'created'} successfully`);
+        toast.success(
+          `Category ${category ? "updated" : "created"} successfully`
+        );
       }
 
-      onClose(); // Close the modal after successful operation
+      onClose();
     } catch (error) {
-      console.error('Error submitting category:', error);
-      toast.error(`Failed to ${category ? 'update' : 'create'} category. Please try again.`);
+      console.error("Error submitting category:", error);
+      toast.error(
+        `Failed to ${
+          category ? "update" : "create"
+        } category. Please try again.`
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -125,7 +171,7 @@ const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
         <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
           <div className="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-              {category ? 'Edit Category' : 'Add Category'}
+              {category ? "Edit Category" : "Add Category"}
             </h3>
             <button
               onClick={onClose}
@@ -146,58 +192,132 @@ const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
             </button>
           </div>
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            <div>
-              <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                Category Name
-              </label>
-              <input
-                type="text"
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                placeholder="Enter category name"
-                
-              />
-              {errors.name && <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.name}</p>}
+            <div className="flex flex-wrap gap-4">
+              <div className="flex-1">
+                <label
+                  htmlFor="name"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Category Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                  placeholder="Enter category name"
+                />
+                {errors.name && (
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+                    {errors.name}
+                  </p>
+                )}
+              </div>
+              <div className="w-40">
+                <label
+                  htmlFor="priority"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Priority
+                </label>
+                <div className="relative">
+                  <select
+                    id="priority"
+                    value={priority}
+                    onChange={(e) => setPriority(Number(e.target.value))}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                  >
+                    {isLoadingPriority ? (
+                      <option disabled>Loading...</option>
+                    ) : (
+                      availablePriorities.map((pri) => (
+                        <option key={pri} value={pri}>
+                          {pri}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                  {errors.priority && (
+                    <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+                      {errors.priority}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
+
             <div>
-              <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                Description
+              <label
+                htmlFor="description"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Category Description
               </label>
               <textarea
                 id="description"
+                rows={4}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                 placeholder="Enter category description"
-                
-              />
-              {errors.description && <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.description}</p>}
+              ></textarea>
+              {errors.description && (
+                <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+                  {errors.description}
+                </p>
+              )}
             </div>
+
             <div>
-              <label htmlFor="photo" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                Category Photo
+              <label
+                htmlFor="photo"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Category Image
               </label>
               <input
                 type="file"
                 id="photo"
-                accept="image/*"
                 onChange={handlePhotoChange}
-                className="block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                className="block w-full text-sm text-gray-500 border border-gray-300 rounded-lg cursor-pointer focus:outline-none dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600"
               />
               {photoPreview && (
-                <img src={photoPreview} alt="Preview" className="mt-4 w-3/4 h-auto rounded-lg" />
+                <div className="mt-4">
+                  <img
+                    src={photoPreview}
+                    alt="Category preview"
+                    className="w-20 h-20 object-cover rounded-md"
+                  />
+                </div>
               )}
-              {errors.photo && <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.photo}</p>}
+              {errors.photo && (
+                <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+                  {errors.photo}
+                </p>
+              )}
             </div>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full text-white bg-black  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 disabled:opacity-50"
-            >
-              {isSubmitting ? (category ? 'Updating...' : 'Adding...') : category ? 'Update Category' : 'Add Category'}
-            </button>
+
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-gray-900 bg-gray-300 hover:bg-gray-400 rounded-lg py-2 px-4 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`ml-4 py-2 px-6 text-white text-sm rounded-lg ${
+                  isSubmitting
+                    ? "bg-gray-400"
+                    : "bg-blue-500 hover:bg-blue-600"
+                }`}
+              >
+                {isSubmitting ? "Submitting..." : category ? "Update" : "Create"}
+              </button>
+            </div>
           </form>
         </div>
       </div>

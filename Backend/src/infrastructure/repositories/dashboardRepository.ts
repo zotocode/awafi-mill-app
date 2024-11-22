@@ -6,14 +6,36 @@ import { CheckoutDTO,OrderSummary,RevenueSummary,CheckoutCreateDTO} from "../../
 import { ICheckout } from "../../domain/entities/checkoutSchema";
 import { BaseRepository } from "./baseRepository";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth,startOfYear,endOfYear } from 'date-fns'; 
+import IDashboardRepository from "../../interface/dashboardInterface/IDashboardRepo";
 
 
 
-export class DashboardRepository extends BaseRepository<ICheckout> implements DashboardRepository {
+export class DashboardRepository extends BaseRepository<ICheckout> implements IDashboardRepository {
   constructor(model: Model<ICheckout>) {
     super(model);
   }
+  async topSellingProduct(): Promise<any[]> {
 
+      const result = await this.model.aggregate([
+        { $match: { orderStatus: { $in: ['delivered', 'shipped'] } } },
+        { $unwind: "$items" },
+        {
+          $group: {
+            _id: "$items.productId",
+            totalQuantity: { $sum: "$items.quantity" },
+            productName: { $first: "$items.name" },
+            images: { $first: "$items.images" }
+          }
+        },
+        { $sort: { totalQuantity: -1 } },
+        { $limit: 5}
+      ]);
+  
+      return result;
+ 
+  }
+  
+ 
 
 
   async viewAllOrders(): Promise<OrderSummary[]> {
@@ -170,17 +192,16 @@ export class DashboardRepository extends BaseRepository<ICheckout> implements Da
   ) {
     const start = new Date(startDate);
     const end = new Date(endDate);
-    console.log("Start Date:", start);
-console.log("End Date:", end);
+
 
 const testDocuments = await this.model.find().limit(5).exec();
-console.log("Sample Documents:", testDocuments);
+
 
 
 const simpleQuery = await this.model.find({
   createdAt: { $gte: start, $lte: end }
 }).exec();
-console.log("Simple Query Results:", simpleQuery);
+
 
   
     const groupByDate: { [key: string]: any } = {

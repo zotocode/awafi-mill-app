@@ -15,5 +15,6 @@ const dashboardController=new DashboardController(dashboardInteractor)
 dashboardRoute.get('/orders',dashboardController.dashTotalOrders.bind(dashboardController))
 dashboardRoute.get('/revenue',dashboardController.dashTotalRevenue.bind(dashboardController))
 dashboardRoute.get('/sales-report',dashboardController.salesReport.bind(dashboardController))
+dashboardRoute.get('/top-Selling',dashboardController.topSellings.bind(dashboardController))
 
 export default dashboardRoute

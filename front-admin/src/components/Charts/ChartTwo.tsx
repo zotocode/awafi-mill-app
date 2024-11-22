@@ -1,8 +1,10 @@
 import { ApexOptions } from 'apexcharts';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactApexChart from 'react-apexcharts';
+import dashboardapi from '../../api/dashboardapi';
 
-const options: ApexOptions = {
+const options=(categories:any):ApexOptions => {
+  return{
   colors: ['#3C50E0', '#80CAEE'],
   chart: {
     fontFamily: 'Satoshi, sans-serif',
@@ -16,7 +18,6 @@ const options: ApexOptions = {
       enabled: false,
     },
   },
-
   responsive: [
     {
       breakpoint: 1536,
@@ -42,9 +43,8 @@ const options: ApexOptions = {
   dataLabels: {
     enabled: false,
   },
-
   xaxis: {
-    categories: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+    overwriteCategories: categories,
   },
   legend: {
     position: 'top',
@@ -52,15 +52,12 @@ const options: ApexOptions = {
     fontFamily: 'Satoshi',
     fontWeight: 500,
     fontSize: '14px',
-
-    // markers: {
-    //   radius: 99,
-    // },
   },
   fill: {
     opacity: 1,
   },
 };
+}
 
 interface ChartTwoState {
   series: {
@@ -69,33 +66,71 @@ interface ChartTwoState {
   }[];
 }
 
+// interface Product {
+//   _id: string | null;
+//   totalQuantity: number;
+//   productName: string;
+//   images: string;
+// }
+
 const ChartTwo: React.FC = () => {
   const [state, setState] = useState<ChartTwoState>({
     series: [
       {
-        name: 'Sales',
-        data: [44, 55, 41, 67, 22, 43, 65],
-      },
-      {
-        name: 'Revenue',
-        data: [13, 23, 20, 8, 13, 27, 15],
+        name: 'Quantity',
+        data: [0, 0, 0, 0, 0, 0, 0],
       },
     ],
   });
-  
-  const handleReset = () => {
-    setState((prevState) => ({
-      ...prevState,
-    }));
-  };
-  handleReset;  
+  const[categories,setCategories]=useState()
+
+  useEffect(() => {
+    const fetchTopSellings = async () => {
+      try {
+        const response = await dashboardapi.topSellings();
+     
+     
+        if (response && response.products) {
+          // Prepare data for the chart
+          const quantities = response.products.map((product:any) => product.totalQuantity);
+          const productNames = response.products.map((product:any) => product.productName);
+          setCategories(productNames)
+          // Pad or trim the quantities to match 7 days
+          const chartData = quantities.length > 7 
+            ? quantities.slice(0, 7) 
+            : [
+                ...quantities, 
+                ...Array(7 - quantities.length).fill(0)
+              ];
+
+          setState({
+            series: [
+              {
+                name: 'Quantity',
+                data: chartData,
+              },
+              {
+                name: 'Quantity',
+                data: chartData,
+              }
+              
+            ],
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching top sellings:', error);
+      }
+    };
+
+    fetchTopSellings();
+  }, []);
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4">
       <div className="mb-4 justify-between gap-4 sm:flex">
         <div>
           <h4 className="text-xl font-semibold text-black dark:text-white">
-            Profit this week
+            Top Selling Products
           </h4>
         </div>
         <div>
@@ -135,7 +170,7 @@ const ChartTwo: React.FC = () => {
       <div>
         <div id="chartTwo" className="-ml-5 -mb-9">
           <ReactApexChart
-            options={options}
+            options={options(categories)}
             series={state.series}
             type="bar"
             height={350}

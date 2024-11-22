@@ -25,6 +25,8 @@ categoryRoutes.get("/category/admin/:id",verifyAdminToken, categoryController.ge
 categoryRoutes.put("/category/admin/:id",verifyAdminToken, uploadCategoryImage.single('photo'), categoryController.updateCategory.bind(categoryController));
 categoryRoutes.patch("/category/admin/:id",verifyAdminToken, categoryController.toggleListStatus.bind(categoryController));
 categoryRoutes.patch("/category/delete/admin/:id",verifyAdminToken, categoryController.deleteCategory.bind(categoryController));
+categoryRoutes.get("/category/availble-priorities",verifyAdminToken, categoryController.availablePrioritySlots.bind(categoryController));
+
 
 // Main Category User Routes
 categoryRoutes.get("/category/:id", categoryController.getCategoryById.bind(categoryController));

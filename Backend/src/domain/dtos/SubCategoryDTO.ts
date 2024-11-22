@@ -4,6 +4,8 @@ export interface subCategoryCreationDTo {
     name: string;
     description: string;
     mainCategory:mongoose.Schema.Types.ObjectId | null;
+    photo:string
+    priority?:number
    
   }
   export interface subCategoryDTo {
@@ -11,10 +13,12 @@ export interface subCategoryCreationDTo {
     name: string;
     description: string;
     mainCategory:mongoose.Schema.Types.ObjectId | null;
-    isListed: string;
-    isDeleted: string;
+    isListed: boolean;
+    isDeleted: boolean;
     createdAt: Date;
     updatedAt: Date;
+    priority:number;
+    photo:string
   }
   mongoose
   

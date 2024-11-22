@@ -19,7 +19,10 @@ export class CategoryRepository extends BaseRepository<ICategory> implements ICa
   async getAllCategories(page:number,limit:number): Promise<LargeDataFetch> {
     const skip=(page-1)*limit
     const totalCategories = await this.model.countDocuments();
-    const categories= await this.model.find({isDeleted:false}).skip(skip).limit(limit);
+    const categories= await this.model.find({isDeleted:false})
+    .sort({  priority: 1})
+    .skip(skip)
+    .limit(limit);
     return{
       data:categories,
       totalPages: Math.ceil(totalCategories / limit)
@@ -50,6 +53,7 @@ export class CategoryRepository extends BaseRepository<ICategory> implements ICa
     const skip = (page - 1) * limit;
     const totalCategories = await this.model.countDocuments({ isListed: true, isDeleted: false });
     const categories = await this.model.find({ isListed: true, isDeleted: false })
+      .sort({  priority: 1})
       .skip(skip)
       .limit(limit);
 

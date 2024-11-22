@@ -149,4 +149,13 @@ export class CategoryController {
       next(error);
     }
   }
+  async availablePrioritySlots(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const slots = await this.categoryInteractor.availblePrioritySlots();
+        res.status(200).json(slots);
+      
+    } catch (error) {
+      next(error);
+    }
+  }
 }

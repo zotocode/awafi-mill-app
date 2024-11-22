@@ -14,6 +14,15 @@ class DashboardApi {
       throw error;
     }
   }
+  async topSellings(): Promise<any> {
+    try {
+      const response = await this.axiosInstance.get('api/dashboard/top-Selling');
+      return response.data; // Ensure your backend sends { total, rate }
+    } catch (error) {
+      console.error('Failed to fetch total views', error);
+      throw error;
+    }
+  }
 
   async fetchTotalRevenue(period:'month' | 'year' |'day'): Promise<any> {
     try {
