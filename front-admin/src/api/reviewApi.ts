@@ -1,5 +1,7 @@
 import { AxiosInstance } from "axios";
 import { useApi } from "./axiosConfig";
+
+// Define the Review type
 export type Review = {
     id: string;
     userName: string;
@@ -12,12 +14,20 @@ export type Review = {
     status: "pending" | "approved";
 };
 
+// Define parameters for fetching reviews
 export type FetchReviewsParams = {
     page?: number;
     limit?: number;
     sortOrder?: "recent" | "old";
     status?: "all" | "pending" | "approved";
     search?: string;
+};
+
+// Define the response structure for paginated review fetch
+export type FetchReviewsResponse = {
+    reviews: Review[];
+    totalPages: number;
+    totalCount: number; // Optional: If available for additional information
 };
 
 class ReviewApi {
@@ -27,9 +37,11 @@ class ReviewApi {
         this.api = apiInstance;
     }
 
-    async fetchReviews(params: FetchReviewsParams) {
+    // Fetch reviews with pagination
+    async fetchReviews(params: FetchReviewsParams): Promise<FetchReviewsResponse> {
         try {
-            const response = await this.api.get<Review[]>("/reviews", { params });
+            const response = await this.api.get<FetchReviewsResponse>("/api/adminReview/", { params });
+            console.log("response.data: ", response.data);
             return response.data;
         } catch (error) {
             console.error("Failed to fetch reviews:", error);
@@ -37,9 +49,10 @@ class ReviewApi {
         }
     }
 
-    async approveReview(reviewId: string) {
+    // Approve a review by its ID
+    async statusReview(reviewId: string, status: string): Promise<Review> {
         try {
-            const response = await this.api.patch<Review>(`/reviews/${reviewId}/approve`);
+            const response = await this.api.patch<Review>(`/api/adminReview/${reviewId}/approved`,{status});
             return response.data;
         } catch (error) {
             console.error("Failed to approve review:", error);
@@ -47,14 +60,6 @@ class ReviewApi {
         }
     }
 
-    async deleteReview(reviewId: string) {
-        try {
-            await this.api.delete(`/reviews/${reviewId}`);
-        } catch (error) {
-            console.error("Failed to delete review:", error);
-            throw error;
-        }
-    }
 }
 
 // Create an instance of ReviewApi using the existing Axios configuration

@@ -19,6 +19,7 @@ import subCategoryRoutes from "./presentation/routes/subCategoryRoute";
 import envConfig from "./config/env";
 import dashboardRoute from "./presentation/routes/dashboardRoute";
 import { verifyAdminToken } from "./presentation/middleware/adminAuthMiddleware";
+import adminReviewRoutes from "./presentation/routes/adminReviewRoute";
 
 
 
@@ -53,6 +54,8 @@ const startServer = async (): Promise<void> => {
     app.use('/api/products', productRoute);
     app.use('/api/cart', verifyToken, cartRoutes)
     app.use('/api/review', verifyToken, reviewRoutes)
+    //TODO add the admin checking middleare here 
+    app.use('/api/adminReview',adminReviewRoutes)
     app.use('/api/wishlist', verifyToken, wishlistRoutes)
     app.use('/api/categories', categoryRoute); 
     app.use('/api/sub-categories', subCategoryRoutes);

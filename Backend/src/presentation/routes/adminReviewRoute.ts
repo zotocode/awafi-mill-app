@@ -13,7 +13,7 @@ const adminReviewRoutes = express.Router();
 
 // Define routes
 adminReviewRoutes.get("/", adminReviewController.getAllReviews.bind(adminReviewController));
-adminReviewRoutes.patch("/:reviewId/approve", adminReviewController.updateReviewStatus.bind(adminReviewController));
-adminReviewRoutes.patch("/:reviewId/decline", adminReviewController.updateReviewStatus.bind(adminReviewController));
+adminReviewRoutes.patch("/:reviewId/approved", adminReviewController.updateReviewStatus.bind(adminReviewController));
+adminReviewRoutes.patch("/:reviewId/declined", adminReviewController.updateReviewStatus.bind(adminReviewController));
 
 export default adminReviewRoutes;
