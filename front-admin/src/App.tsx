@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./state/store";
@@ -13,9 +12,10 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import DefaultLayout from "./layouts/DefaultLayout";
 import BulkProducAddingPage from "./pages/product/BulkProducAddingPage";
-import Banner from "./pages/BannerManagement"
+import Banner from "./pages/BannerManagement";
 import OrderManagementPage from "./pages/order/OrderManagement";
 import SalesReport from "./pages/SalesReports";
+import NewFeaturePage from "./pages/NewFeaturePage"; // New Page
 
 function App() {
   return (
@@ -49,6 +49,8 @@ function App() {
               <Route path="/categories/sub" element={<SubCategoryManagementPage />} />
               <Route path="/banner" element={<Banner />} />
               <Route path="/sales-report" element={<SalesReport />} />
+              <Route path="/reviews" element={<NewFeaturePage />} />
+
             </Route>
           </Route>
         </Routes>
