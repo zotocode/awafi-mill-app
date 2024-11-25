@@ -7,7 +7,7 @@ interface OrderPreviewModalProps {
   order: OrderType | null;
   isOpen: boolean;
   onClose: () => void;
-  onActionReturn: (orderId: string, data: {productId:string,variantId:string,returnStatus:'approved'| 'rejected'}) => Promise<void>;
+  onActionReturn: (orderId: string, data?: {productId:string,variantId:string,returnStatus:'approved'| 'rejected'}) => Promise<void>;
   
 }
 
