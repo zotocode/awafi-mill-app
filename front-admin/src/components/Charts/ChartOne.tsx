@@ -37,6 +37,7 @@ const ChartOne: React.FC<Props> = ({ revenue }) => {
   const fetchData = async (period: 'day' | 'month' | 'year') => {
     try {
       const response = await adminDashBoard.fetchTotalRevenue(period);
+    
       const chartData: RevenueData[] = response.data;
 
       // Update the revenue in the parent component

@@ -14,6 +14,11 @@ export class SubCategoryController {
   async addCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const category: subCategoryCreationDTo = req.body;
+      const photo=req.file
+      if(photo && typeof photo.path=="string")
+      {
+        category.photo=photo.path
+      }
       const result: any = await this.categoryInteractor.addCategory(category);
       if (result?.status) {
         res.status(result.status).json({ message: result.message });
@@ -35,6 +40,7 @@ export class SubCategoryController {
       next(error);
     }
   }
+
   async searchBySubCategoryName(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const page = req.query.page ? Number(req.query.page) : 1;
@@ -92,6 +98,13 @@ export class SubCategoryController {
     try {
       const productId = new mongoose.Types.ObjectId(req.params.id); // Convert string to ObjectId
       const updatedData: Partial<subCategoryCreationDTo> = req.body; 
+      const photo=req.file
+      
+      if(photo && typeof photo.path=="string")
+      {
+        updatedData.photo=photo.path
+      }
+      
       const updatedProduct:any = await this.categoryInteractor.updateCategory(productId, updatedData);
       if (updatedProduct?.status) {
         res.status(updatedProduct.status).json({ message: updatedProduct.message });
@@ -139,6 +152,17 @@ export class SubCategoryController {
       } else {
         res.status(404).json({ message: "Category not found" });
       }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+
+  async availablePrioritySlots(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const slots = await this.categoryInteractor.availblePrioritySlots();
+        res.status(200).json(slots);
+      
     } catch (error) {
       next(error);
     }

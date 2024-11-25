@@ -27,6 +27,10 @@ const CategorySchema: Schema = new Schema(
     isDeleted: {
       type: Boolean,
       default: false, // Default value is false
+    },
+    priority: {
+      type: Number,
+      default: 101, 
     }
   },
   {

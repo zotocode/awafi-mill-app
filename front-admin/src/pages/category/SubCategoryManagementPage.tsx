@@ -66,8 +66,37 @@ const SubCategoryManagementPage = () => {
   }
 
   const categoryColumns: TableColumn[] = [
+        // New Image Column
+        {
+          header: "Image",
+          accessor: "image", // Assuming the image URL is stored in the 'image' field of subCategory
+          render: (row: { [key: string]: any }) => (
+            <img
+              src={row.photo || "/path/to/default/image.png"} // Provide a fallback image if no image exists
+              alt={row.name}
+              className="w-10 h-10 object-cover rounded-full"
+            />
+          ),
+        },
     { header: "Category Name", accessor: "name" },
     { header: "Description", accessor: "description" },
+    {
+      header: "Priority",
+      accessor: "priority",
+      render: (row: { [key: string]: any }) => (
+        <span
+          className={`px-2 py-1 rounded-full text-xs ${
+            row.priority <= 5
+              ? "bg-red-100 text-red-800"
+              : row.priority <= 10
+              ? "bg-yellow-100 text-yellow-800"
+              : "bg-green-100 text-green-800"
+          }`}
+        >
+          {row.priority == 101 ? "none" : row.priority}
+        </span>
+      ),
+    },
     {
       header: "Status",
       accessor: "isListed",
@@ -80,9 +109,10 @@ const SubCategoryManagementPage = () => {
           {row.isListed ? "Listed" : "Not Listed"}
         </span>
       ),
-    },
+    }
   ];
-
+  
+  
   const handleModalClose = () => {
     setModal(false);
     setSelectedCategory(null);

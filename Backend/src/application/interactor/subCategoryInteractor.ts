@@ -4,14 +4,18 @@ import IsubCategoryRepo from "../../interface/subCategoryInterface/IsubCategoryR
 import {subCategoryCreationDTo,subCategoryDTo} from '../../domain/dtos/SubCategoryDTO'
 import IsubCategoryInteractor from "../../interface/subCategoryInterface/IsubCategoryInteractory";
 import mongoose from "mongoose";
+import { ICloudinaryService } from "../../interface/serviceInterface/IcloudinaryInterface";
+import IsubCategory from "../../domain/entities/subCategorySchema";
 
 
 export class SubCategoryInteractor implements IsubCategoryInteractor {
   private categoryRepo: IsubCategoryRepo; // Use the category repository
+  private cloudService:ICloudinaryService;
   
 
-  constructor(categoryRepo: IsubCategoryRepo) {
+  constructor(categoryRepo: IsubCategoryRepo,cloudService:ICloudinaryService) {
     this.categoryRepo = categoryRepo;
+    this.cloudService=cloudService
   }
 
   // Add a new category
@@ -24,6 +28,12 @@ export class SubCategoryInteractor implements IsubCategoryInteractor {
       return { message: "Category always in your bucket", status: 409 };
 
     }
+    if(data && data.photo)
+      {
+        const uploadImage=await this.cloudService.uploadSubCategoryImage(data.photo)
+        data.photo=uploadImage.secure_url
+  
+      }
     const category = await this.categoryRepo.addCategory(data); // Use repository method
 
     return this.mapToDTO(category);
@@ -66,6 +76,12 @@ export class SubCategoryInteractor implements IsubCategoryInteractor {
       }
 
     }
+    if(data.photo)
+      {
+        const uploadImage=await this.cloudService.uploadSubCategoryImage(data.photo)
+        data.photo=uploadImage.secure_url
+  
+      }
    
     const updatedCategory = await this.categoryRepo.updateCategory(categoryId, data); // Use repository method
     return updatedCategory && !updatedCategory.isDeleted ? this.mapToDTO(updatedCategory) : null;
@@ -84,7 +100,7 @@ export class SubCategoryInteractor implements IsubCategoryInteractor {
         throw new Error("Category is already listed.");
       }
       category.isListed = true; // List the category
-      await this.categoryRepo.updateCategory(id, category); // Use repository method to update
+      await this.categoryRepo.updateCategory(id, this.mapToDTO(category)); // Use repository method to update
       return { message: "Category listed successfully" };
     }
     throw new Error("Category not found.");
@@ -98,16 +114,41 @@ export class SubCategoryInteractor implements IsubCategoryInteractor {
         throw new Error("Category is already unlisted.");
       }
       category.isListed = false; // Unlist the category
-      await this.categoryRepo.updateCategory(id, category); // Use repository method to update
+      await this.categoryRepo.updateCategory(id, this.mapToDTO(category)); // Use repository method to update
       return { message: "Category unlisted successfully" };
     }
     throw new Error("Category not found.");
   }
 
+  async availblePrioritySlots(): Promise<{priorities:number[] |[]}> {
+    const maxPriorities = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  
+    // Fetch all listed categories
+    const categoriesResponse = await this.categoryRepo.getAllCategories(0, 0);
+  
+    // Extract existing priorities
+    const existingPriorities = categoriesResponse.data
+      .map((ele) => ele.priority)
+      .filter((priority) => typeof priority === "number" && priority !=101); // Filter out invalid values
+  
+    // Find missing priorities
+    const missingPriorities = maxPriorities.filter(
+      (priority) => !existingPriorities.includes(priority)
+    );
+  
+  
+  
+    // Return the mapped category data along with priorities
+  
+    return  {priorities: missingPriorities}
+  
+  }
+  
+
   // Map Category to ProductDTO
-  private mapToDTO(category: any): subCategoryDTo {
+  private mapToDTO(category: IsubCategory): subCategoryDTo {
     return {
-      _id: category._id.toString(),
+      _id: category._id,
       name: category.name,
       description: category.description,
       mainCategory:category.mainCategory,
@@ -115,6 +156,8 @@ export class SubCategoryInteractor implements IsubCategoryInteractor {
       isDeleted: category.isDeleted,
       createdAt: category.createdAt,
       updatedAt: category.updatedAt,
+      photo:category.photo,
+      priority:category.priority
     };
   }
 }
