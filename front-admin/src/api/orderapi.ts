@@ -46,6 +46,16 @@ class OrderApi {
       throw error;
     }
   }
+  async actionOnReturnOrder(orderId:string,data:{productId:string,variantId:string,returnStatus:'rejected' |'approved'}) {
+    try {
+      const response = await this.axiosInstance.put(`/api/orders/order/admin/return/${orderId}`,data);
+    
+      return response;
+    } catch (error) {
+      console.error('Failed to cancel order:', error);
+      throw error;
+    }
+  }
 }
 
 export default new OrderApi();

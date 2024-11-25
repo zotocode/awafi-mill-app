@@ -1,9 +1,11 @@
 import Stripe from 'stripe';
 import envConfig from "../../config/env";
 import { IPaymentGateway } from './IPaymentGateway';
+import { ShippingAddressDTO } from '../../domain/dtos/CheckoutDTO';
+import mongoose from 'mongoose';
+import { IProductDetails } from '../../domain/dtos/CartDTO';
 
-
-export class StripePaymentGateway implements IPaymentGateway {
+export class TamaraPaymentGateway implements IPaymentGateway {
     private stripe: Stripe;
 
     constructor() {
@@ -22,5 +24,6 @@ export class StripePaymentGateway implements IPaymentGateway {
         return false;
     }
 
-    // ... rest of your code remains the same
+
+  
 }

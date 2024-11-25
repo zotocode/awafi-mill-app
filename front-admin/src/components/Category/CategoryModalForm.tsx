@@ -228,15 +228,14 @@ const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
                     onChange={(e) => setPriority(Number(e.target.value))}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                   >
-                    {isLoadingPriority ? (
-                      <option disabled>Loading...</option>
-                    ) : (
-                      availablePriorities.map((pri) => (
+                   
+                   <option value="101">Select defualt</option>
+                      {availablePriorities.map((pri) => (
                         <option key={pri} value={pri}>
                           {pri}
                         </option>
-                      ))
-                    )}
+                      ))}
+                    
                   </select>
                   {errors.priority && (
                     <p className="mt-2 text-sm text-red-600 dark:text-red-500">

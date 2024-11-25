@@ -111,6 +111,7 @@ const ProductManagement: React.FC = () => {
     const action = isListed ? "unlist" : "list";
     try {
       const response = await productapi.listingProduct(_id, action);
+
       if (response.status === 200) {
         fetchProducts(currentPage, itemsPerPage); // Re-fetch products after listing/unlisting
       }

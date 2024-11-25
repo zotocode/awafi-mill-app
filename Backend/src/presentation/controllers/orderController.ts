@@ -80,6 +80,8 @@ export class OrderController {
         orderStatus: req.body.orderStatus,
         trackingId:trackingId==undefined ? ' ':trackingId
       };
+
+    
    
       const updatedOrder = await this.orderInteractor.updateOrderStatus(updateData);
       if (!updatedOrder) {
@@ -92,7 +94,30 @@ export class OrderController {
       next(error);
     }
   }
-  
+
+
+  async actionOnReturnOrder(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      const orderId = req.params.id;
+      const { productId,variantId,returnStatus } = req.body;
+
+      if (!userId) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+      }
+    
+      const result = await this.orderInteractor.actionOnReturnOrder(orderId,req.body);
+      if (!result) {
+        res.status(404).json({ message: "Order not found" });
+        return;
+      }
+
+      res.status(200).json({ result});
+    } catch (error) {
+      next(error);
+    }
+  }
   
 
   async cancelOrder(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -178,4 +203,27 @@ export class OrderController {
       next(error);
     }
   }
+  async returnUserOrder(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      const orderId = req.params.id;
+      const { returnReason,productId,variantId } = req.body;
+
+      if (!userId) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+      }
+    
+      const result = await this.orderInteractor.returnUserOrder(orderId, userId,req.body);
+      if (!result) {
+        res.status(404).json({ message: "Order not found" });
+        return;
+      }
+
+      res.status(200).json({ result});
+    } catch (error) {
+      next(error);
+    }
+  }
+ 
 }

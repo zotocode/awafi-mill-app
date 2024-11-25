@@ -1,26 +1,31 @@
 import mongoose, { Model } from "mongoose";
 import { ICheckout } from "../../domain/entities/checkoutSchema";
+import { required } from "joi";
 
 // Checkout schema
 const checkoutSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  cartId: { type: mongoose.Schema.Types.ObjectId, ref: "Cart", required: false },
   items: [{
     productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: false },
     variantId: { type: mongoose.Schema.Types.ObjectId, ref: "Variant", required: false },
     quantity: { type: Number, required: false },
+    returnStatus: { 
+      type: String, 
+      enum: ['not_requested', 'requested', 'approved', 'rejected'], 
+      default: 'not_requested' 
+    },
+    returnReason: { type: String }, // Reason for return
+    refundAmount: { type: Number, default: 0 }, // Amount refunded for this item
     name: { type: String, required: true },
     weight: { type: String, required: true },
-    inPrice: { type: Number, required: true },
-    outPrice: { type: Number, required: true },
+    price: { type: Number, required: true },
     images: { type: String, required: true },
-    stockQuantity: { type: Number, required: true },
-    rating: { type: Number, default: 0 }
   }],
-  paymentMethod: { type: String, enum: ['COD', 'Razorpay', 'Stripe'], required: true },
-  transactionId: { type: String, required: false }, 
+  paymentMethod: { type: String, enum: ['COD','Stripe', 'Tabby' ,'Tamara'], required: true },
+  transactionId: { type: String, required: true }, 
   amount: { type: Number, required: true },
   currency: { type: String, default: 'INR' },
-
   shippingAddress: {
     fullName: { type: String, required: true },
     addressLine1: { type: String, required: true },
@@ -39,23 +44,17 @@ const checkoutSchema = new mongoose.Schema({
     country: { type: String, required: false },
     phone: { type: String, required: false }
   },
-
-  // Payment-related fields
   paymentStatus: { 
     type: String, 
     enum: ['pending', 'completed', 'failed'], 
     default: 'pending' 
   },
   paymentFailureReason: { type: String }, 
-
-  // Order status
   orderStatus: { 
     type: String, 
     enum: ['processing', 'shipped', 'delivered', 'cancelled'], 
     default: 'processing' 
   },
-
-  // Return and refund management
   returnStatus: { 
     type: String, 
     enum: ['not_requested', 'requested', 'approved', 'rejected'], 
@@ -66,18 +65,19 @@ const checkoutSchema = new mongoose.Schema({
     enum: ['not_initiated', 'initiated', 'completed', 'failed'], 
     default: 'not_initiated' 
   },
-
-  // Coupons
+  returnRequestedAt: { type: Date }, 
+  returnProcessedAt: { type: Date }, 
+  returnReason:{type:String,required:false},
   couponCode: { type: String, required:false },
   discountAmount: { type: Number, default: 0,required:false }, 
   cancellationReason: { type: String, requiered:false }, 
-  trackingId:{type:String,required:false},
-  // Tracking timestamps
-  paymentCompletedAt: { type: Date ,required:false},
-  orderPlacedAt:{type:Date,required:true},
-  deliveredAt: { type: Date ,required:true}
+  trackingId: { type: String, required:false },
+  paymentCompletedAt: { type: Date, required:false },
+  orderPlacedAt: { type: Date, required:true },
+  deliveredAt: { type: Date, required:true }
 }, {
   timestamps: true
 });
+
 
 export const CheckoutModel: Model<ICheckout> = mongoose.model<ICheckout>("Checkout", checkoutSchema);

@@ -1,13 +1,13 @@
 // src/interface/cartInterface/IcartRepo.ts
 import mongoose from "mongoose";
-import { CartDTO } from "../../domain/dtos/CartDTO";
+import { CartDTO, IProductDetails } from "../../domain/dtos/CartDTO";
 import { IUserCart } from "../../domain/entities/userCartSchema";
 
 
 // Cart repository interface
 export default interface ICartRepo {
   createCart(data: CartDTO): Promise<IUserCart>;
-  findCartByUser(userId: string): Promise<IUserCart | null>;
+  findCartByUser(userId: string): Promise< null | IProductDetails[] >;
   addItemToCart(userId: string, productId: string, variantId: string, quantity: number): Promise<IUserCart | null>;
   updateItemQuantity(userId: string, productId: string, variantId: string, quantity: number): Promise<IUserCart | null>;
   removeItemFromCart(userId: string, productId: string, variantId: string): Promise<IUserCart | null>;

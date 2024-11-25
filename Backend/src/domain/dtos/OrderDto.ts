@@ -1,5 +1,7 @@
 
   import mongoose from "mongoose";
+import { IProductDetails } from "./CartDTO";
+import { ICheckoutItem } from "../entities/checkoutSchema";
 
 // OrderDTO.ts
 export interface CreateOrderDTO {
@@ -51,9 +53,8 @@ export interface CreateOrderDTO {
   export interface OrderDTO {
     _id: mongoose.Types.ObjectId;
     user: mongoose.Types.ObjectId;
-    cart: mongoose.Types.ObjectId;
-    items: ItemsListDTO[];
-    paymentMethod: 'COD' | 'Razorpay' | 'Stripe';
+    items: ICheckoutItem[];
+    paymentMethod: 'COD' | 'Tamara' | 'Stripe' | 'Tabby';
     transactionId: string;
     amount: number;
     currency: string;

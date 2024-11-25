@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { IProductDetails } from "./CartDTO";
 
 // domain/dtos/CheckoutDTO.ts
 
@@ -22,41 +23,37 @@ export interface ShippingAddressDTO {
 
 // Checkout DTO for frontend interactions
 export interface CheckoutDTO {
-  userId: string;
-  amount: number;
-  currency: string;
-  paymentMethod: 'COD' | 'Razorpay' | 'Stripe';
-  time: Date;
+  userId:string;
+  paymentMethod: 'COD' | 'Tabby' | 'Stripe';
   shippingAddress: ShippingAddressDTO;
-  transactionId: string;
-  paymentStatus: 'pending' | 'completed' | 'failed';
+  currency:string
+  transactionId:string
+  amount:number
+  paymentStatus:"pending" | "completed" | "failed"
+
 }
 
 // CheckoutCreateDTO for database or backend processing
 export interface CheckoutCreateDTO {
   user: mongoose.Types.ObjectId;
+  cartId?: mongoose.Types.ObjectId;
   amount: number;
   currency: string;
-  paymentMethod: 'COD' | 'Razorpay' | 'Stripe';
+  paymentMethod: 'COD' | 'Tabby' | 'Stripe';
   orderPlacedAt: Date;
-  deliveredAt: Date;
-  items: { 
+  items:{ 
     productId: string;
     variantId: string;
     name: string;
-    quantity: number;
     weight: string;
-    inPrice: number;
-    outPrice: number;
+    quantity: number;
+    price:number;
     images: string;
-    stockQuantity: number;
-    rating: number;
-
   }[];
   shippingAddress: ShippingAddressDTO;
-  transactionId:string;
   paymentStatus:"pending" | "completed" | "failed"
-  
+  transactionId:string
+  deliveredAt:Date
 }
 
 // Order Summary for summarizing order data
