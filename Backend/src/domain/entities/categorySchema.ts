@@ -9,6 +9,7 @@ export default interface ICategory extends Document {
     isDeleted: boolean;
     createdAt: Date;
     updatedAt: Date;
+    priority:number;
   }
 
   

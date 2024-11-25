@@ -1,11 +1,10 @@
 import { useApi } from './axiosConfig'
-import { creatingSubCategory } from '../types/categoryType';
 
 class SubCategoryApi{
     axiosInstance :any=useApi()
-    async addCategory(data:creatingSubCategory): Promise<any> {
+    async addCategory(data:FormData): Promise<any> {
        
-          return await this.axiosInstance.post('/api/sub-categories/category/sub/admin',data);
+          return await this.axiosInstance.post('/api/sub-categories/category/sub/admin',data,{headers: { 'Content-Type': 'multipart/form-data' }});
      
       }
     async fetchAllCategories(page:number,limit:number): Promise<any> {
@@ -40,9 +39,14 @@ class SubCategoryApi{
           return error;
         }
       }
-    async updateCategory(id:string,data:any): Promise<any> {
+    async updateCategory(id:string,data:FormData): Promise<any> {
      
-          return await this.axiosInstance.put(`/api/sub-categories/category/sub/admin/${id}`,data);
+          return await this.axiosInstance.put(`/api/sub-categories/category/sub/admin/${id}`,data,{headers: { 'Content-Type': 'multipart/form-data' }});
+       
+      }
+    async getAvailablePriorities(): Promise<any> {
+     
+          return await this.axiosInstance.get(`/api/sub-categories/category/sub/availble-priorities`);
        
       }
     async lisitingAndUnlisting(id:string,action:string): Promise<any> {

@@ -3,6 +3,8 @@ import CardDataStats from '../../components/CardDataStats';
 import ChartOne from '../../components/Charts/ChartOne';
 import adminDashBoard from '../../api/dashboardapi'; 
 import LoadingSpinner from '../../components/Spinner/LoadingSpinner';
+import ChartTwo from '../../components/Charts/ChartTwo';
+
 
 const Dashboard = () => {
   // State to store fetched data
@@ -129,6 +131,7 @@ const Dashboard = () => {
         />
       </div>
       <ChartOne revenue={setTotalRevenue} />
+      <ChartTwo/>
     </>
   );
 };

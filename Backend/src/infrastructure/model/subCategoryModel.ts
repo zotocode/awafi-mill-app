@@ -29,6 +29,14 @@ const SubCategorySchema: Schema = new Schema(
     isDeleted: {
       type: Boolean,
       default: false, // Default value is false
+    } , 
+    photo: {
+      type: String,
+      required: true,
+    },
+    priority: {
+      type: Number,
+      default: 101, 
     }
   },
   {
