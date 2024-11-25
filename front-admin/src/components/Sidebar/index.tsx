@@ -4,15 +4,16 @@ import SidebarLinkGroup from './SidebarLinks';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Logo from '../../images/white Awafi logoWithText.png'
 
-import { 
-  faTachometerAlt, 
-  faUsers, 
+import {
+  faTachometerAlt,
+  faUsers,
   faBoxOpen,
   faLayerGroup,    // New: for main Categories
   faFolderTree,    // New: for Category section
-  faTree ,      // New: for Sub Categories
+  faTree,      // New: for Sub Categories
   faCertificate,
-  faShoppingCart
+  faShoppingCart,
+  faStar
 } from '@fortawesome/free-solid-svg-icons';
 
 interface SidebarProps {
@@ -70,18 +71,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   return (
     <aside
       ref={sidebar}
-      className={`absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-black duration-300 ease-linear dark:bg-boxdark lg:static lg:translate-x-0 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}
+      className={`absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-black duration-300 ease-linear dark:bg-boxdark lg:static lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
     >
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
         <NavLink to="/" >
-        <div className='flex flex-row '>
-          <div className='w-2/'><img src={Logo} alt="" /></div>
-        
-        </div>
-        
+          <div className='flex flex-row '>
+            <div className='w-2/'><img src={Logo} alt="" /></div>
+
+          </div>
+
         </NavLink>
 
         <button
@@ -121,9 +121,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               <li>
                 <NavLink
                   to="/dashboard"
-                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                    pathname.includes('dashboard') && 'bg-graydark dark:bg-meta-4'
-                  }`}
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes('dashboard') && 'bg-graydark dark:bg-meta-4'
+                    }`}
                 >
                   <FontAwesomeIcon icon={faTachometerAlt} />
                   Dashboard
@@ -132,9 +131,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               <li>
                 <NavLink
                   to="/users"
-                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                    pathname.includes('users') && 'bg-graydark dark:bg-meta-4'
-                  }`}
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes('users') && 'bg-graydark dark:bg-meta-4'
+                    }`}
                 >
                   <FontAwesomeIcon icon={faUsers} />
                   Users
@@ -143,9 +141,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               <li>
                 <NavLink
                   to="/products"
-                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                    pathname.includes('products') && 'bg-graydark dark:bg-meta-4'
-                  }`}
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes('products') && 'bg-graydark dark:bg-meta-4'
+                    }`}
                 >
                   <FontAwesomeIcon icon={faBoxOpen} />
                   Products
@@ -162,10 +159,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     <React.Fragment>
                       <NavLink
                         to="/categories/main"
-                        className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                          (pathname === '/categories/main' || pathname.includes('/categories/main')) &&
+                        className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${(pathname === '/categories/main' || pathname.includes('/categories/main')) &&
                           'bg-graydark dark:bg-meta-4 shadow-lg'
-                        }`}
+                          }`}
                         onClick={(e) => {
                           e.preventDefault();
                           sidebarExpanded ? handleClick() : setSidebarExpanded(true);
@@ -174,9 +170,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         <FontAwesomeIcon icon={faLayerGroup} className="mr-2" />
                         Category
                         <svg
-                          className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
-                            open && 'rotate-180'
-                          }`}
+                          className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && 'rotate-180'
+                            }`}
                           width="20"
                           height="20"
                           viewBox="0 0 20 20"
@@ -194,9 +189,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
                       {/* Dropdown Menu */}
                       <div
-                        className={`translate transform overflow-hidden transition-all duration-300 ease-in-out ${
-                          !open && 'hidden'
-                        } ${open}`}
+                        className={`translate transform overflow-hidden transition-all duration-300 ease-in-out ${!open && 'hidden'
+                          } ${open}`}
                       >
                         <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
                           <li>
@@ -233,9 +227,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               <li>
                 <NavLink
                   to="/banner"
-                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                    pathname.includes('banner') && 'bg-graydark dark:bg-meta-4'
-                  }`}
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes('banner') && 'bg-graydark dark:bg-meta-4'
+                    }`}
                 >
                   <FontAwesomeIcon icon={faCertificate} />
                   Banners
@@ -244,23 +237,31 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               <li>
                 <NavLink
                   to="/order"
-                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                    pathname.includes('order') && 'bg-graydark dark:bg-meta-4'
-                  }`}
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes('order') && 'bg-graydark dark:bg-meta-4'
+                    }`}
                 >
-                  <FontAwesomeIcon  icon={faShoppingCart}  />
+                  <FontAwesomeIcon icon={faShoppingCart} />
                   Orders
                 </NavLink>
               </li>
               <li>
                 <NavLink
                   to="/sales-report"
-                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                    pathname.includes('sales') && 'bg-graydark dark:bg-meta-4'
-                  }`}
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes('sales') && 'bg-graydark dark:bg-meta-4'
+                    }`}
                 >
                   <FontAwesomeIcon icon={faShoppingCart} />
                   Sales Reports
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/reviews"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes('reviews') && 'bg-graydark dark:bg-meta-4'
+                    }`}
+                >
+                  <FontAwesomeIcon icon={faStar} />
+                  Review Management
                 </NavLink>
               </li>
             </ul>
