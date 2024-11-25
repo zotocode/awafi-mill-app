@@ -49,7 +49,8 @@ const startServer = async (): Promise<void> => {
 
     app.use('/api/user', userRoute);
     app.use('/api/admin', adminRoute)
-    app.use('/api/dashboard',verifyAdminToken, dashboardRoute)
+    // app.use('/api/dashboard',verifyAdminToken, dashboardRoute)
+    app.use('/api/dashboard', dashboardRoute)
     app.use('/api/orders', orderRoutes)
     app.use('/api/products', productRoute);
     app.use('/api/cart', verifyToken, cartRoutes)
