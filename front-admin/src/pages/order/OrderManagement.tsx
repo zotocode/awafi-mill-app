@@ -11,7 +11,8 @@ import {
   CheckCircle,
   XCircle,
   AlertTriangle,
-  X
+  X,
+  Loader2
 } from "lucide-react";
 import OrderPreviewModal from '../../components/Modals/OrderPreviewModal';
 import { Alert, AlertDescription } from '../../components/Alerts/Alert';
@@ -26,6 +27,8 @@ const OrderManagementPage = () => {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [orderToCancel, setOrderToCancel] = useState<OrderType | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const getStatusIcon = (status: OrderStatus) => {
     switch (status) {
@@ -77,8 +80,6 @@ const OrderManagementPage = () => {
     reason?: string
   ) => {
     try {
-  
-      
       const response = await OrderApi.updateOrderStatus(
         orderId, 
         newStatus, 
@@ -87,7 +88,7 @@ const OrderManagementPage = () => {
       );
 
       if (response.status === 200) {
-       
+        toast.success(`Order status updated to ${newStatus}`);
         setOrderData(prevOrders =>
           prevOrders.map(order =>
             order._id.toString() === orderId
@@ -96,10 +97,11 @@ const OrderManagementPage = () => {
           )
         );
       }
-    } catch (error:any) {
-      toast.error(error.response.data.error)
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to update order status');
     }
   };
+
   const handleTrackingIdChange = (orderId: string, value: string) => {
     setTrackingIds((prev) => ({
       ...prev,
@@ -107,42 +109,41 @@ const OrderManagementPage = () => {
     }));
   };
 
-  // Handle status change for shipping
-const handleConfirmShipping = (orderId: string) => {
-  const trackingId = trackingIds[orderId];
-  if (trackingId && trackingId.trim()) {
-    handleStatusChange(orderId, 'shipped', trackingId.trim());
-    setTrackingIds((prev) => {
-      const updated = { ...prev };
-      delete updated[orderId];
-      return updated;
-    });
-  }
-};
-
+  const handleConfirmShipping = (orderId: string) => {
+    const trackingId = trackingIds[orderId];
+    if (trackingId && trackingId.trim()) {
+      handleStatusChange(orderId, 'shipped', trackingId.trim());
+      setTrackingIds((prev) => {
+        const updated = { ...prev };
+        delete updated[orderId];
+        return updated;
+      });
+    }
+  };
 
   const handleCancelOrder = async () => {
     if (!orderToCancel || !cancelReason.trim()) return;
-    const response=await orderapi.cancelOrder( orderToCancel._id,cancelReason)
-   
-    if(response.status==200)
-    {
-      setOrderData(prevOrders =>
-        prevOrders.map(order =>
-          order._id.toString() === orderToCancel._id.toString()
-            ? { ...order, orderStatus: "cancelled" }
-            : order
-        )
-      );
-      toast.success("order cancelled successfully")
-    }else
-    {
-      toast.error("order cancellation failed")
+    
+    try {
+      const response = await orderapi.cancelOrder(orderToCancel._id, cancelReason);
+      
+      if (response.status === 200) {
+        setOrderData(prevOrders =>
+          prevOrders.map(order =>
+            order._id.toString() === orderToCancel._id.toString()
+              ? { ...order, orderStatus: "cancelled" }
+              : order
+          )
+        );
+        toast.success("Order cancelled successfully");
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to cancel order");
+    } finally {
+      setIsCancelModalOpen(false);
+      setOrderToCancel(null);
+      setCancelReason('');
     }
-
-    setIsCancelModalOpen(false);
-    setOrderToCancel(null);
-    setCancelReason('');
   };
 
   const columns: TableColumn[] = [
@@ -160,7 +161,7 @@ const handleConfirmShipping = (orderId: string) => {
       accessor: "amount",
       render: (row: { [key: string]: any }) => (
         <span className="font-mono text-sm font-medium">
-          ${row.amount.toFixed(2)}
+          {(row.amount || 0).toFixed(2)}  {row.currency}
         </span>
       )
     },
@@ -169,11 +170,11 @@ const handleConfirmShipping = (orderId: string) => {
       accessor: 'paymentStatus',
       render: (row: { [key: string]: any }) => (
         <div className="flex items-center gap-2">
-          <span className={`px-3 py-1 rounded-full text-sm font-medium ${paymentStatusStyles[row.paymentStatus as keyof typeof paymentStatusStyles]}`}>
+          <span className={`px-3 py-1 rounded-full text-sm font-medium ${paymentStatusStyles[row.paymentStatus as keyof typeof paymentStatusStyles] || paymentStatusStyles.pending}`}>
             {row.paymentStatus === 'pending' && <AlertTriangle className="inline-block w-4 h-4 mr-1 -mt-1" />}
             {row.paymentStatus === 'completed' && <CheckCircle className="inline-block w-4 h-4 mr-1 -mt-1" />}
             {row.paymentStatus === 'failed' && <XCircle className="inline-block w-4 h-4 mr-1 -mt-1" />}
-            {row.paymentStatus.charAt(0).toUpperCase() + row.paymentStatus.slice(1)}
+            {(row.paymentStatus || 'pending').charAt(0).toUpperCase() + (row.paymentStatus || 'pending').slice(1)}
           </span>
         </div>
       )
@@ -183,16 +184,44 @@ const handleConfirmShipping = (orderId: string) => {
       accessor: 'orderStatus',
       render: (row: { [key: string]: any }) => (
         <div className="flex items-center gap-2">
-          <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusStyles[row.orderStatus as OrderStatus]}`}>
+          <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusStyles[row.orderStatus as OrderStatus] || statusStyles.processing}`}>
             {getStatusIcon(row.orderStatus as OrderStatus)}
             <span className="ml-1">
-              {row.orderStatus.charAt(0).toUpperCase() + row.orderStatus.slice(1)}
+              {(row.orderStatus || 'processing').charAt(0).toUpperCase() + (row.orderStatus || 'processing').slice(1)}
             </span>
           </span>
         </div>
       )
     },
   ];
+
+  const onActionReturn=async(orderId:string,data:{productId:string,variantId:string,returnStatus:'approved' |'rejected'})=>
+  {
+    const{productId,variantId,returnStatus}=data
+    if (selectedOrder) {
+      const updatedItems = selectedOrder.items.map((item) => {
+        if (item.productId === productId && item.variantId === variantId) {
+          return { ...item, returnStatus };
+        }
+        return item;
+      });
+    
+      setSelectedOrder({ ...selectedOrder, items: updatedItems });
+    }
+    
+  
+     const response=await orderapi.actionOnReturnOrder(orderId,data)
+     if(response.status==200)
+     {
+      toast.success(`order ${returnStatus}  successfully`)
+
+     }
+     else{
+      toast.error(` Order ${returnStatus} failed`)
+     }
+    
+
+  }
 
   const actions = (row: { [key: string]: any }): JSX.Element => {
     const typedRow = row as OrderType;
@@ -204,25 +233,25 @@ const handleConfirmShipping = (orderId: string) => {
       <div className="flex items-center gap-3">
         {isProcessingToShipped ? (
           <div className="flex items-center gap-2">
-             <input
-            type="text"
-            value={trackingIds[typedRow._id.toString()] || ''} // Use tracking ID for this order
-            onChange={(e) => handleTrackingIdChange(typedRow._id.toString(), e.target.value)}
-            placeholder="Enter Tracking ID"
-            className="px-3 py-1.5 text-sm border rounded-lg"
-          />
-              <button
-            onClick={() => handleConfirmShipping(typedRow._id.toString())}
-            disabled={!trackingIds[typedRow._id.toString()]?.trim()} // Disable if tracking ID is empty
-            className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-              trackingIds[typedRow._id.toString()]?.trim()
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            }`}
-          >
-            <TruckIcon className="inline-block w-4 h-4 mr-1" />
-            Confirm Shipping
-          </button>
+            <input
+              type="text"
+              value={trackingIds[typedRow._id.toString()] || ''}
+              onChange={(e) => handleTrackingIdChange(typedRow._id.toString(), e.target.value)}
+              placeholder="Enter Tracking ID"
+              className="px-3 py-1.5 text-sm border rounded-lg"
+            />
+            <button
+              onClick={() => handleConfirmShipping(typedRow._id.toString())}
+              disabled={!trackingIds[typedRow._id.toString()]?.trim()}
+              className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                trackingIds[typedRow._id.toString()]?.trim()
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              }`}
+            >
+              <TruckIcon className="inline-block w-4 h-4 mr-1" />
+              Confirm Shipping
+            </button>
           </div>
         ) : (
           <select
@@ -276,16 +305,47 @@ const handleConfirmShipping = (orderId: string) => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
         const response = await OrderApi.getAllOrders();
+        
         if (response.status === 200) {
-          setOrderData(response.data.orders);
+          setOrderData(response.data?.orders || []);
         }
-      } catch (error) {
-        console.error('Failed to fetch orders:', error);
+      } catch (error: any) {
+        const errorMessage = error.response?.data?.error || 'Failed to fetch orders';
+        setError(errorMessage);
+        toast.error(errorMessage);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchOrders();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          <p className="text-gray-600">Loading orders...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -294,7 +354,7 @@ const handleConfirmShipping = (orderId: string) => {
         <p className="text-sm text-gray-600">Manage and track all orders in one place</p>
       </div>
 
-      {orderData.length === 0 ? (
+      {(!orderData || orderData.length === 0) ? (
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
@@ -311,14 +371,7 @@ const handleConfirmShipping = (orderId: string) => {
         </div>
       )}
 
-      <OrderPreviewModal
-        order={selectedOrder}
-        isOpen={isPreviewModalOpen}
-        onClose={() => {
-          setIsPreviewModalOpen(false);
-          setSelectedOrder(null);
-        }}
-      />
+   
 
       {/* Cancel Order Modal */}
       {isCancelModalOpen && (
@@ -370,6 +423,16 @@ const handleConfirmShipping = (orderId: string) => {
           </div>
         </div>
       )}
+
+<OrderPreviewModal
+        order={selectedOrder}
+        isOpen={isPreviewModalOpen}
+        onClose={() => {
+          setIsPreviewModalOpen(false);
+          setSelectedOrder(null);
+        }}
+        onActionReturn={onActionReturn}
+      />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 // src/infrastructure/repositories/cartRepo.ts
-import { CartDTO } from "../../domain/dtos/CartDTO";
+import { CartDTO, IProductDetails } from "../../domain/dtos/CartDTO";
 import { Model, Types } from "mongoose";
 import { IUserCart } from "../../domain/entities/userCartSchema";
 import { BaseRepository } from "./baseRepository";
@@ -27,7 +27,7 @@ export class CartRepository extends BaseRepository<IUserCart> implements ICartRe
   //   .exec();
   // Repository method
   // @ts-ignore
-  async findCartByUser(userId: string): Promise<IUserCart | null> {
+  async findCartByUser(userId: string): Promise<IProductDetails[] | null> {
     try {
       let cart = await this.model.findOne({ user: userId })
         .populate('items.product')
@@ -55,7 +55,7 @@ export class CartRepository extends BaseRepository<IUserCart> implements ICartRe
     
         // console.log("Transformed cart:", transformedCart);
         // @ts-ignore
-        return transformedCart;
+        return transformedCart
       } catch (error) {
         console.error("Error finding cart for user:", error);
         throw new Error("Could not find cart for the user. Please check the user ID.");

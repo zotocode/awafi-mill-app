@@ -1,13 +1,12 @@
-import Stripe from 'stripe';
-import envConfig from "../../config/env";
+import Razorpay from 'razorpay';
+import envConfig from "../../config/env"; // Make sure to have your keys in envConfig
 import { IPaymentGateway } from './IPaymentGateway';
-
-
-export class StripePaymentGateway implements IPaymentGateway {
-    private stripe: Stripe;
+import { ShippingAddressDTO } from '../../domain/dtos/CheckoutDTO';
+export class  TabbyPaymentGateway implements IPaymentGateway {
+    // private stripe: Stripe;
 
     constructor() {
-        this.stripe = new Stripe(envConfig.STRIPE_SECRET_KEY as string);
+        // this.stripe = new Stripe(envConfig.STRIPE_SECRET_KEY as string);
     }
 
     async verifyPayment(clientSecret: string): Promise<boolean> {
@@ -22,5 +21,4 @@ export class StripePaymentGateway implements IPaymentGateway {
         return false;
     }
 
-    // ... rest of your code remains the same
 }

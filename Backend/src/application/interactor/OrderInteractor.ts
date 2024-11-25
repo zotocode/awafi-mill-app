@@ -92,6 +92,101 @@ export class OrderInteractor implements IOrderInteractor {
   async cancelUserOrder(orderId: string, userId: string, cancellationReason: string): Promise<boolean> {
     return await this.orderRepository.cancelWithReason(orderId, userId, cancellationReason);
   }
+  async returnUserOrder(
+    orderId: string,
+    userId: string,
+    returnData: { returnReason: string; productId?: string; variantId?: string }
+  ): Promise<any> {
+    // Validate required parameters
+    if (!orderId || !userId || !returnData?.returnReason) {
+      throw new Error('Missing required fields: orderId, userId, or returnReason.');
+    }
+    const orderObjectId=new mongoose.Types.ObjectId(orderId)
+    const order =await this.orderRepository.findByOrderId(orderObjectId)
+    if(order && (order.paymentStatus != "completed"  || order.orderStatus !== "delivered"))
+    {
+      throw new Error("delivered and payment completed product can only return")
+    }
+ 
+    if (returnData.productId && returnData.variantId) {
+      // Ensure returnData contains productId and variantId before passing to returnOneProduct
+      const data: { returnReason: string; productId: string; variantId: string } = {
+        returnReason: returnData.returnReason,
+        productId: returnData.productId,
+        variantId: returnData.variantId,
+      };
+      
+      // Handle returning a specific product variant
+      return await this.orderRepository.returnOneProduct(orderId, data);
+    }
+  
+    // Handle returning the entire order
+    return await this.orderRepository.returnTheOrder(orderId, returnData.returnReason);
+  }
+
+
+
+
+
+  async actionOnReturnOrder(
+    orderId: string,
+    returnData: { productId?: string; variantId?: string; returnStatus: 'approved'| 'rejected' }
+  ): Promise<any> {
+   console.log("dataaaaa",returnData)
+
+    if (!orderId || !returnData) {
+      throw new Error('Missing required fields: orderId or returnData.');
+    }
+  
+    // Check for the return reason in case of returning the entire order
+    if (!returnData.returnStatus && !(returnData.productId && returnData.variantId)) {
+      throw new Error('return status is required for returning');
+    }
+  
+
+    const orderObjectId = new mongoose.Types.ObjectId(orderId);
+    
+    // Fetch the order from the repository
+    const order = await this.orderRepository.findByOrderId(orderObjectId);
+  
+    // Ensure the order exists and meets return conditions
+    if (!order) {
+      throw new Error('Order not found.');
+    }
+    if (order.paymentStatus !== 'completed' || order.orderStatus !== 'delivered') {
+      throw new Error('Only delivered and payment completed products can be returned.');
+    }
+
+
+  
+    // Check if it's a product-level return
+    if (returnData.productId && returnData.variantId ) {
+      // Ensure returnData contains productId and variantId before passing to returnOneProduct
+      const item = order.items.find(
+        (e) => e.productId?.toString() === returnData.productId && e.variantId?.toString() === returnData.variantId
+      );
+      if (!item) {
+        throw new Error('Product or variant not found in the order.');
+      }
+
+    const refundAmount = item.price * item.quantity;
+      const data = {
+        productId: returnData.productId,
+        variantId: returnData.variantId,
+        returnStatus:returnData.returnStatus,
+        refundAmount
+      };
+  
+      // Handle returning a specific product variant
+      return await this.orderRepository.actionOnReturnOneProduct(orderId, data);
+    }
+  
+
+    return await this.orderRepository.returnOrder(orderId,returnData.returnStatus);
+  }
+  
+  
+  
 
   private mapToDTO(order: ICheckout): OrderDTO {
     return {
@@ -105,7 +200,6 @@ export class OrderInteractor implements IOrderInteractor {
       shippingAddress: order.shippingAddress,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
-      cart: order.cart,
       paymentMethod: order.paymentMethod,
       currency: order.currency || 'USD',
       discountAmount: order.discountAmount || 0,

@@ -1,61 +1,57 @@
-import mongoose, { Document } from "mongoose";
+import { Types,Document } from "mongoose";
 
-// Checkout interface
-export interface ICheckout extends Document {
-  _id:mongoose.Types.ObjectId;
-  user: mongoose.Types.ObjectId;
-  cart: mongoose.Types.ObjectId;
-  transactionId:string;
-  orderPlacedAt:Date;
-  items: { 
-    productId: string;
-    variantId: string;
-    name: string;
-    quantity: number;
-    weight: string;
-    inPrice: number;
-    outPrice: number;
-    images: string;
-    stockQuantity: number;
-    rating: number;
-  }[];
-  paymentMethod: 'COD' | 'Razorpay' | 'Stripe';
+export interface ICheckoutItem {
+  productId?: Types.ObjectId;
+  variantId?: Types.ObjectId;
+  quantity: number;
+  returnStatus?: "not_requested" | "requested" | "approved" | "rejected";
+  returnReason?: string; // Reason for return
+  refundAmount?: number; // Amount refunded for this item
+  name: string;
+  weight: string;
+  price:number
+  images: string;
+  stockQuantity: number;
+  rating?: number;
+}
+
+export interface IAddress {
+  fullName: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  postalCode: string;
+  country: string;
+  phone: string;
+}
+
+export interface ICheckout extends Document  {
+  _id: Types.ObjectId;
+  user: Types.ObjectId;
+  cartId: Types.ObjectId;
+  items: ICheckoutItem[];
+  paymentMethod: 'COD' |'Stripe'| 'Tabby' |'Tamara';
+  transactionId: string;
   amount: number;
+  returnReason:string;
   currency: string;
-  cancellationReason?:string;
-  trackingId?:string;
-  // Address fields
-  shippingAddress?: {
-    fullName: string;
-    addressLine1: string;
-    addressLine2?: string;
-    city: string;
-    postalCode: string;
-    country: string;
-    phone: string;
-  };
-  billingAddress?: {
-    fullName: string;
-    addressLine1: string;
-    addressLine2?: string;
-    city: string;
-    postalCode: string;
-    country: string;
-    phone: string;
-  };
-
-  // Payment and order status
-  paymentStatus: 'pending' | 'completed' | 'failed';
+  shippingAddress: IAddress;
+  billingAddress?: IAddress;
+  paymentStatus?: "pending" | "completed" | "failed";
   paymentFailureReason?: string;
-  orderStatus: 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  returnStatus: 'not_requested'| 'requested'| 'approved'| 'rejected'; 
-  refundStatus: 'not_initiated'| 'initiated'| 'completed'| 'failed'; 
-  couponCode?: string;  
-  discountAmount: number; 
+  orderStatus?: "processing" | "shipped" | "delivered" | "cancelled";
+  returnStatus?: "not_requested" | "requested" | "approved" | "rejected";
+  refundStatus?: "not_initiated" | "initiated" | "completed" | "failed";
+  returnRequestedAt?: Date;
+  returnProcessedAt?: Date;
+  couponCode?: string;
+  discountAmount?: number;
+  cancellationReason?: string;
+  trackingId?: string;
   paymentCompletedAt?: Date;
-  deliveredAt?: Date;
+  orderPlacedAt: Date;
+  deliveredAt: Date;
   createdAt: Date;
   updatedAt: Date;
-  userDetails?:any;
-  productDetails?:any
+  userDetails:any
 }

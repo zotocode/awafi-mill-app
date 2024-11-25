@@ -6,24 +6,31 @@ import { CheckoutDTO ,CheckoutCreateDTO} from "../../domain/dtos/CheckoutDTO";
 import { IproductRepo } from "../../interface/productInterface/IproductRepo"; // Import IproductRepo
 import mongoose from "mongoose";
 import envConfig from "../../config/env";
+import { IUserCart } from "../../domain/entities/userCartSchema";
+import { IPaymentGateway } from "../../infrastructure/paymentGateways/IPaymentGateway";
+import { IProductDetails } from "../../domain/dtos/CartDTO";
+
 
 export class CheckoutInteractor implements ICheckoutInteractor {
     private cartRepo: ICartRepo;
     private checkoutRepo: ICheckoutRepo;
     private productRepo: IproductRepo; // Declare productRepo
+    private stripePaymentGateway:IPaymentGateway
+    private taabyPaymentGateway:IPaymentGateway
  
 
-    constructor(cartRepo: ICartRepo, checkoutRepo: ICheckoutRepo, productRepo: IproductRepo) {
+    constructor(cartRepo: ICartRepo, checkoutRepo: ICheckoutRepo, productRepo: IproductRepo, stripePaymentGateway:IPaymentGateway, taabyPaymentGateway:IPaymentGateway) {
         this.cartRepo = cartRepo;
         this.checkoutRepo = checkoutRepo;
-        this.productRepo = productRepo; // Initialize productRepo
-       
+        this.productRepo = productRepo; 
+        this.stripePaymentGateway=stripePaymentGateway
+        this.taabyPaymentGateway=taabyPaymentGateway
     }
 
-    async  getSecretKey(paymentMethod:'Razorpay'| 'Stripe'):Promise<{secretKey:string}>
+    async  getSecretKey(paymentMethod:'Stripe'| 'Tabby' |'Tamara'):Promise<{secretKey:string}>
     {
 
-        if(paymentMethod==="Razorpay")
+        if(paymentMethod==="Tabby")
         {
             return {secretKey:envConfig.RAZORPAY_SECRET_KEY as string}
         }
@@ -31,37 +38,89 @@ export class CheckoutInteractor implements ICheckoutInteractor {
         {
             
             return {secretKey:envConfig.STRIPE_SECRET_KEY as string}
+        } else if(paymentMethod=="Tamara")
+        {
+            return{secretKey:"no value"}
         }
         return{secretKey:"no value"}
     }
-    async processCheckout(data: CheckoutDTO): Promise<any> {
-        // Find the user's cart
-        const cartItems: any | null = await this.cartRepo.findCartByUser(data.userId);
-       
-        if (!cartItems) throw new Error("Cart not found");
-    
-        // Prepare the checkout data to be saved
-        const checkoutData: CheckoutCreateDTO = {
-            user: new mongoose.Types.ObjectId(data.userId),
-            amount: data.amount,
-            paymentMethod: data.paymentMethod,
-            orderPlacedAt: new Date(data.time),
-            deliveredAt: new Date(new Date(data.time).getTime() + 3 * 24 * 60 * 60 * 1000), // 3 days after order time
-            items: cartItems,
-            currency: data.currency,
-            shippingAddress: data.shippingAddress,  // Add shipping address
-            transactionId: data.transactionId,      // Add transaction ID
-            paymentStatus: data.paymentStatus       // Set initial payment status
-        };
-    
-        // Save the checkout data in the database
-        const checkoutResult = await this.checkoutRepo.createCheckout(checkoutData);
-   
-        // Clear the cart after successful checkout
-        await this.cartRepo.clearCart(data.userId);
-    
-        return checkoutResult; // Return checkout result for frontend reference
+    async getVerifyPayment(paymentMethod:'Stripe'| 'Tabby' |'Tamara',clientSecret:string):Promise<boolean>
+    {
+        if(paymentMethod==="Tabby")
+            {
+                return true
+            }
+            else if(paymentMethod==="Stripe")
+            {
+                
+                return true
+            } else if(paymentMethod=="Tamara")
+            {
+                return true
+            }
+        
+  return false
     }
-    
+    async processCheckout({
+        userId,
+        shippingAddress,
+        paymentMethod,
+        currency,
+        amount,
+        transactionId,
+        paymentStatus,
+      }: CheckoutDTO): Promise<any> {
+        // Step 1: Retrieve cart items
+        const response= await this.cartRepo.findCartByUser(userId);
+        const inPrice = /aed/i.test(currency);
+       const cartItems=response?.map((e)=>{
+        return {
+            productId: e.productId,
+            variantId: e.variantId,
+            name: e.name,
+            weight: e.weight,
+            quantity: e.quantity,
+            price:inPrice ? e.inPrice :e.outPrice,
+            images: e.images
+        }
+       })
+      
+        if (!cartItems) {
+          throw new Error("Cart not found or no items in the cart");
+        }
+      
+ ;
+      
+        // Step 2: Convert user ID to ObjectId
+        const userInObjectId = new mongoose.Types.ObjectId(userId);
+      
+        // Step 3: Create checkout data
+        const data: CheckoutCreateDTO = {
+            user: userInObjectId,
+            currency,
+            paymentMethod,
+            orderPlacedAt: new Date(),
+            items: cartItems,
+            shippingAddress,
+            amount,
+            transactionId,
+            paymentStatus,
+            deliveredAt: (() => {
+              const date = new Date();
+              date.setDate(date.getDate() + 5); // Add 5 days to the current date
+              return date;
+            })(),
+          };
+          
+        // Step 4: Save checkout data
+        const checkout = await this.checkoutRepo.createCheckout(data);
+      
+        // Step 5: Clear the cart after successful checkout (optional)
+        // await this.cartRepo.clearCart(userId);
+      
+        // Step 6: Return the checkout result
+        return checkout;
+      }
+      
 
 }

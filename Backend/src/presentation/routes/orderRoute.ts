@@ -37,6 +37,11 @@ orderRoutes.patch(
 verifyAdminToken,
   orderController.cancelOrder.bind(orderController)
 );
+orderRoutes.put(
+  "/order/admin/return/:id", 
+verifyAdminToken,
+  orderController.actionOnReturnOrder.bind(orderController)
+);
 
 
 // User routes
@@ -56,9 +61,14 @@ verifyToken,
   orderController.getUserOrderById.bind(orderController)
 );
 orderRoutes.patch(
-  "/order/user/:id/cancel", 
+  "/order/user/cancel/:id", 
 verifyToken,
   orderController.cancelUserOrder.bind(orderController)
+)
+orderRoutes.put(
+  "/order/user/return/:id", 
+verifyToken,
+  orderController.returnUserOrder.bind(orderController)
 );
 
 export default orderRoutes;

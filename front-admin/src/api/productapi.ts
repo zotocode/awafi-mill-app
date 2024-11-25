@@ -99,7 +99,7 @@ class ProductApi{
       async listingProduct(id:string,action:string): Promise<any> {
         try {
     
-          return await this.axiosInstance.patch(`/api/products/product/admin/${id}?action=${action}`);
+          return await this.axiosInstance.patch(`/api/products/product/list-status/admin/${id}?action=${action}`);
         } catch (error: unknown) {
          
           return error;

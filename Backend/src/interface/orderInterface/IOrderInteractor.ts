@@ -18,4 +18,6 @@ export default interface IOrderInteractor {
   getUserOrders(params: { userId: string; status?: string; page: number; limit: number }): Promise<any>;
   getUserOrderById(orderId: string, userId: string): Promise<any>;
   cancelUserOrder(orderId: string, userId: string, cancellationReason: string): Promise<any>;
+  returnUserOrder(orderId: string, userId: string, returnData:{ returnReason:string,productId?:string,variantId?:string}): Promise<any>;
+  actionOnReturnOrder(orderId: string, returnData:{ productId?:string,variantId?:string,returnStatus:'approved'| 'rejected'}): Promise<any>;
 }
