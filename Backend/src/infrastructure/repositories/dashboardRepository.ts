@@ -190,81 +190,10 @@ export class DashboardRepository extends BaseRepository<ICheckout> implements ID
     endDate: Date,
     interval: 'day' | 'week' | 'month' | 'year'
   ) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-
-const testDocuments = await this.model.find().limit(5).exec();
-
-
-
-const simpleQuery = await this.model.find({
-  createdAt: { $gte: start, $lte: end }
-}).exec();
-
-
-  
-    const groupByDate: { [key: string]: any } = {
-      day: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-      week: { $dateToString: { format: "%Y-%U", date: "$createdAt" } },
-      month: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
-      year: { $dateToString: { format: "%Y", date: "$createdAt" } }
-    };
-  
-    const pipeline: PipelineStage[] = [
-      {
-        $match: {
-          createdAt: { $gte: start, $lte: end },
-          orderStatus: "delivered",
-          paymentStatus: "completed"
-        }
-      },
-      {
-        $unwind: "$items"
-      },
-      {
-        $group: {
-          _id: {
-            date: groupByDate[interval], // Adjust here for different intervals
-            product: "$items.product"
-          },
-          totalQuantity: { $sum: "$items.quantity" },
-          totalRevenue: { $sum: { $multiply: ["$amount", "$items.quantity"] } }
-        }
-      },
-      {
-        $lookup: {
-          from: "products",
-          localField: "_id.product",
-          foreignField: "_id",
-          as: "productDetails"
-        }
-      },
-      {
-        $unwind: "$productDetails"
-      },
-      {
-        $project: {
-          date: "$_id.date",
-          productId: "$_id.product",
-          productName: "$productDetails.name",
-          totalQuantity: 1,
-          totalRevenue: 1
-        }
-      },
-      {
-        $sort: { date: 1 }
-      }
-    ];
-    
-  
     try {
-      console.log("Pipeline:", JSON.stringify(pipeline, null, 2)); // Log the pipeline
-      const report = await this.model.aggregate(pipeline).exec();
-      console.log("Sales Report:", report); // Log the result
-      return report;
+      
     } catch (error) {
-      console.error("Error generating sales report:", error);
+      console.error(error);
       throw error;
     }
   }

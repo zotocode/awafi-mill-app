@@ -2,10 +2,12 @@ import { Review } from "../api/reviewApi";
 
 const ReviewItem = ({ 
   review, 
-  onApprove 
+  onApprove, 
+  onDecline 
 }: { 
   review: Review; 
-  onApprove: (id: string) => void;
+  onApprove: (id: string) => void; 
+  onDecline: (id: string) => void;
 }) => (
   <div className="bg-white rounded-lg shadow-md p-6 mb-4">
     <div className="flex flex-col md:flex-row gap-6">
@@ -16,7 +18,7 @@ const ReviewItem = ({
           className="w-full h-full object-cover rounded-lg"
         />
       </div>
-      
+
       <div className="flex-1">
         <div className="flex justify-between items-start mb-4">
           <div>
@@ -29,14 +31,13 @@ const ReviewItem = ({
               {[...Array(5)].map((_, i) => (
                 <span
                   key={i}
-                  className={`text-lg ${
-                    i < review.rating ? 'text-yellow-400' : 'text-gray-300'
-                  }`}
+                  className={`text-lg ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
                 >
                   ★
                 </span>
               ))}
             </div>
+            {/* Show Approve or Decline buttons based on review status */}
             {review.status === 'pending' && (
               <button
                 onClick={() => onApprove(review.id)}
@@ -58,11 +59,32 @@ const ReviewItem = ({
                 Approve
               </button>
             )}
+            {review.status === 'approved' && (
+              <button
+                onClick={() => onDecline(review.id)}
+                className="inline-flex items-center px-3 py-1 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
+              >
+                <svg
+                  className="w-4 h-4 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+                Revert Approval
+              </button>
+            )}
           </div>
         </div>
-        
+
         <p className="text-gray-700 mb-2">{review.reviewContent}</p>
-        
+
         <div className="flex justify-between items-center text-sm text-gray-500">
           <span>
             {new Date(review.createdAt).toLocaleDateString('en-US', {
@@ -71,11 +93,15 @@ const ReviewItem = ({
               day: 'numeric'
             })}
           </span>
-          <span className={`px-2 py-1 rounded-full text-xs ${
-            review.status === 'approved' 
-              ? 'bg-green-100 text-green-800' 
-              : 'bg-yellow-100 text-yellow-800'
-          }`}>
+          <span
+            className={`px-2 py-1 rounded-full text-xs ${
+              review.status === 'approved'
+                ? 'bg-green-100 text-green-800'
+                : review.status === 'pending'
+                ? 'bg-yellow-100 text-yellow-800'
+                : 'bg-red-100 text-red-800'
+            }`}
+          >
             {review.status.charAt(0).toUpperCase() + review.status.slice(1)}
           </span>
         </div>
