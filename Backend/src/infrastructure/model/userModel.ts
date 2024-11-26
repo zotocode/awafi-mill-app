@@ -1,3 +1,5 @@
+// src/infrastructure/model/userModel.ts
+
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 // Define the user document interface

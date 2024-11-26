@@ -8,12 +8,15 @@ export default interface IOrderRepository {
   findAll(params: {
     page: number;
     limit: number;
+    status:string;
+    paymentStatus:string
   }): Promise<{
     orders: ICheckout[];
     total: number;
     page: number;
     limit: number;
   }>;
+
   
   findByOrderId(orderId: mongoose.Types.ObjectId): Promise<ICheckout | null>;
 
@@ -45,5 +48,5 @@ export default interface IOrderRepository {
 
   returnOrder(orderId:string,returnStatus:'approved'| 'rejected'):Promise<any>
   actionOnReturnOneProduct(orderId: string,data:{ productId: string,
-    variantId: string,returnStatus:'approved'| 'rejected',refundAmount:number}): Promise<ICheckout | null>;
+    variantId: string,returnStatus:'approved'| 'rejected',refundAmount:number}): Promise<any>;
 }

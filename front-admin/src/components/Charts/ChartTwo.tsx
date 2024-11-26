@@ -67,7 +67,7 @@ interface ChartTwoState {
 }
 
 
-const ChartTwo: React.FC = () => {
+const ChartTwo: React.FC = (topSellings) => {
   const [state, setState] = useState<ChartTwoState>({
     series: [
       {

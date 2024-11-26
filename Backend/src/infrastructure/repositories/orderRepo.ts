@@ -34,33 +34,74 @@ export class OrderRepository extends BaseRepository<ICheckout> implements IOrder
     }
   }
 
-  async findAll(params: { page: number; limit: number }): Promise<{
+  async findAll(params: { page: number; limit: number; status: string; paymentStatus: string }): Promise<{
     orders: ICheckout[];
     total: number;
     page: number;
     limit: number;
   }> {
     try {
-      const skip = (params.page - 1) * params.limit;
+      const { page, limit, status, paymentStatus } = params;
+      const skip = (page - 1) * limit;
   
+      // Initialize query
+      const query: Record<string, any> = {};
+  
+      // Handle "returned" status
+      if (status === "returned") {
+        query.$or = [
+          { returnStatus: { $in: ["requested", "approved", "rejected"] } },
+          { "items.returnStatus": { $in: ["requested", "approved", "rejected"] } },
+        ];
+      } else {
+        // Add paymentStatus condition if applicable
+        if (["pending", "completed", "failed"].includes(paymentStatus)) {
+          query.paymentStatus = paymentStatus;
+        }
+  
+        // Add orderStatus condition for non-returned status
+        if (["processing", "shipped", "delivered", "cancelled"].includes(status)) {
+          query.orderStatus = status;
+        }
+      }
+  
+      // Execute aggregation pipeline and count
       const [orders, total] = await Promise.all([
         this.model.aggregate([
+          { $match: query },
           {
             $lookup: {
-              from: 'users',
+              from: "users",
               let: { userId: "$user" },
               pipeline: [
                 { $match: { $expr: { $eq: ["$_id", "$$userId"] } } },
-                { $project: { password: 0, _id: 0 } } // exclude user ID and password fields
+                { $project: { password: 0, _id: 0 } },
               ],
-              as: 'userDetails'
-            }
+              as: "userDetails",
+            },
+          },
+          {
+            $addFields: {
+              hasReturnRequest: {
+                $cond: {
+                  if: {
+                    $gt: [
+                      { $size: { $filter: { input: "$items", as: "item", cond: { $in: ["$$item.returnStatus", ["requested"]] } } } },
+                      0,
+                    ],
+                  },
+                  then: true,
+                  else: false,
+                },
+              },
+            },
           },
           {
             $project: {
               _id: 1,
               user: 1,
-              trackingId: 1,        // Make sure trackingId is included in the projection
+              trackingId: 1,
+              transactionId:1,
               orderStatus: 1,
               paymentStatus: 1,
               amount: 1,
@@ -71,21 +112,26 @@ export class OrderRepository extends BaseRepository<ICheckout> implements IOrder
               createdAt: 1,
               updatedAt: 1,
               discountAmount: 1,
-              userDetails: { $arrayElemAt: ["$userDetails", 0] }  // Flatten userDetails array
-            }
+              userDetails: { $arrayElemAt: ["$userDetails", 0] },
+              hasReturnRequest: 1, // Include the hasReturnRequest field
+              deliveredAt:1,
+              orderPlacedAt:1
+
+            },
           },
           { $sort: { createdAt: -1 } },
           { $skip: skip },
-          { $limit: params.limit }
+          { $limit: limit },
         ]),
-        this.model.countDocuments()
+        this.model.countDocuments(query),
       ]);
   
-      return { orders, total, page: params.page, limit: params.limit };
+      return { orders, total, page, limit };
     } catch (error) {
       throw new Error(`Error finding orders: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
+  
   
 
   async findByOrderId(orderId: mongoose.Types.ObjectId): Promise<ICheckout | null> {
@@ -238,7 +284,7 @@ export class OrderRepository extends BaseRepository<ICheckout> implements IOrder
 
     // Update the return status and reason for the specific product variant
     const result = await this.model.updateOne(
-      { _id: orderId, "items.productId": productId, "items.variantId": variantId ,orderStatus:"delivered"},
+      { _id: orderId, "items.productId": productId, "items.variantId": variantId ,orderStatus:"delivered", "items.returnStatus": { $ne: "requested" }},
       {
         $set: {
           "items.$.returnStatus": "requested",

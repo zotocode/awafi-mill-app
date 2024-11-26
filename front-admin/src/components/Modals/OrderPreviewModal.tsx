@@ -7,7 +7,7 @@ interface OrderPreviewModalProps {
   order: OrderType | null;
   isOpen: boolean;
   onClose: () => void;
-  onActionReturn: (orderId: string, data?: {productId:string,variantId:string,returnStatus:'approved'| 'rejected'}) => Promise<void>;
+  onActionReturn: (orderId: string, data: {productId:string,variantId:string,returnStatus:'approved'| 'rejected'}) => Promise<void>;
   
 }
 
@@ -211,6 +211,18 @@ const OrderPreviewModal: React.FC<OrderPreviewModalProps> = ({
                         Delivered: {new Date(order.deliveredAt).toLocaleString()}
                       </p>
                     )}
+                  </div>
+                </div>
+                <div className="bg-white dark:bg-gray-700 p-5 rounded-lg border border-gray-100 dark:border-gray-600">
+                  <h3 className="font-medium text-gray-900 dark:text-white mb-4">Important Details</h3>
+                  <div className="space-y-3">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      trackingId: {order.trackingId ?order.trackingId :"Nil"}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      trackingId: {order.transactionId ?order.transactionId :"Nil"}
+                    </p>
+                   
                   </div>
                 </div>
               </>

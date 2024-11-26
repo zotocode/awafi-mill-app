@@ -1,3 +1,5 @@
+// src/infrastructure/model/producModel.ts
+
 import mongoose, { Schema } from 'mongoose';
 import Product  from '../../domain/entities/productSchema';
 import { ref, required } from 'joi';

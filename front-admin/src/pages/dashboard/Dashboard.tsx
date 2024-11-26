@@ -4,6 +4,7 @@ import ChartOne from '../../components/Charts/ChartOne';
 import adminDashBoard from '../../api/dashboardapi'; 
 import LoadingSpinner from '../../components/Spinner/LoadingSpinner';
 import ChartTwo from '../../components/Charts/ChartTwo';
+import dashboardapi from '../../api/dashboardapi';
 
 
 const Dashboard = () => {
@@ -19,10 +20,24 @@ const Dashboard = () => {
     },
   });
   const [totalRevenue,setTotalRevenue]=useState<number>(0)
-
+  const [topSellingProduct,setTopSellingProduct]=useState()
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+
+  
+useEffect(()=>{
+  const fetchTopSellings = async () => {
+    try {
+      const response=await dashboardapi.topSellings()
+      setTopSellingProduct(response.product)
+    } catch (error) {
+       console.log(`Erro message:${error}`)
+    }
+  }
+
+  fetchTopSellings()
+},[])
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
@@ -131,7 +146,7 @@ const Dashboard = () => {
         />
       </div>
       <ChartOne revenue={setTotalRevenue} />
-      <ChartTwo/>
+      <ChartTwo  />
     </>
   );
 };

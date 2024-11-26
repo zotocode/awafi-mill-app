@@ -10,9 +10,10 @@ export class AdminReviewInteractor implements IAdminReviewInteractor {
     this.reviewRepo = reviewRepo;
   }
 
-  async getAllReviews(params: any): Promise<AdminReviewDTO[]> {
-    const reviews = await this.reviewRepo.findAllReviews(params);
-    return reviews.map(this.mapToDTO);
+  async getAllReviews(params: any): Promise<{ reviews: AdminReviewDTO[], totalPages: number }> {
+    const { reviews, totalPages } = await this.reviewRepo.findAllReviews(params);
+    const mappedReviews = reviews.map(this.mapToDTO);
+    return { reviews: mappedReviews, totalPages };
   }
 
   async updateReviewStatus(reviewId: string, status: string): Promise<AdminReviewDTO> {

@@ -372,7 +372,6 @@ const ProductManagement: React.FC = () => {
             onCancel={() => setShowDialog(false)}
           />
         )}
-        Image
         <ImagePreviewModal
           product={selectedProduct}
           isOpen={showPreviewModal}

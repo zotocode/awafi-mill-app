@@ -215,6 +215,29 @@ export class ProductRepository
     // Return the first item in the array or an empty array if no products were found
     return products[0] as IProductSchema || null;
   }
+  async UpdateStockByIdAndVariantId(
+    productId: mongoose.Types.ObjectId,
+    variantId: mongoose.Types.ObjectId,
+    stockToIncrease: number
+  ): Promise<IProductSchema | null> {
+    try {
+      // Update the stock quantity of the specified variant
+      const product = await this.model.findOneAndUpdate(
+        { _id: productId, "variants._id": variantId }, // Match the product and variant
+        {
+          $inc: { // Increment the stock quantity
+            "variants.$.stockQuantity": stockToIncrease
+          }
+        },
+        { new: true } // Return the updated product document
+      );
+  
+      return product || null; // Return the updated product or null if not found
+    } catch (error) {
+      throw new Error(`Error updating stock: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  
   
   async findByNameAndVariant(query: {
     name: string;
