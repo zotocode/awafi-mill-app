@@ -1,3 +1,5 @@
+// src/application/interactor/adminReviewInteractor.ts
+
 import IAdminReviewRepo from "../../interface/reviewInterface/IadminReviewRepo";
 import IAdminReviewInteractor from "../../interface/reviewInterface/IadminReviewInteractor";
 import { AdminReviewDTO } from "../../domain/dtos/ReviewDTO";

@@ -1,3 +1,5 @@
+// src/interface/reviewInterface/IadminReviewInteractor.ts
+
 import { AdminReviewDTO } from "../../domain/dtos/ReviewDTO";
 
 export default interface IAdminReviewInteractor {

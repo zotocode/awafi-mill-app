@@ -1,32 +1,68 @@
-// const handleGenerateReport = async () => {
-//   // Validate that the date range is selected for custom reports
-//   if (reportType === 'custom' && (!startDate || !endDate)) {
-//     setError('Please select both start and end dates.');
-//     return;
-//   }
+import { AxiosInstance } from "axios";
+import { useApi } from "./axiosConfig"; // Assuming you have an Axios instance setup
 
-//   setLoading(true);
-//   setError(null); // Clear any previous errors
-//   try {
-//     // Fetch the sales report file from the backend
-//     const response = await SalesApi.generateSalesReport(reportType, startDate, endDate, { responseType: 'blob' });
+// Define the parameters for generating sales report
+export type SalesReportParams = {
+  reportType: string;
+  startDate: string;
+  endDate: string;
+};
 
-//     // Create a URL for the file blob
-//     const url = window.URL.createObjectURL(new Blob([response]));
+// Define the response type for sales summary
+export type SalesSummary = {
+  reportPeriod: {
+    startDate: string;
+    endDate: string;
+  };
+  totalRevenue: number;
+  totalQuantitySold: number;
+  averageOrderValue: number;
+  topSellingProducts: Array<{
+    productId: string;
+    productName: string;
+    quantity: number;
+    totalRevenue: number;
+    averagePrice: number;
+  }>;
+};
 
-//     // Create an anchor tag to trigger the file download
-//     const a = document.createElement('a');
-//     a.href = url;
-//     a.download = 'sales_report.xlsx'; // The file name you want the download to have
-//     a.click(); // Trigger the download
+// Define the response type for downloading the report (blob data)
+export type DownloadReportResponse = Blob;
 
-//     // Revoke the object URL after download
-//     window.URL.revokeObjectURL(url);
-//   } catch (err) {
-//     setError('Failed to fetch sales report. Please try again.');
-//   } finally {
-//     setLoading(false);
-//   }
-// };
+class SalesReportApi {
+  private api: AxiosInstance;
 
+  constructor(apiInstance: AxiosInstance) {
+    this.api = apiInstance;
+  }
 
+  // Fetch the sales report
+  async generateSalesReport(params: SalesReportParams): Promise<SalesSummary> {
+    try {
+      const response = await this.api.get<SalesSummary>("/api/sales/report", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch sales report:", error);
+      throw error;
+    }
+  }
+
+  // Download the sales report as a Blob (Excel file)
+  async downloadSalesReport(params: SalesReportParams): Promise<DownloadReportResponse> {
+    try {
+      const response = await this.api.get<DownloadReportResponse>("/api/sales/report/download", {
+        responseType: "blob",
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to download sales report:", error);
+      throw error;
+    }
+  }
+}
+
+// Create an instance of SalesReportApi using the existing Axios configuration
+const salesReportApiInstance = new SalesReportApi(useApi());
+
+export default salesReportApiInstance;

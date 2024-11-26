@@ -1,3 +1,5 @@
+// src/presentation/controllers/adminReviewController.ts
+
 import { NextFunction, Request, Response } from "express";
 import IAdminReviewInteractor from "../../interface/reviewInterface/IadminReviewInteractor"; 
 

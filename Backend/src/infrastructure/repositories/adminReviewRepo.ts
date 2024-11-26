@@ -1,3 +1,5 @@
+// src/infrastructure/repositories/adminReviewRepo.ts
+
 import { Model } from "mongoose";
 import { IReview } from "../../domain/entities/reviewSchema";
 import IAdminReviewRepo from "../../interface/reviewInterface/IadminReviewRepo";

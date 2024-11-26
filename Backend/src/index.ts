@@ -20,6 +20,7 @@ import envConfig from "./config/env";
 import dashboardRoute from "./presentation/routes/dashboardRoute";
 import { verifyAdminToken } from "./presentation/middleware/adminAuthMiddleware";
 import adminReviewRoutes from "./presentation/routes/adminReviewRoute";
+import { setupAdminSalesRoutes } from "./presentation/routes/adminSalesRoute";
 
 
 
@@ -49,7 +50,7 @@ const startServer = async (): Promise<void> => {
 
     app.use('/api/user', userRoute);
     app.use('/api/admin', adminRoute)
-    // app.use('/api/dashboard',verifyAdminToken, dashboardRoute)
+    app.use('/api/dashboard',verifyAdminToken, dashboardRoute)
     app.use('/api/dashboard', dashboardRoute)
     app.use('/api/orders', orderRoutes)
     app.use('/api/products', productRoute);
@@ -62,6 +63,7 @@ const startServer = async (): Promise<void> => {
     app.use('/api/sub-categories', subCategoryRoutes);
     app.use('/api/banner', bannerRoutes);
     app.use('/api/checkout',verifyToken, checkoutRoutes);
+    app.use('/api/sales',setupAdminSalesRoutes());
 
     app.get('/test', (req: Request, res: Response) => {
       res.send("hai");
