@@ -12,7 +12,7 @@ import {
   XCircle,
   AlertTriangle,
   X,
-  Loader2
+  
 } from "lucide-react";
 import OrderPreviewModal from '../../components/Modals/OrderPreviewModal';
 import { Alert, AlertDescription } from '../../components/Alerts/Alert';
@@ -22,7 +22,7 @@ import orderapi from '../../api/orderapi';
 const OrderManagementPage = () => {
   const [orderData, setOrderData] = useState<OrderType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [limit, setLimit] = useState(10); // Increased from 3 to 10 for better pagination
+  const limit=4
   const [totalOrders, setTotalOrders] = useState<number>(0);
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedPaymentStatus, setSelectedPaymentStatus] = useState('');
@@ -32,7 +32,7 @@ const OrderManagementPage = () => {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [orderToCancel, setOrderToCancel] = useState<OrderType | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const totalPages = Math.ceil(totalOrders / limit);
 
@@ -363,7 +363,7 @@ const OrderManagementPage = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        setIsLoading(true);
+      
         setError(null);
         
         let response;
@@ -389,7 +389,7 @@ const OrderManagementPage = () => {
         setError(errorMessage);
         toast.error(errorMessage);
       } finally {
-        setIsLoading(false);
+        // setIsLoading(false);
       }
     };
     

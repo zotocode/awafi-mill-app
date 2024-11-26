@@ -1,3 +1,5 @@
+// src/presentation/routes/adminReviewRoute.ts
+
 import express from "express";
 import { AdminReviewController } from "../controllers/adminReviewController"; 
 import { AdminReviewInteractor } from "../../application/interactor/adminReviewInteractor"; 

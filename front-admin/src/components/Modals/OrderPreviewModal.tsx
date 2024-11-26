@@ -1,6 +1,6 @@
 import { Dialog } from '@headlessui/react';
-import { OrderType, ItemsList } from '../../types/orderTypes';
-import { X, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
+import { OrderType } from '../../types/orderTypes';
+import { X, CheckCircle, XCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface OrderPreviewModalProps {

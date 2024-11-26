@@ -1,3 +1,5 @@
+// src/interface/reviewInterface/IadminReviewRepo.ts
+
 import { IAggregatedReview } from "../../infrastructure/repositories/adminReviewRepo";
 
 export default interface IAdminReviewRepo {
