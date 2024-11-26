@@ -43,6 +43,8 @@ export interface OrderType {
   trackingId?:string;
   userDetails:any;
   productDetails:any;
+  hasReturnRequest:boolean
+  orderPlacedAt:Date;
   }
   
   export type ItemsList={

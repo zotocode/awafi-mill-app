@@ -6,12 +6,15 @@ import { OrderInteractor } from "../../application/interactor/OrderInteractor";
 import { verifyAdminToken } from "../middleware/adminAuthMiddleware";
 import { verifyToken } from "../middleware/userAuthMiddleware";
 import { CheckoutModel } from "../../infrastructure/model/checkoutModel";
+import { ProductRepository } from "../../infrastructure/repositories/productRepository";
+import { ProductModel } from "../../infrastructure/model/producModel";
 
 
 verifyAdminToken
 // Set up dependencies
 const orderRepo = new OrderRepository(CheckoutModel);
-const orderInteractor = new OrderInteractor(orderRepo);
+const productRepo=new ProductRepository(ProductModel)
+const orderInteractor = new OrderInteractor(orderRepo,productRepo);
 const orderController = new OrderController(orderInteractor);
 
 const orderRoutes = express.Router();

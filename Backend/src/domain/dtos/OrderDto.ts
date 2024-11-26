@@ -87,12 +87,14 @@ export interface CreateOrderDTO {
     couponCode?: string;
     discountAmount: number;
     paymentCompletedAt?: Date;
-    deliveredAt?: Date;
+    deliveredAt: Date;
     createdAt: Date;
     updatedAt: Date;
     trackingId?:string;
     userDetails?:any;
     productDetails?:any;
+    hasReturnRequest?:boolean;
+    orderPlacedAt:Date
   }
   
   export interface UpdateOrderStatusDTO {

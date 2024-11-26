@@ -36,11 +36,13 @@ export class OrderController {
     try {
      
 
-      const { status, page = 1, limit = 10 } = req.query;
-
+      const { status, page = 1, limit = 10,paymentStatus } = req.query;
+  
       const orders = await this.orderInteractor.getOrders({
         page: Number(page),
-        limit: Number(limit)
+        limit: Number(limit),
+        status:String(status),
+        paymentStatus:String(paymentStatus)
       });
 
       res.status(200).json(orders);

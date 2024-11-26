@@ -3,12 +3,15 @@ import { CreateOrderDTO, OrderDTO, UpdateOrderStatusDTO } from "../../domain/dto
 import { ICheckout} from "../../domain/entities/checkoutSchema";
 import IOrderInteractor from "../../interface/orderInterface/IOrderInteractor";
 import IOrderRepository from "../../interface/orderInterface/IOrderRepo";
+import { IproductRepo } from "../../interface/productInterface/IproductRepo";
 
 export class OrderInteractor implements IOrderInteractor {
   private orderRepository: IOrderRepository;
+  private productRepository:IproductRepo;
 
-  constructor(orderRepository: IOrderRepository) {
+  constructor(orderRepository: IOrderRepository,productRepository:IproductRepo) {
     this.orderRepository = orderRepository;
+    this.productRepository=productRepository
   }
 
   async createOrder(data: CreateOrderDTO): Promise<OrderDTO> {
@@ -19,12 +22,16 @@ export class OrderInteractor implements IOrderInteractor {
   async getOrders(params: {
     page: number;
     limit: number;
+    status:string;
+    paymentStatus:string
   }): Promise<{
     orders: OrderDTO[];
     total: number;
     page: number;
     limit: number;
   }> {
+    const{status}=params
+    
     const result = await this.orderRepository.findAll(params);
     return {
       orders: result.orders.map(order => this.mapToDTO(order)),
@@ -127,25 +134,30 @@ export class OrderInteractor implements IOrderInteractor {
 
 
 
-
   async actionOnReturnOrder(
     orderId: string,
-    returnData: { productId?: string; variantId?: string; returnStatus: 'approved'| 'rejected' }
+    returnData: { productId?: string; variantId?: string; returnStatus: 'approved' | 'rejected' }
   ): Promise<any> {
-   console.log("dataaaaa",returnData)
-
+    const { productId, variantId, returnStatus } = returnData;
+  
+    // Validate required fields
     if (!orderId || !returnData) {
       throw new Error('Missing required fields: orderId or returnData.');
     }
   
-    // Check for the return reason in case of returning the entire order
-    if (!returnData.returnStatus && !(returnData.productId && returnData.variantId)) {
-      throw new Error('return status is required for returning');
+    if (!returnStatus) {
+      throw new Error('returnStatus is required for returning the order or product.');
     }
   
-
+    // If returning a product, productId and variantId are required
+    if (returnData.productId && !returnData.variantId) {
+      throw new Error('variantId is required when returning a specific product.');
+    }
+  
     const orderObjectId = new mongoose.Types.ObjectId(orderId);
-    
+    const productObjectId = productId ? new mongoose.Types.ObjectId(productId) : null;
+    const variantObjectId = variantId ? new mongoose.Types.ObjectId(variantId) : null;
+  
     // Fetch the order from the repository
     const order = await this.orderRepository.findByOrderId(orderObjectId);
   
@@ -153,36 +165,51 @@ export class OrderInteractor implements IOrderInteractor {
     if (!order) {
       throw new Error('Order not found.');
     }
+  
     if (order.paymentStatus !== 'completed' || order.orderStatus !== 'delivered') {
       throw new Error('Only delivered and payment completed products can be returned.');
     }
-
-
   
-    // Check if it's a product-level return
-    if (returnData.productId && returnData.variantId ) {
-      // Ensure returnData contains productId and variantId before passing to returnOneProduct
+    // If it's a product-level return
+    if (productId && variantId) {
       const item = order.items.find(
-        (e) => e.productId?.toString() === returnData.productId && e.variantId?.toString() === returnData.variantId
+        (e) => e.productId?.toString() === productId && e.variantId?.toString() === variantId
       );
+  
       if (!item) {
         throw new Error('Product or variant not found in the order.');
       }
-
-    const refundAmount = item.price * item.quantity;
+  
+      // Calculate refund amount based on item price and quantity
+      const refundAmount = item.price * item.quantity;
+  
       const data = {
-        productId: returnData.productId,
-        variantId: returnData.variantId,
-        returnStatus:returnData.returnStatus,
+        productId,
+        variantId,
+        returnStatus,
         refundAmount
       };
   
       // Handle returning a specific product variant
-      return await this.orderRepository.actionOnReturnOneProduct(orderId, data);
+      const result = await this.orderRepository.actionOnReturnOneProduct(orderId, data);
+  
+      if (result?.nModified > 0 && returnStatus=='approved') {
+        // Update stock for the returned product variant
+        await this.productRepository.UpdateStockByIdAndVariantId(productObjectId, variantObjectId, item.quantity);
+      }
     }
   
-
-    return await this.orderRepository.returnOrder(orderId,returnData.returnStatus);
+    // Handle the full order return if no product-level return
+    if (!productId || !variantId) {
+      return await this.orderRepository.returnOrder(orderId, returnStatus);
+    }
+  
+    // Return a response after handling the return process
+    return {
+      message: 'Return processed successfully.',
+      orderId,
+      returnStatus,
+    };
   }
   
   
@@ -206,6 +233,10 @@ export class OrderInteractor implements IOrderInteractor {
       paymentStatus:order.paymentStatus,
       trackingId:order.trackingId || '',
       userDetails:order.userDetails,
+      hasReturnRequest:order.hasReturnRequest,
+      deliveredAt:order.deliveredAt,
+      orderPlacedAt:order.orderPlacedAt
+
      
     };
   }

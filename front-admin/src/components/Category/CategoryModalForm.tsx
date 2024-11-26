@@ -29,7 +29,7 @@ const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
     priority: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoadingPriority, setIsLoadingPriority] = useState(false); // Loading state for priority
+  // const [isLoadingPriority, setIsLoadingPriority] = useState(false); // Loading state for priority
 
   useEffect(() => {
     if (category) {
@@ -50,7 +50,7 @@ const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
   useEffect(() => {
     const fetchAvailablePriorities = async () => {
       try {
-        setIsLoadingPriority(true); // Set loading to true before API call
+        // setIsLoadingPriority(true); // Set loading to true before API call
         const response = await CategoryApi.getAvailablePriorities();
         let priorities = response.data.priorities || [];
         if (category && !priorities.includes(category.priority)) {
@@ -61,7 +61,7 @@ const CategoryModalForm: React.FC<CategoryModalFormProps> = ({
         console.error("Error fetching available priorities:", error);
         toast.error("Failed to fetch available priorities. Please try again.");
       } finally {
-        setIsLoadingPriority(false); // Set loading to false after API call
+        // setIsLoadingPriority(false); // Set loading to false after API call
       }
     };
 

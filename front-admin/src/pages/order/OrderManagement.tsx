@@ -12,7 +12,7 @@ import {
   XCircle,
   AlertTriangle,
   X,
-  Loader2
+  
 } from "lucide-react";
 import OrderPreviewModal from '../../components/Modals/OrderPreviewModal';
 import { Alert, AlertDescription } from '../../components/Alerts/Alert';
@@ -21,14 +21,20 @@ import orderapi from '../../api/orderapi';
 
 const OrderManagementPage = () => {
   const [orderData, setOrderData] = useState<OrderType[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit=4
+  const [totalOrders, setTotalOrders] = useState<number>(0);
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<OrderType | null>(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [trackingIds, setTrackingIds] = useState<Record<string, string>>({});
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
   const [orderToCancel, setOrderToCancel] = useState<OrderType | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const totalPages = Math.ceil(totalOrders / limit);
 
   const getStatusIcon = (status: OrderStatus) => {
     switch (status) {
@@ -44,6 +50,22 @@ const OrderManagementPage = () => {
         return <Package className="w-4 h-4" />;
     }
   };
+
+  const orderStatusOptions = [
+    { value: '', label: 'All Statuses' },
+    { value: 'shipped', label: 'Shipped' },
+    { value: 'processing', label: 'Processing' },
+    { value: 'delivered', label: 'Delivered' },
+    { value: 'returned', label: 'Returned' },
+    { value: 'cancelled', label: 'Cancelled' },
+  ];
+
+  const paymentStatusOptions = [
+    { value: '', label: 'All Payment Statuses' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'failed', label: 'Failed' },
+  ];
 
   const getAvailableStatuses = (currentStatus: OrderStatus): OrderStatus[] => {
     switch (currentStatus) {
@@ -108,7 +130,7 @@ const OrderManagementPage = () => {
       [orderId]: value,
     }));
   };
-
+  
   const handleConfirmShipping = (orderId: string) => {
     const trackingId = trackingIds[orderId];
     if (trackingId && trackingId.trim()) {
@@ -156,6 +178,7 @@ const OrderManagementPage = () => {
         </span>
       )
     },
+    
     { 
       header: "Amount", 
       accessor: "amount",
@@ -179,6 +202,7 @@ const OrderManagementPage = () => {
         </div>
       )
     },
+
     {
       header: 'Order Status',
       accessor: 'orderStatus',
@@ -193,11 +217,30 @@ const OrderManagementPage = () => {
         </div>
       )
     },
+    { 
+      header: "Return Request", 
+      accessor: "hasReturnRequest",
+      render: (row: { [key: string]: any }) => (
+        <div className="flex justify-center items-center">
+          {row.hasReturnRequest ? (
+            <span className="text-green-500 text-sm font-medium">Requested</span>  // "Requested" text for return request
+          ) : (
+            <span className="text-red-500 text-sm font-medium">Not Requested</span>  // "Not Requested" text when no return request
+          )}
+        </div>
+      )
+    }
+    
+    
   ];
 
-  const onActionReturn=async(orderId:string,data:{productId:string,variantId:string,returnStatus:'approved' |'rejected'})=>
-  {
-    const{productId,variantId,returnStatus}=data
+  const onActionReturn = async (
+    orderId: string, 
+    data: { productId: string; variantId: string; returnStatus: "approved" | "rejected" }
+  ) => {
+    const { productId, variantId, returnStatus } = data;
+  
+    // Update the `selectedOrder` state
     if (selectedOrder) {
       const updatedItems = selectedOrder.items.map((item) => {
         if (item.productId === productId && item.variantId === variantId) {
@@ -205,23 +248,38 @@ const OrderManagementPage = () => {
         }
         return item;
       });
-    
       setSelectedOrder({ ...selectedOrder, items: updatedItems });
     }
-    
   
-     const response=await orderapi.actionOnReturnOrder(orderId,data)
-     if(response.status==200)
-     {
-      toast.success(`order ${returnStatus}  successfully`)
-
-     }
-     else{
-      toast.error(` Order ${returnStatus} failed`)
-     }
-    
-
-  }
+    // Update the `orderData` state
+    setOrderData((prevOrders) =>
+      prevOrders.map((order) => {
+        if (order._id.toString() === orderId) {
+          return {
+            ...order,
+            items: order.items.map((item) => {
+              if (item.productId === productId && item.variantId === variantId) {
+                return { ...item, returnStatus };
+              }
+              return item;
+            }),
+          };
+        }
+        return order;
+      })
+    );
+  
+    // Call the API
+    const response = await orderapi.actionOnReturnOrder(orderId, data);
+  
+    // Handle the response
+    if (response.status === 200) {
+      toast.success(`Order ${returnStatus} successfully`);
+    } else {
+      toast.error(`Order ${returnStatus} failed`);
+    }
+  };
+  
 
   const actions = (row: { [key: string]: any }): JSX.Element => {
     const typedRow = row as OrderType;
@@ -305,34 +363,51 @@ const OrderManagementPage = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        setIsLoading(true);
+      
         setError(null);
-        const response = await OrderApi.getAllOrders();
+        
+        let response;
+        
+        // Enhanced filtering mechanism
+        if (selectedStatus || selectedPaymentStatus) {
+          response = await OrderApi.getAllOrders(
+            currentPage, 
+            limit, 
+            selectedStatus, 
+            selectedPaymentStatus
+          );
+        } else {
+          response = await OrderApi.getAllOrders(currentPage, limit);
+        }
         
         if (response.status === 200) {
           setOrderData(response.data?.orders || []);
+          setTotalOrders(response.data.total);
         }
       } catch (error: any) {
         const errorMessage = error.response?.data?.error || 'Failed to fetch orders';
         setError(errorMessage);
         toast.error(errorMessage);
       } finally {
-        setIsLoading(false);
+        // setIsLoading(false);
       }
     };
+    
     fetchOrders();
-  }, []);
+  }, [currentPage, selectedStatus, selectedPaymentStatus,isPreviewModalOpen]);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-          <p className="text-gray-600">Loading orders...</p>
-        </div>
-      </div>
-    );
-  }
+  // Pagination handlers
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prevPage => prevPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prevPage => prevPage - 1);
+    }
+  };
 
   if (error) {
     return (
@@ -349,9 +424,36 @@ const OrderManagementPage = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-2">Order Management</h1>
-        <p className="text-sm text-gray-600">Manage and track all orders in one place</p>
+      <div className="mb-6 flex items-center space-x-4">
+        <select
+          value={selectedStatus}
+          onChange={(e) => {
+            setCurrentPage(1); // Reset to first page when changing filter
+            setSelectedStatus(e.target.value);
+          }}
+          className="px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          {orderStatusOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={selectedPaymentStatus}
+          onChange={(e) => {
+            setCurrentPage(1); // Reset to first page when changing filter
+            setSelectedPaymentStatus(e.target.value);
+          }}
+          className="px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          {paymentStatusOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       {(!orderData || orderData.length === 0) ? (
@@ -362,16 +464,33 @@ const OrderManagementPage = () => {
           </AlertDescription>
         </Alert>
       ) : (
-        <div className="bg-white rounded-lg shadow">
+        <div className="bg-white rounded-lg ">
           <Table 
             data={orderData} 
             columns={columns}
             actions={actions}
           />
+          <div className="flex justify-center items-center space-x-4 mt-4">
+            <button
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 text-sm ${currentPage === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-black text-white hover:bg-gray-800"} rounded`}
+            >
+              Previous
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 text-sm ${currentPage === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-black text-white hover:bg-gray-800"} rounded`}
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
-
-   
 
       {/* Cancel Order Modal */}
       {isCancelModalOpen && (
@@ -424,7 +543,7 @@ const OrderManagementPage = () => {
         </div>
       )}
 
-<OrderPreviewModal
+      <OrderPreviewModal
         order={selectedOrder}
         isOpen={isPreviewModalOpen}
         onClose={() => {

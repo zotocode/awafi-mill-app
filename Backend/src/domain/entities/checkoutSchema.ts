@@ -54,4 +54,6 @@ export interface ICheckout extends Document  {
   createdAt: Date;
   updatedAt: Date;
   userDetails:any
+  hasReturnRequest?:boolean
+  
 }
