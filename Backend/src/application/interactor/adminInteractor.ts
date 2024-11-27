@@ -22,7 +22,7 @@ export class AdminInteractor implements IadminInteractor {
  async logIn(data: any): Promise<any> {
      if(data.email === email && password === data.password){
        
-         const accessToken = this.jwt.generateToken({ id: data.email }, "30d");
+         const accessToken = this.jwt.generateToken({ id: data.email }, "30d",envConfig.ACCESS_TOKEN_SECRET);
          return { success: true, message: "Login successful", data: accessToken }; 
      }else{
     

@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
-import
-userRoute from "./presentation/routes/userRoute";
+import cookieparser from  'cookie-parser'
+import userRoute from "./presentation/routes/userRoute";
 import productRoute from "./presentation/routes/productRoute";
 import cartRoutes from "./presentation/routes/cartRoute";
 import categoryRoute from "./presentation/routes/categoryRoute";
@@ -24,6 +24,7 @@ import { setupAdminSalesRoutes } from "./presentation/routes/adminSalesRoute";
 
 
 
+
 const startServer = async (): Promise<void> => {
   try {
     await connectDB();
@@ -33,6 +34,7 @@ const startServer = async (): Promise<void> => {
     app.use(morgan("dev"));
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
+    app.use(cookieparser());
 
     // CORS configuration
     app.use(

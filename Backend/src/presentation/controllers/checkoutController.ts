@@ -2,7 +2,6 @@
 import { NextFunction, Request, Response } from "express";
 import ICheckoutInteractor from "../../interface/checkoutInterface/IcheckoutInteractor";
 import { CheckoutDTO } from "../../domain/dtos/CheckoutDTO";
-import mongoose from "mongoose";
 
 export class CheckoutController {
   private checkoutInteractor: ICheckoutInteractor;
@@ -46,13 +45,13 @@ export class CheckoutController {
   async verifyPayment(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.id;
-      const{paymentMethod,clientSecret}=req.body
+      const{paymentMethod,paymentIntents}=req.body
       if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
         return;
       }
        
-      const checkoutResponse=await this.checkoutInteractor.getVerifyPayment(paymentMethod,clientSecret);
+      const checkoutResponse=await this.checkoutInteractor.getVerifyPayment(paymentMethod, paymentIntents);
       res.status(200).json(checkoutResponse)
     } catch (error) {
       next(error);
