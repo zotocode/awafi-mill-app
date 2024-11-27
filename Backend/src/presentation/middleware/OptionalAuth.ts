@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { JWT } from '../../application/services/jwtService';
+import envConfig from '../../config/env';
 
 // Create an instance of your JWT service
 const jwtService = new JWT();
@@ -10,7 +11,7 @@ export const optionalAuth = (req: Request, res: Response, next: NextFunction) =>
 
   if (authHeader && authHeader.startsWith('Bearer')) {
     const token = authHeader.split(' ')[1];
-    const { payload, message } = jwtService.verifyToken(token);
+    const { payload, message } = jwtService.verifyToken(token,envConfig.ACCESS_TOKEN_SECRET);
     console.log(message);
 
     // Attach user ID to req if token is valid
