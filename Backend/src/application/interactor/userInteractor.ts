@@ -12,6 +12,7 @@ import RedisServices from "../../application/services/redisServices";
 import { userProfileDTO,userPasswordChangeDTO } from "../../domain/dtos/UserDTO";
 import { IaddressRepo } from "../../interface/addressInterface/IaddressRepo";
 import { log } from "console";
+import envConfig from "../../config/env";
 
 
 export class UserInteractor implements IUserInteractor {
@@ -27,6 +28,7 @@ export class UserInteractor implements IUserInteractor {
     this.jwt = jwt;
     this.emailService=emailService;
     this.addressRepo = addressRepo;
+    
   }
 
   //=-========================================================================login===========================================================
@@ -39,16 +41,17 @@ export class UserInteractor implements IUserInteractor {
 
       const userLogin = await this.bcrypt.comparePassword(password, userData.password);
       if (userLogin) {
-        const accessToken = this.jwt.generateToken({ id: userData.id }, "1h");
-        return { success: true, message: "Login successful", data: accessToken };
+        const accessToken = this.jwt.generateToken({ id: userData.id }, "1h",envConfig.ACCESS_TOKEN_SECRET);
+        const refreshToken = this.jwt.generateToken({ id: userData.id }, "15d",envConfig.REFRESH_TOKEN_SECRET);
+        return { success: true, message: "Login successful", data:{accessToken,refreshToken} };
       } else {
         return { success: false, message: "Invalid credentials" };
       }
     } catch (error) {
-      console.log("error", error);
       throw new Error("Login failed");
     }
   }
+
 
   //=-========================================registration========================
   async registerUser(email: string, name: string, password: string, phone: number): Promise<UserInteractorResp> {

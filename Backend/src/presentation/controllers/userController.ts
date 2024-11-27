@@ -2,14 +2,20 @@
 //user Controller
 import { Request, Response, NextFunction } from "express";
 import { IUserInteractor } from "../../interface/userInterface/IuserInteractor";
-import { verify } from "crypto";
-import { string } from "joi";
+import envConfig from "../../config/env";
+import { Ijwt } from "../../interface/serviceInterface/IjwtInterface";
+const jwt = require('jsonwebtoken')
+
 
 export class UserController {
   private userInteractor: IUserInteractor;
+  private jwt:Ijwt
 
-  constructor(userInteractor: IUserInteractor) {
+  constructor(userInteractor: IUserInteractor,jwt:Ijwt) {
     this.userInteractor = userInteractor;
+    this.jwt=jwt
+
+
   }
 
   //=-========================================controller login===============
@@ -18,14 +24,47 @@ export class UserController {
       const { email, password } = req.body;
       const result = await this.userInteractor.login(email, password);
       if (result.success) {
-        return res
-          .status(200)
-          .json({ status: true, message: result.message, token: result.data });
+        const {accessToken,refreshToken}=result.data
+        res.cookie('jwt', refreshToken, {
+          httpOnly: true,
+          secure: true,
+          maxAge:15* 24 * 60 * 60 * 1000, // 1 day
+        });
+        return res.status(200).json({ status: true, message: result.message, token: accessToken });
       } else {
         return res.status(401).json({ status: false, message: result.message });
       }
     } catch (error) {
       next(error);
+    }
+  }
+  //-----------------------------refreshToken------------------------------
+   async  refreshToken(req: Request, res: Response, next: NextFunction) {
+    try {
+      const refreshToken = req.cookies?.jwt;
+    
+  
+      if (!refreshToken) {
+        return res.status(401).json({ status: false, message: 'Unauthorized: No token provided' });
+      }
+  
+      // Verify refresh token
+      const decoded = this.jwt.verifyToken(refreshToken,envConfig.REFRESH_TOKEN_SECRET!);
+      console.log(decoded)
+  
+      if (!decoded?.payload?.id) {
+        return res.status(403).json({ status: false, message: 'Forbidden: Invalid token' });
+      }
+  
+      const accessToken=this.jwt.generateToken({ id: decoded.payload.id }, "1h",envConfig.ACCESS_TOKEN_SECRET)
+  
+      return res.status(200).json({ status: true, token:accessToken });
+    } catch (error) {
+      // Handle specific errors like TokenExpiredError or JsonWebTokenError
+      if (error.name === 'TokenExpiredError') {
+        return res.status(401).json({ status: false, message: 'Unauthorized: Token expired' });
+      }
+      return next(error);
     }
   }
   //=========================================register====================
@@ -54,7 +93,6 @@ export class UserController {
   async otpVerify(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, otp } = req.body;
-      console.log("req.body: ", req.body);
       const result = await this.userInteractor.verifyOtp(email, otp);
 
       // Handle the response based on the result of OTP verification

@@ -44,7 +44,7 @@ export class CheckoutInteractor implements ICheckoutInteractor {
         }
         return{secretKey:"no value"}
     }
-    async getVerifyPayment(paymentMethod:'Stripe'| 'Tabby' |'Tamara',clientSecret:string):Promise<boolean>
+    async getVerifyPayment(paymentMethod:'Stripe'| 'Tabby' |'Tamara',paymentIntentsId:string):Promise<boolean>
     {
         if(paymentMethod==="Tabby")
             {
@@ -52,8 +52,7 @@ export class CheckoutInteractor implements ICheckoutInteractor {
             }
             else if(paymentMethod==="Stripe")
             {
-                
-                return true
+                return this.stripePaymentGateway.verifyPayment(paymentIntentsId)
             } else if(paymentMethod=="Tamara")
             {
                 return true

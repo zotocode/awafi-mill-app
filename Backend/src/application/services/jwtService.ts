@@ -11,16 +11,16 @@ export type jwtOutput = {
 export class JWT implements Ijwt {
   constructor() {}
 
-  generateToken(payload: object, expiresIn: string | number): string {
-    return jwt.sign(payload, "JWT_PRIVATE_KEY", {
+  generateToken(payload: object, expiresIn: string | number,secretKey:string): string {
+    return jwt.sign(payload, secretKey, {
       expiresIn,
     });
   }
 
 
-  verifyToken(token: string): any {
+  verifyToken(token: string,secretKey:string): any {
     try {
-      const decoded = jwt.verify(token, "JWT_PRIVATE_KEY") as JwtPayload;
+      const decoded = jwt.verify(token, secretKey) as JwtPayload;
       return {
         payload: decoded,
         message: "Authenticated",

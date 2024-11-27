@@ -10,16 +10,14 @@ export class StripePaymentGateway implements IPaymentGateway {
         this.stripe = new Stripe(envConfig.STRIPE_SECRET_KEY as string);
     }
 
-    async verifyPayment(clientSecret: string): Promise<boolean> {
+    async verifyPayment(paymentIntentsId: string): Promise<any> {
         try {
-            // const { paymentIntent } = await this.stripe.retrievePaymentIntent(clientSecret);
-            // if (paymentIntent && paymentIntent.status === 'succeeded') {
-            //     return true;
-            // }
+            return await this.stripe.paymentIntents.retrieve(paymentIntentsId)
+      
         } catch (error) {
             console.error('Error verifying payment:', error);
         }
-        return false;
+        return {success:false,message:"There is not such payments"};
     }
 
     // ... rest of your code remains the same

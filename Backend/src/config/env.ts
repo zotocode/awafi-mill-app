@@ -19,6 +19,8 @@ interface EnvConfig {
     Frontend_URL:string;
     RAZORPAY_KEY_ID:string;
     STRIPE_PUBLIC_KEY:string;
+    REFRESH_TOKEN_SECRET:string;
+    ACCESS_TOKEN_SECRET:string;
     // STRIPE_PUBLIC_KEY: string
 }
 
@@ -38,7 +40,9 @@ const envConfig: EnvConfig = {
     PORT:process.env.PORT as string,
     Frontend_URL:process.env.Frontend_URL as string,
     RAZORPAY_KEY_ID:process.env.RAZORPAY_KEY_ID as string,
-    STRIPE_PUBLIC_KEY:process.env.STRIPE_PUBLIC_KEY as string
+    STRIPE_PUBLIC_KEY:process.env.STRIPE_PUBLIC_KEY as string,
+    ACCESS_TOKEN_SECRET:process.env.ACCESS_TOKEN_SECRET as string,
+    REFRESH_TOKEN_SECRET:process.env.REFRESH_TOKEN_SECRET as string
     // STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY as string
 };
 
