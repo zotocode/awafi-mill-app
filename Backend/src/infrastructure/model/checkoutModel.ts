@@ -6,6 +6,7 @@ import { required } from "joi";
 const checkoutSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   cartId: { type: mongoose.Schema.Types.ObjectId, ref: "Cart", required: false },
+  orderId: { type: String,  required: true },
   items: [{
     productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: false },
     variantId: { type: mongoose.Schema.Types.ObjectId, ref: "Variant", required: false },
@@ -25,7 +26,7 @@ const checkoutSchema = new mongoose.Schema({
   paymentMethod: { type: String, enum: ['COD','Stripe', 'Tabby' ,'Tamara'], required: true },
   transactionId: { type: String, required: true }, 
   amount: { type: Number, required: true },
-  currency: { type: String, default: 'INR' },
+  currency: { type: String, default: 'AED' },
   shippingAddress: {
     fullName: { type: String, required: true },
     addressLine1: { type: String, required: true },

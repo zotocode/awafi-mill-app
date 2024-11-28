@@ -6,8 +6,9 @@ export default interface IOrderInteractor {
   getOrders(params: {
     page: number;
     limit: number;
-    status:string;
-    paymentStatus:string;
+    status:string|null;
+    paymentStatus:string|null;
+    orderId:string|null
   }): Promise<{
     orders: OrderDTO[];
     total: number;

@@ -18,11 +18,12 @@ import OrderPreviewModal from '../../components/Modals/OrderPreviewModal';
 import { Alert, AlertDescription } from '../../components/Alerts/Alert';
 import { toast } from 'react-toastify';
 import orderapi from '../../api/orderapi';
+import SearchBar from '../../components/Search/SearchBar';
 
 const OrderManagementPage = () => {
   const [orderData, setOrderData] = useState<OrderType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const limit=4
+  const limit=25
   const [totalOrders, setTotalOrders] = useState<number>(0);
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedPaymentStatus, setSelectedPaymentStatus] = useState('');
@@ -35,7 +36,10 @@ const OrderManagementPage = () => {
   // const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const totalPages = Math.ceil(totalOrders / limit);
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+  const [isSearching, setIsSearching] = useState(false);
+ 
   const getStatusIcon = (status: OrderStatus) => {
     switch (status) {
       case 'processing':
@@ -131,6 +135,14 @@ const OrderManagementPage = () => {
     }));
   };
   
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500); // 500ms delay
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   const handleConfirmShipping = (orderId: string) => {
     const trackingId = trackingIds[orderId];
     if (trackingId && trackingId.trim()) {
@@ -174,7 +186,7 @@ const OrderManagementPage = () => {
       accessor: "_id",
       render: (row: { [key: string]: any }) => (
         <span className="font-mono text-sm text-gray-700">
-          {row._id.toString().slice(-8).toUpperCase()}
+          {row.orderId}
         </span>
       )
     },
@@ -363,22 +375,16 @@ const OrderManagementPage = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-      
+        setIsSearching(!!debouncedSearchTerm);
         setError(null);
         
-        let response;
-        
-        // Enhanced filtering mechanism
-        if (selectedStatus || selectedPaymentStatus) {
-          response = await OrderApi.getAllOrders(
-            currentPage, 
-            limit, 
-            selectedStatus, 
-            selectedPaymentStatus
-          );
-        } else {
-          response = await OrderApi.getAllOrders(currentPage, limit);
-        }
+        const response = await OrderApi.getAllOrders(
+          currentPage, 
+          limit, 
+          selectedStatus, 
+          selectedPaymentStatus,
+          debouncedSearchTerm // Pass the debounced search term
+        );
         
         if (response.status === 200) {
           setOrderData(response.data?.orders || []);
@@ -389,12 +395,12 @@ const OrderManagementPage = () => {
         setError(errorMessage);
         toast.error(errorMessage);
       } finally {
-        // setIsLoading(false);
+        setIsSearching(false);
       }
     };
     
     fetchOrders();
-  }, [currentPage, selectedStatus, selectedPaymentStatus,isPreviewModalOpen]);
+  }, [currentPage, selectedStatus, selectedPaymentStatus, debouncedSearchTerm, isPreviewModalOpen]);
 
   // Pagination handlers
   const handleNextPage = () => {
@@ -425,6 +431,12 @@ const OrderManagementPage = () => {
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-6 flex items-center space-x-4">
+      <SearchBar 
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              isSearching={isSearching}
+              title="Serch order by Id"
+            />
         <select
           value={selectedStatus}
           onChange={(e) => {

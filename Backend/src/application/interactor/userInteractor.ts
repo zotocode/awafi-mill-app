@@ -3,7 +3,7 @@ import { IUserInteractor } from "../../interface/userInterface/IuserInteractor";
 import { IuserDocument } from "../../infrastructure/model/userModel";
 import { IUserRepo } from "../../interface/userInterface/IuserRepo";
 import { IBcrypt } from "../../interface/serviceInterface/IbcryptInterface";
-import { generateOTP } from "../services/otpService";
+import { generateOTP } from "../services/genaralService";
 import { UserInteractorResp } from "../../types/userTypes";
 import { Ijwt } from "../../interface/serviceInterface/IjwtInterface";
 import { userDTO,userCreationDTO } from "../../domain/dtos/UserDTO";  // Import UserDTO
@@ -28,7 +28,7 @@ export class UserInteractor implements IUserInteractor {
     this.jwt = jwt;
     this.emailService=emailService;
     this.addressRepo = addressRepo;
-    
+
   }
 
   //=-========================================================================login===========================================================

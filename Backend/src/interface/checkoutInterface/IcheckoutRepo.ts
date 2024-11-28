@@ -4,5 +4,6 @@ import { OrderSummary,RevenueSummary } from "../../domain/dtos/CheckoutDTO";
 
 export default interface ICheckoutRepo {
   createCheckout(data: CheckoutCreateDTO): Promise<ICheckout>;
+  fetchdataByOrderId(orderId:string):Promise<ICheckout | null>
   
 }

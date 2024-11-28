@@ -9,6 +9,7 @@ import envConfig from "../../config/env";
 import { IUserCart } from "../../domain/entities/userCartSchema";
 import { IPaymentGateway } from "../../infrastructure/paymentGateways/IPaymentGateway";
 import { IProductDetails } from "../../domain/dtos/CartDTO";
+import { generateRandomId } from "../services/genaralService";
 
 
 export class CheckoutInteractor implements ICheckoutInteractor {
@@ -60,6 +61,7 @@ export class CheckoutInteractor implements ICheckoutInteractor {
         
   return false
     }
+   
     async processCheckout({
         userId,
         shippingAddress,
@@ -70,54 +72,61 @@ export class CheckoutInteractor implements ICheckoutInteractor {
         paymentStatus,
       }: CheckoutDTO): Promise<any> {
         // Step 1: Retrieve cart items
-        const response= await this.cartRepo.findCartByUser(userId);
+        const response = await this.cartRepo.findCartByUser(userId);
         const inPrice = /aed/i.test(currency);
-       const cartItems=response?.map((e)=>{
-        return {
+        
+        const cartItems = response?.map((e) => {
+          return {
             productId: e.productId,
             variantId: e.variantId,
             name: e.name,
             weight: e.weight,
             quantity: e.quantity,
-            price:inPrice ? e.inPrice :e.outPrice,
-            images: e.images
-        }
-       })
+            price: inPrice ? e.inPrice : e.outPrice,
+            images: e.images,
+          };
+        });
       
         if (!cartItems) {
           throw new Error("Cart not found or no items in the cart");
         }
       
- ;
+        let orderId: string;
+
+        do {
+          orderId = generateRandomId(10); 
+        } while (await this.checkoutRepo.fetchdataByOrderId(orderId)); 
+       
       
-        // Step 2: Convert user ID to ObjectId
+        // Step 3: Convert user ID to ObjectId
         const userInObjectId = new mongoose.Types.ObjectId(userId);
       
-        // Step 3: Create checkout data
+        // Step 4: Create checkout data
         const data: CheckoutCreateDTO = {
-            user: userInObjectId,
-            currency,
-            paymentMethod,
-            orderPlacedAt: new Date(),
-            items: cartItems,
-            shippingAddress,
-            amount,
-            transactionId,
-            paymentStatus,
-            deliveredAt: (() => {
-              const date = new Date();
-              date.setDate(date.getDate() + 5); // Add 5 days to the current date
-              return date;
-            })(),
-          };
-          
-        // Step 4: Save checkout data
+          user: userInObjectId,
+          orderId:orderId, // Use the unique orderId here
+          currency,
+          paymentMethod,
+          orderPlacedAt: new Date(),
+          items: cartItems,
+          shippingAddress,
+          amount,
+          transactionId,
+          paymentStatus,
+          deliveredAt: (() => {
+            const date = new Date();
+            date.setDate(date.getDate() + 5); // Add 5 days to the current date
+            return date;
+          })(),
+        };
+      
+        // Step 5: Save checkout data
         const checkout = await this.checkoutRepo.createCheckout(data);
       
-        // Step 5: Clear the cart after successful checkout (optional)
+        // Step 6: Clear the cart after successful checkout (optional)
         // await this.cartRepo.clearCart(userId);
       
-        // Step 6: Return the checkout result
+        // Step 7: Return the checkout result
         return checkout;
       }
       

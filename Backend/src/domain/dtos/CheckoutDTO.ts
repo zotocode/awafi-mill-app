@@ -38,6 +38,7 @@ export interface CheckoutCreateDTO {
   user: mongoose.Types.ObjectId;
   cartId?: mongoose.Types.ObjectId;
   amount: number;
+  orderId:string;
   currency: string;
   paymentMethod: 'COD' | 'Tabby' | 'Stripe';
   orderPlacedAt: Date;

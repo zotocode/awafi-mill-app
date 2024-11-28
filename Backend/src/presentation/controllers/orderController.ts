@@ -34,22 +34,28 @@ export class OrderController {
 
   async getOrders(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-     
-
-      const { status, page = 1, limit = 10,paymentStatus } = req.query;
+      const {
+        status = null,
+        page = 1,
+        limit = 10,
+        paymentStatus = null,
+        orderId = null,
+      } = req.query;
   
       const orders = await this.orderInteractor.getOrders({
-        page: Number(page),
-        limit: Number(limit),
-        status:String(status),
-        paymentStatus:String(paymentStatus)
+        page: Number(page) ?? 1,
+        limit: Number(limit) ?? 10,
+        status: status ? String(status) : null,
+        paymentStatus: paymentStatus ? String(paymentStatus) : null,
+        orderId: orderId ? String(orderId) : null,
       });
-
+  
       res.status(200).json(orders);
     } catch (error) {
       next(error);
     }
   }
+  
 
   async getOrderById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {

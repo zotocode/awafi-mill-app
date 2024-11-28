@@ -16,4 +16,8 @@ export class CheckoutRepository extends BaseRepository<ICheckout> implements ICh
      
       return await super.create(data);
     }
+    async fetchdataByOrderId(orderId:string ): Promise<ICheckout |null> {
+     
+      return await super.findOne({orderId:orderId});
+    }
 }

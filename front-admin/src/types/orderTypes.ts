@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 export interface OrderType {
   _id: mongoose.Types.ObjectId;
+  orderId:string;
   user: mongoose.Types.ObjectId;
   items: ItemsList[];
   paymentMethod: 'COD' | 'Tamara' | 'Stripe' | 'Tabby';
