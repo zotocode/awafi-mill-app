@@ -4,9 +4,9 @@ class UserApi {
   axiosInstance: any = useApi();
 
   // Fetch all users data
-  async fetchAllUserData(): Promise<any> {
+  async fetchAllUserData(page:number,limit:number): Promise<any> {
     try {
-      return await this.axiosInstance.get('/api/admin/allUser');
+      return await this.axiosInstance.get(`/api/admin/allUser?page=${page}&limit=${limit}`);
     } catch (error: unknown) {
       console.error('Error fetching users:', error);
       return error;

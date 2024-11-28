@@ -28,6 +28,7 @@ export interface IAddress {
 export interface ICheckout extends Document  {
   _id: Types.ObjectId;
   user: Types.ObjectId;
+  orderId:string;
   cartId: Types.ObjectId;
   items: ICheckoutItem[];
   paymentMethod: 'COD' |'Stripe'| 'Tabby' |'Tamara';

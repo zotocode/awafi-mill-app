@@ -34,37 +34,38 @@ export class OrderRepository extends BaseRepository<ICheckout> implements IOrder
     }
   }
 
-  async findAll(params: { page: number; limit: number; status: string; paymentStatus: string }): Promise<{
+  async findAll(params: { page: number; limit: number; status: string|null; paymentStatus: string|null,orderId:string|null }): Promise<{
     orders: ICheckout[];
     total: number;
     page: number;
     limit: number;
   }> {
     try {
-      const { page, limit, status, paymentStatus } = params;
+      const { page, limit, status, paymentStatus,orderId } = params;
       const skip = (page - 1) * limit;
   
       // Initialize query
       const query: Record<string, any> = {};
-  
+      if (orderId) {
+        query.orderId = { $regex: `^${orderId}`, $options: 'i' }; 
+      }
+       if (paymentStatus && ["pending", "completed", "failed"].includes(paymentStatus)) {
+        query.paymentStatus = paymentStatus;
+      }
       // Handle "returned" status
-      if (status === "returned") {
+      if (status === "returned" && status) {
         query.$or = [
           { returnStatus: { $in: ["requested", "approved", "rejected"] } },
           { "items.returnStatus": { $in: ["requested", "approved", "rejected"] } },
         ];
-      } else {
-        // Add paymentStatus condition if applicable
-        if (["pending", "completed", "failed"].includes(paymentStatus)) {
-          query.paymentStatus = paymentStatus;
-        }
-  
+      } else if(status) {
+       
         // Add orderStatus condition for non-returned status
         if (["processing", "shipped", "delivered", "cancelled"].includes(status)) {
           query.orderStatus = status;
         }
       }
-  
+      
       // Execute aggregation pipeline and count
       const [orders, total] = await Promise.all([
         this.model.aggregate([
@@ -104,6 +105,7 @@ export class OrderRepository extends BaseRepository<ICheckout> implements IOrder
               transactionId:1,
               orderStatus: 1,
               paymentStatus: 1,
+              orderId:1,
               amount: 1,
               currency: 1,
               items: 1,
@@ -336,10 +338,8 @@ async  returnTheOrder(orderId:string, returnReason:string):Promise<any>
         $set: {
           "items.$.returnStatus": returnStatus,
           "items.$.refundAmount": refundAmount,
-        },
-        $inc: {
-          amount: -refundAmount, // Subtract refundAmount from the total amount
-        },
+        }
+    
       }
     );
   

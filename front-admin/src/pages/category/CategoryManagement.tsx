@@ -17,7 +17,7 @@ const MainCategoryManagementPage = () => {
   const [actionType, setActionType] = useState<"delete" | "list">();
   const [currentPage, setCurrentPage] = useState(1); // Pagination state
   const [totalPages, setTotalPages] = useState(1); // Total pages from API
-  const [itemsPerPage] = useState(10); // Items per page
+  const [itemsPerPage] = useState(25); // Items per page
   const [searchTerm, setSearchTerm] = useState(""); // Search term
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm); // For debouncing
   const [isSearching, setIsSearching] = useState(false);

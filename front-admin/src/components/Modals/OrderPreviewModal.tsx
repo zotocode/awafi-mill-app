@@ -71,7 +71,7 @@ const OrderPreviewModal: React.FC<OrderPreviewModalProps> = ({
           <div className="flex justify-between items-center mb-6 sticky top-0 bg-white dark:bg-gray-800 z-10 pb-4 border-b border-gray-300 dark:border-gray-700">
             <div>
               <Dialog.Title className="text-xl font-semibold text-gray-900 dark:text-white">
-                Order Details #{order._id.toString().slice(-8).toUpperCase()}
+                Order Details #{order.orderId}
               </Dialog.Title>
               {hasReturnRequests && (
                 <span className="mt-2 inline-block px-3 py-1 text-sm bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 rounded-full">

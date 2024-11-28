@@ -31,14 +31,11 @@ export class AdminInteractor implements IadminInteractor {
      
  }
 
- async usersData(): Promise<UserResponse> {
+ async usersData(page:number,limit:number): Promise<UserResponse> {
   try {
-    const userData: UserDTO[] = await this.userRepository.findAll(); // Fetch users as UserDTO[]
+    const userData = await this.userRepository.findAll(page,limit); // Fetch users as UserDTO[]
     
-    return {
-      status: true,
-      data: userData,
-    };
+    return userData
   } catch (error) {
     console.error("Error fetching user data:", error);
     

@@ -4,6 +4,7 @@ import { IuserDocument, userModel } from "../model/userModel";
 import { InewUserData } from "../../types/userTypes";
 import { BaseRepository } from "./baseRepository";
 import { UserDTO } from "../../domain/dtos/AdminDto";
+import { LargeDataFetch, responseHandler } from "../../types/commonTypes";
 
 export class UserRepo extends BaseRepository<IuserDocument> implements IUserRepo {
   constructor() {
@@ -39,7 +40,7 @@ export class UserRepo extends BaseRepository<IuserDocument> implements IUserRepo
 
 
     async registerUser(userData: InewUserData): Promise<string> {
-        console.log("user register  repo..", userData);
+  
         const newUser = new this.model({  
           email: userData.email,
           password: userData.password,
@@ -73,23 +74,27 @@ export class UserRepo extends BaseRepository<IuserDocument> implements IUserRepo
       
     }
 
-    async findAll(): Promise<UserDTO[]> {  // Ensure return type is strictly UserDTO[]
+    async findAll(page: number, limit: number): Promise<LargeDataFetch> {
       try {
-        const users: IuserDocument[] = await this.model.find({}); // Fetch users as IuserDocument[]
-        
-        // Map the raw Mongoose documents to UserDTO
+        const skip = (page - 1) * limit;
+        const [users, total] = await Promise.all([
+          this.model.find().skip(skip).limit(limit),
+          this.model.countDocuments()
+        ]);
+    
         const userDTOs: UserDTO[] = users.map((user: IuserDocument) => ({
-          _id: user._id.toString(), // Convert ObjectId to string
+          _id: user._id.toString(),
           email: user.email,
           name: user.name,
           phone: user.phone,
           isBlocked: user.isBlocked,
         }));
-  
-        return userDTOs; // Return UserDTO[]
+    
+        return { data: userDTOs, totalPages: Math.ceil(total / limit) };
       } catch (error) {
         console.error("Error finding users:", error);
-        throw error; // Rethrow error for further handling
+        throw error;
       }
     }
+    
 }

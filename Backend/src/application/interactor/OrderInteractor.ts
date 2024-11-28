@@ -22,8 +22,9 @@ export class OrderInteractor implements IOrderInteractor {
   async getOrders(params: {
     page: number;
     limit: number;
-    status:string;
-    paymentStatus:string
+    status:string | null;
+    paymentStatus:string |null
+    orderId:string |null
   }): Promise<{
     orders: OrderDTO[];
     total: number;
@@ -218,6 +219,7 @@ export class OrderInteractor implements IOrderInteractor {
   private mapToDTO(order: ICheckout): OrderDTO {
     return {
       _id: order._id,
+      orderId:order.orderId,
       user: order.user,
       transactionId:order.transactionId  || '',
       amount: order.amount,
