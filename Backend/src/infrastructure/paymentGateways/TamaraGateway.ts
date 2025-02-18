@@ -1,29 +1,11 @@
-import Stripe from 'stripe';
-import envConfig from "../../config/env";
-import { IPaymentGateway } from './IPaymentGateway';
-import { ShippingAddressDTO } from '../../domain/dtos/CheckoutDTO';
-import mongoose from 'mongoose';
-import { IProductDetails } from '../../domain/dtos/CartDTO';
+import { IPaymentGateway } from "./IPaymentGateway";
 
 export class TamaraPaymentGateway implements IPaymentGateway {
-    private stripe: Stripe;
+  async createPaymentIntent(amount: number, currency: string) {
+    return { clientSecret: "tabby-secret-key", paymentIntentId: "tabby_12345" };
+  }
 
-    constructor() {
-        this.stripe = new Stripe(envConfig.STRIPE_SECRET_KEY as string);
-    }
-
-    async verifyPayment(clientSecret: string): Promise<boolean> {
-        try {
-            // const { paymentIntent } = await this.stripe.retrievePaymentIntent(clientSecret);
-            // if (paymentIntent && paymentIntent.status === 'succeeded') {
-            //     return true;
-            // }
-        } catch (error) {
-            console.error('Error verifying payment:', error);
-        }
-        return false;
-    }
-
-
-  
+  async verifyPayment(paymentIntentId: string): Promise<{ success: boolean; message: string }> {
+    return {success:true,message:"sdf"}; // Placeholder, implement real Tabby verification
+  }
 }
