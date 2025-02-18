@@ -51,7 +51,7 @@ export class CheckoutController {
         return;
       }
        
-      const checkoutResponse=await this.checkoutInteractor.getVerifyPayment(paymentMethod, paymentIntents);
+      const checkoutResponse=await this.checkoutInteractor.verifyPayment(paymentMethod, paymentIntents);
       res.status(200).json(checkoutResponse)
     } catch (error) {
       next(error);
