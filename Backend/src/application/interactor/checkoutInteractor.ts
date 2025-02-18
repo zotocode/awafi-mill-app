@@ -124,7 +124,7 @@ export class CheckoutInteractor implements ICheckoutInteractor {
         const checkout = await this.checkoutRepo.createCheckout(data);
       
         // Step 6: Clear the cart after successful checkout (optional)
-        // await this.cartRepo.clearCart(userId);
+        await this.cartRepo.clearCart(userId);
       
         // Step 7: Return the checkout result
         return checkout;
