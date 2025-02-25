@@ -16,17 +16,37 @@ const UserManagementPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const [userData, setUserData] = useState<User | null>(null);
+  const limit=25
+  const [currentPage, setCurrentPage] = useState(1); // Pagination state
+  const [totalPages, setTotalPages] = useState(1); // Total pages returned from backend
+  
+
+
+    // Pagination handlers
+    const handleNextPage = () => {
+      if (currentPage < totalPages) {
+        setCurrentPage((prevPage) => prevPage + 1);
+      }
+    };
+  
+    const handlePreviousPage = () => {
+      if (currentPage > 1) {
+        setCurrentPage((prevPage) => prevPage - 1);
+      }
+    };
+
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [currentPage,limit]);
 
   const fetchUsers = async () => {
     try {
-      const response = await userApi.fetchAllUserData();
+      const response = await userApi.fetchAllUserData(currentPage,limit);
 
       if (response.status === 200 && response.data) {
         setUsers(response.data.data);
+        setTotalPages(response.data.totalPages)
       } else {
         throw new Error("Invalid response from API");
       }
@@ -104,6 +124,33 @@ const UserManagementPage = () => {
           <h1 className="text-2xl font-semibold">User Management</h1>
         </div>
         <Table data={users} columns={userColumns} actions={userActions} />
+        <div className="flex justify-center items-center space-x-4 mt-4">
+          <button
+            onClick={handlePreviousPage}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 text-sm ${
+              currentPage === 1
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-black text-white hover:bg-gray-800"
+            } rounded`}
+          >
+            Previous
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 text-sm ${
+              currentPage === totalPages
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-black text-white hover:bg-gray-800"
+            } rounded`}
+          >
+            Next
+          </button>
+        </div>
         {showConfirmationDialog && userData && (
           <ConfirmationDialog
             message="Are you sure you want to block this user?"

@@ -24,12 +24,15 @@ export class AdminController {
 
   async allUsers(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await this.adminInteractor.usersData();
-      return res.status(result.status ? 200 : 500).json(result);  
+      const page = Math.max(1, Number(req.query.page) || 1);
+      const limit = Math.max(1, Number(req.query.limit) || 10);
+      const result = await this.adminInteractor.usersData(page, limit);
+      return res.status(200).json(result);
     } catch (error) {
       next(error);
     }
   }
+  
 
   async blockUser(req: Request, res: Response, next: NextFunction){
     const result = await this.adminInteractor.blockUser(req.body.email)

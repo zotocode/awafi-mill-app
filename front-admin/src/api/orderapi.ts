@@ -4,10 +4,11 @@ import { useApi } from './axiosConfig';
 class OrderApi {
   axiosInstance = useApi();
 
-  async getAllOrders(page:number,limit:number,orderStatus?:string,selectedPaymentStatus?:string) {
+  async getAllOrders(page:number,limit:number,orderStatus?:string,selectedPaymentStatus?:string,orderId?:string,) {
+ 
     try {
-      
-      const response = await this.axiosInstance.get(`/api/orders/order/admin/?page=${page}&limit=${limit}&status=${orderStatus}&paymentStatus=${selectedPaymentStatus}`);
+         
+      const response = await this.axiosInstance.get(`/api/orders/order/admin/?page=${page}&limit=${limit}&status=${orderStatus}&paymentStatus=${selectedPaymentStatus}&orderId=${orderId}`);
       
       return response;
     } catch (error) {

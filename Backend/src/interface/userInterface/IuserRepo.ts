@@ -1,9 +1,10 @@
 import { UserDTO,UserActionResponse } from "../../domain/dtos/AdminDto";
 import { IuserDocument } from "../../infrastructure/model/userModel";
+import { LargeDataFetch } from "../../types/commonTypes";
 
 export interface IUserRepo {
     findUser(email: string): Promise<any>;
-    findAll():Promise<UserDTO[]>
+    findAll(page:number,limit:number):Promise<LargeDataFetch>
     findUserEmail(email: string):Promise<IuserDocument | null>
     findUserByMobile(phone: number):Promise<IuserDocument | null>
     registerUser(data: any): Promise<string>;

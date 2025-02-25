@@ -9,6 +9,7 @@ import envConfig from "../../config/env";
 import { IUserCart } from "../../domain/entities/userCartSchema";
 import { IPaymentGateway } from "../../infrastructure/paymentGateways/IPaymentGateway";
 import { IProductDetails } from "../../domain/dtos/CartDTO";
+import { generateRandomId } from "../services/genaralService";
 
 
 export class CheckoutInteractor implements ICheckoutInteractor {
@@ -44,82 +45,97 @@ export class CheckoutInteractor implements ICheckoutInteractor {
         }
         return{secretKey:"no value"}
     }
-    async getVerifyPayment(paymentMethod:'Stripe'| 'Tabby' |'Tamara',paymentIntentsId:string):Promise<boolean>
-    {
-        if(paymentMethod==="Tabby")
-            {
-                return true
-            }
-            else if(paymentMethod==="Stripe")
-            {
-                return this.stripePaymentGateway.verifyPayment(paymentIntentsId)
-            } else if(paymentMethod=="Tamara")
-            {
-                return true
-            }
-        
-  return false
-    }
     async processCheckout({
-        userId,
-        shippingAddress,
-        paymentMethod,
-        currency,
-        amount,
-        transactionId,
-        paymentStatus,
-      }: CheckoutDTO): Promise<any> {
-        // Step 1: Retrieve cart items
-        const response= await this.cartRepo.findCartByUser(userId);
-        const inPrice = /aed/i.test(currency);
-       const cartItems=response?.map((e)=>{
-        return {
-            productId: e.productId,
-            variantId: e.variantId,
-            name: e.name,
-            weight: e.weight,
-            quantity: e.quantity,
-            price:inPrice ? e.inPrice :e.outPrice,
-            images: e.images
-        }
-       })
-      
-        if (!cartItems) {
-          throw new Error("Cart not found or no items in the cart");
-        }
-      
- ;
-      
-        // Step 2: Convert user ID to ObjectId
-        const userInObjectId = new mongoose.Types.ObjectId(userId);
-      
-        // Step 3: Create checkout data
-        const data: CheckoutCreateDTO = {
-            user: userInObjectId,
-            currency,
-            paymentMethod,
-            orderPlacedAt: new Date(),
-            items: cartItems,
-            shippingAddress,
-            amount,
-            transactionId,
-            paymentStatus,
-            deliveredAt: (() => {
-              const date = new Date();
-              date.setDate(date.getDate() + 5); // Add 5 days to the current date
-              return date;
-            })(),
-          };
-          
-        // Step 4: Save checkout data
-        const checkout = await this.checkoutRepo.createCheckout(data);
-      
-        // Step 5: Clear the cart after successful checkout (optional)
-        // await this.cartRepo.clearCart(userId);
-      
-        // Step 6: Return the checkout result
-        return checkout;
+      userId,
+      shippingAddress,
+      paymentMethod,
+      currency,
+    }: CheckoutDTO): Promise<any> {
+      // Step 1: Retrieve cart items
+      const response = await this.cartRepo.findCartByUser(userId);
+      const inPrice = /aed/i.test(currency);
+      const totalAmount = Array.isArray(response)
+        ? response.reduce((acc, item) => acc + (inPrice ? item.inPrice * item.quantity : item.outPrice *item.quantity), 0)
+        : 0;
+  
+      if (!response || response.length === 0) {
+        throw new Error("Cart not found or empty");
       }
+
+      console.log("Total amount here 🚀🚀🚀🚀 :",totalAmount)
+  
+      const cartItems = response.map((e) => ({
+        productId: e.productId,
+        variantId: e.variantId,
+        name: e.name,
+        weight: e.weight,
+        quantity: e.quantity,
+        price: inPrice ? e.inPrice : e.outPrice,
+        images: e.images,
+      }));
+  
+      let orderId: string;
+      do {
+        orderId = generateRandomId(10);
+      } while (await this.checkoutRepo.fetchdataByOrderId(orderId));
+  
+      // Convert user ID to ObjectId
+      const userInObjectId = new mongoose.Types.ObjectId(userId);
+  
+     let  paymentIntentId="0"
+  
+      // Step 2: Create Payment Intent for Stripe or Tabby
+      if (paymentMethod === "Stripe") {
+        const payment = await this.stripePaymentGateway.createPaymentIntent(totalAmount, currency);
+        paymentIntentId = payment.paymentIntentId;
+      } else if (paymentMethod === "Tabby") {
+        const payment = await this.taabyPaymentGateway.createPaymentIntent(totalAmount, currency);
+        paymentIntentId = payment.paymentIntentId;
+      }
+  
+      // Step 3: Save checkout data
+      const checkoutData: CheckoutCreateDTO = {
+        user: userInObjectId,
+        orderId,
+        currency,
+        paymentMethod,
+        orderPlacedAt: new Date(),
+        items: cartItems,
+        shippingAddress,
+        amount: totalAmount,
+        transactionId: paymentIntentId,
+        paymentStatus: "pending",
+        deliveredAt: (() => {
+          const date = new Date();
+          date.setDate(date.getDate() + 5);
+          return date;
+        })(),
+      };
+  
+      const checkout = await this.checkoutRepo.createCheckout(checkoutData);
+  
+      // Step 4: Clear the cart
+      // await this.cartRepo.clearCart(userId);
+  
+      // Step 5: Return checkout result with payment credentials
+      return {
+        checkout,
+        paymentSecret: paymentMethod === "Stripe" ? checkoutData.transactionId : null,
+        paymentIntentId
+      };
+    }
+  
+    /**
+     * Verifies payment after completion
+     */
+    async verifyPayment(paymentMethod: "Stripe" | "Tabby", paymentIntentsId: string): Promise<{success:boolean,message:string}> {
+      if (paymentMethod === "Stripe") {
+        return this.stripePaymentGateway.verifyPayment(paymentIntentsId);
+      } else if (paymentMethod === "Tabby") {
+        return this.taabyPaymentGateway.verifyPayment(paymentIntentsId);
+      }
+      return {success:false,message:"Payment is failed or payment method is not allowed"}
+    }
       
 
 }

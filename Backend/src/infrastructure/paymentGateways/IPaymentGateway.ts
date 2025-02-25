@@ -1,11 +1,16 @@
-
-import mongoose from "mongoose";
-import { ShippingAddressDTO } from "../../domain/dtos/CheckoutDTO";
-import { IProductDetails } from "../../domain/dtos/CartDTO";
-
-// Interface for payment gateways
 export interface IPaymentGateway {
-  // initiatePayment(userId:mongoose.Types.ObjectId,shippingAddress:ShippingAddressDTO,items:IProductDetails[],currency:string): Promise<any>;
-    verifyPayment(paymentIntentsId: string,): Promise<boolean>;
-  }
-  
+  /**
+   * Creates a payment intent for the given amount and currency.
+   * @param amount - Total amount to be paid.
+   * @param currency - Currency code (e.g., "usd", "aed").
+   * @returns Promise containing clientSecret and paymentIntentId.
+   */
+  createPaymentIntent(amount: number, currency: string): Promise<{ clientSecret: string; paymentIntentId: string }>;
+
+  /**
+   * Verifies if a payment was successful.
+   * @param paymentIntentsId - The ID of the payment intent.
+   * @returns Promise<boolean> indicating success or failure.
+   */
+  verifyPayment(paymentIntentsId: string): Promise<{success:boolean,message:string}>;
+}

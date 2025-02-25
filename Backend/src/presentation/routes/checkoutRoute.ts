@@ -8,7 +8,7 @@ import { ProductRepository } from "../../infrastructure/repositories/productRepo
 import { ProductModel } from "../../infrastructure/model/producModel";
 import { CheckoutRepository } from "../../infrastructure/repositories/checkoutRepository";
 import { StripePaymentGateway } from "../../infrastructure/paymentGateways/StripeGateway";
-import { TabbyPaymentGateway } from "../../infrastructure/paymentGateways/TabbytPaymentGateway";
+import {TabbyPaymentService} from "../../infrastructure/paymentGateways/TabbytPaymentGateway";
 import { TamaraPaymentGateway } from "../../infrastructure/paymentGateways/TamaraGateway";
 
 
@@ -16,7 +16,7 @@ const checkoutRepo = new CheckoutRepository(CheckoutModel);
 const cartRepo = new CartRepository(CartModel);
 const productRepo = new ProductRepository(ProductModel); 
 const stripePayment=new StripePaymentGateway()
-const tabbyPayment=new TabbyPaymentGateway()
+const tabbyPayment=new TabbyPaymentService()
 const tamarPayment=new TamaraPaymentGateway()
 const checkoutInteractor = new CheckoutInteractor(cartRepo, checkoutRepo, productRepo,stripePayment,tabbyPayment); 
 const checkoutController = new CheckoutController(checkoutInteractor);

@@ -53,6 +53,7 @@ export interface CreateOrderDTO {
   export interface OrderDTO {
     _id: mongoose.Types.ObjectId;
     user: mongoose.Types.ObjectId;
+    orderId:string;
     items: ICheckoutItem[];
     paymentMethod: 'COD' | 'Tamara' | 'Stripe' | 'Tabby';
     transactionId: string;

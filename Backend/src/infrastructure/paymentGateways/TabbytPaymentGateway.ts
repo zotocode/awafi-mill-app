@@ -1,24 +1,11 @@
-import Razorpay from 'razorpay';
-import envConfig from "../../config/env"; // Make sure to have your keys in envConfig
-import { IPaymentGateway } from './IPaymentGateway';
-import { ShippingAddressDTO } from '../../domain/dtos/CheckoutDTO';
-export class  TabbyPaymentGateway implements IPaymentGateway {
-    // private stripe: Stripe;
+import { IPaymentGateway } from "./IPaymentGateway";
 
-    constructor() {
-        // this.stripe = new Stripe(envConfig.STRIPE_SECRET_KEY as string);
-    }
+export class TabbyPaymentService implements IPaymentGateway {
+  async createPaymentIntent(amount: number, currency: string) {
+    return { clientSecret: "tabby-secret-key", paymentIntentId: "tabby_12345" };
+  }
 
-    async verifyPayment(clientSecret: string): Promise<boolean> {
-        try {
-            // const { paymentIntent } = await this.stripe.retrievePaymentIntent(clientSecret);
-            // if (paymentIntent && paymentIntent.status === 'succeeded') {
-            //     return true;
-            // }
-        } catch (error) {
-            console.error('Error verifying payment:', error);
-        }
-        return false;
-    }
-
+  async verifyPayment(paymentIntentId: string): Promise<{ success: boolean; message: string }> {
+    return {success:true,message:"sdf"}; // Placeholder, implement real Tabby verification
+  }
 }
