@@ -4,7 +4,7 @@ import { logout } from "../state/adminSlice";
 
 export const useApi = (): AxiosInstance => {
   const axiosInstance: AxiosInstance = axios.create({
-    baseURL:  "https://testfro.adilc0070.site",
+    baseURL:  "http://app.awafimill.com/",
     withCredentials: true,  
   });
 
