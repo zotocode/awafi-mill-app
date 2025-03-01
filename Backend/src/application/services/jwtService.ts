@@ -11,11 +11,10 @@ export type jwtOutput = {
 export class JWT implements Ijwt {
   constructor() {}
 
-  generateToken(payload: object, expiresIn: string | number,secretKey:string): string {
-    return jwt.sign(payload, secretKey, {
-      expiresIn,
-    });
-  }
+ generateToken(payload: string | object | Buffer, expiresIn: string | number, secretKey: string): string {
+  return jwt.sign(payload, secretKey, { expiresIn });
+}
+
 
 
   verifyToken(token: string,secretKey:string): any {
