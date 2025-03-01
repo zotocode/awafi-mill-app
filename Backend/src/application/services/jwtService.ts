@@ -1,7 +1,6 @@
 import { JwtPayload } from "jsonwebtoken";
 import { Ijwt } from "../../interface/serviceInterface/IjwtInterface";
 import jwt from "jsonwebtoken";
-import tokens from "razorpay/dist/types/tokens";
 
 export type jwtOutput = {
   payload: JwtPayload | null;
@@ -11,13 +10,11 @@ export type jwtOutput = {
 export class JWT implements Ijwt {
   constructor() {}
 
- generateToken(payload: string | object | Buffer, expiresIn: string | number, secretKey: string): string {
-  return jwt.sign(payload, secretKey, { expiresIn });
-}
+  generateToken(payload: string | object | Buffer, expiresIn: string | number, secretKey: string): string {
+    return jwt.sign(payload, secretKey, { expiresIn });
+  }
 
-
-
-  verifyToken(token: string,secretKey:string): any {
+  verifyToken(token: string, secretKey: string): jwtOutput {
     try {
       const decoded = jwt.verify(token, secretKey) as JwtPayload;
       return {
@@ -31,6 +28,4 @@ export class JWT implements Ijwt {
       };
     }
   }
-
-
 }
