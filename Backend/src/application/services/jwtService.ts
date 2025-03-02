@@ -11,11 +11,13 @@ export class JWT implements Ijwt {
   constructor() {}
 
   generateToken(payload: string | object | Buffer, expiresIn: string | number, secretKey: string): string {
+    // @ts-ignore
     return jwt.sign(payload, secretKey, { expiresIn });
   }
 
   verifyToken(token: string, secretKey: string): jwtOutput {
     try {
+      // @ts-ignore
       const decoded = jwt.verify(token, secretKey) as JwtPayload;
       return {
         payload: decoded,
